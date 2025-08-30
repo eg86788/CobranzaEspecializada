@@ -6,6 +6,8 @@ from app.extensions import db
 from .config import Config
 from .db_legacy import fetchall  # si lo usas en otros módulos, se queda
 from .errors import register_error_handlers
+from flask import Flask, redirect, url_for, session
+
 
 
 def create_app():
@@ -103,6 +105,22 @@ def create_app():
                 # No detenemos el arranque si falla (p.ej. usando Postgres con tablas ya creadas)
                 pass
 
+    # === RUTA RAÍZ SIN NUEVO BLUEPRINT ===
+    def _root_index():
+        user_id = session.get("user_id")
+        role = session.get("role")  # "admin" o "user"
+        if user_id:
+            if role == "admin":
+                # ⬇️ Cambia el endpoint por el real de tu panel admin
+                return redirect(url_for("admin_portal.dashboard"))
+            else:
+                # ⬇️ Cambia por el endpoint real de tu “inicio productos”
+                return redirect(url_for("inicio_productos.index"))
+        # ⬇️ Cambia por el endpoint real de tu login (hoy está en /admin/login)
+        return redirect(url_for("admin.login"))
+
+    app.add_url_rule("/", "root_index", _root_index)
+    
     register_error_handlers(app)
 
     return app

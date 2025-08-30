@@ -1,7 +1,7 @@
 # app/blueprints/catalogos.py
 # ABM de catálogos simples (CPAE, ETV, Estados, Municipios) con una estructura configurable.
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..db_legacy import fetchall, fetchone, execute
 
 catalogos_bp = Blueprint("catalogos", __name__)
@@ -13,6 +13,12 @@ CATALOGOS = {
     "municipios": {"tabla": "catalogo_municipios", "campo": "nombre"},
 }
 
+def guard():
+    # Guard simple sin importar auth_admin (evita ciclos)
+    if session.get("role") != "admin":
+        flash("Debes iniciar sesión de administrador.", "warning")
+        return redirect(url_for("auth_admin.login", next=request.path))
+    
 @catalogos_bp.route("/admin/catalogos", methods=["GET"])
 def ver_catalogos():
     return render_template("catalogos.html", catalogos=CATALOGOS.keys())
