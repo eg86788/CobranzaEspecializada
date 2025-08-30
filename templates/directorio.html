@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Directorio - Servicios de Cobranza Especializada{% endblock %}
+
+{% block content %}
+<style>
+  .persona-box {
+    background-color: #ffffff;
+    border-left: 6px solid #003746;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .persona-box.lider {
+    border-color: #FF1B44;
+    background-color: #fdf4f6;
+  }
+  .persona-box .persona {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .persona-box .persona img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+    border: 2px solid #ccc;
+  }
+  .persona-box .persona .info h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #003746;
+  }
+  .persona-box .persona .info small {
+    display: block;
+    color: #555;
+  }
+  .title-main {
+    font-size: 1.6rem;
+    color: #003746;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  .persona-group {
+    margin-left: 2rem;
+    border-left: 2px dashed #ccc;
+    padding-left: 1rem;
+  }
+</style>
+
+<div class="container">
+  <div class="title-main">Directorio de Cobranza Especializada</div>
+
+  <!-- Coordinadora principal -->
+  <div class="persona-box lider">
+    <div class="persona">
+      <img src="{{ url_for('static', filename='images/dafne.jpg') }}" alt="Dafne Jimenez">
+      <div class="info">
+        <h5>Dafne Jimenez</h5>
+        <small>Coordinación de Cobranza</small>
+        <small>dafne.jimenez@empresa.com</small>
+        <small>CDMX</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subordinados directos -->
+  <div class="persona-box">
+    <div class="persona">
+      <img src="{{ url_for('static', filename='images/edgar.jpg') }}" alt="Edgar Garcia">
+      <div class="info">
+        <h5>Edgar Garcia</h5>
+        <small>Servicios de Efectivo, DEB y PEMEX Gas/Línea</small>
+        <small>edgar.garcia@empresa.com</small>
+        <small>CDMX</small>
+      </div>
+    </div>
+    <div class="persona-group">
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/luisalonso.jpg') }}" alt="Luis Alonso Garcia">
+        <div class="info">
+          <h5>Luis Alonso Garcia</h5>
+          <small>Soporte Operativo</small>
+          <small>luis.alonso@empresa.com</small>
+          <small>Estado de México</small>
+        </div>
+      </div>
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/davidlazaro.jpg') }}" alt="David Lazaro">
+        <div class="info">
+          <h5>David Lazaro Sanchez</h5>
+          <small>Soporte Operativo</small>
+          <small>david.lazaro@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="persona-box">
+    <div class="persona">
+      <img src="{{ url_for('static', filename='images/luisramirez.jpg') }}" alt="Luis Ramirez Roldan">
+      <div class="info">
+        <h5>Luis Ramirez Roldan</h5>
+        <small>Domiciliación</small>
+        <small>luis.ramirez@empresa.com</small>
+        <small>CDMX</small>
+      </div>
+    </div>
+    <div class="persona-group">
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/davidhernandez.jpg') }}" alt="David Hernandez">
+        <div class="info">
+          <h5>David Hernandez Ayala</h5>
+          <small>Soporte</small>
+          <small>david.hernandez@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/karla.jpg') }}" alt="Karla Nava">
+        <div class="info">
+          <h5>Karla Nava</h5>
+          <small>Soporte</small>
+          <small>karla.nava@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/fatima.jpg') }}" alt="Fatima Lerin">
+        <div class="info">
+          <h5>Fatima Lerin</h5>
+          <small>Soporte</small>
+          <small>fatima.lerin@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="persona-box">
+    <div class="persona">
+      <img src="{{ url_for('static', filename='images/antonio.jpg') }}" alt="Antonio Varela">
+      <div class="info">
+        <h5>Antonio Varela</h5>
+        <small>Concentración de Fondos y Cobranza Universal</small>
+        <small>antonio.varela@empresa.com</small>
+        <small>CDMX</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="persona-box">
+    <div class="persona">
+      <img src="{{ url_for('static', filename='images/eduardo.jpg') }}" alt="Eduardo Aguilar">
+      <div class="info">
+        <h5>Eduardo Aguilar</h5>
+        <small>Impuestos Aduanales, Federales y SUA-SIPARE</small>
+        <small>eduardo.aguilar@empresa.com</small>
+        <small>CDMX</small>
+      </div>
+    </div>
+    <div class="persona-group">
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/karina.jpg') }}" alt="Karina Segoviano">
+        <div class="info">
+          <h5>Karina Segoviano</h5>
+          <small>Soporte</small>
+          <small>karina.segoviano@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/edgarramirez.jpg') }}" alt="Edgar Ramirez">
+        <div class="info">
+          <h5>Edgar Ramirez</h5>
+          <small>Soporte</small>
+          <small>edgar.ramirez@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/cesar.jpg') }}" alt="Cesar Baños">
+        <div class="info">
+          <h5>Cesar Baños</h5>
+          <small>Soporte</small>
+          <small>cesar.banos@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="persona-box">
+    <div class="persona">
+      <img src="{{ url_for('static', filename='images/villavicencio.jpg') }}" alt="Luis Villavicencio">
+      <div class="info">
+        <h5>Luis Villavicencio</h5>
+        <small>Servicio Electrónico de Pagos</small>
+        <small>luis.villavicencio@empresa.com</small>
+        <small>CDMX</small>
+      </div>
+    </div>
+    <div class="persona-group">
+      <div class="persona">
+        <img src="{{ url_for('static', filename='images/fernanda.jpg') }}" alt="Fernanda Ordaz">
+        <div class="info">
+          <h5>Fernanda Ordaz</h5>
+          <small>Soporte</small>
+          <small>fernanda.ordaz@empresa.com</small>
+          <small>CDMX</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

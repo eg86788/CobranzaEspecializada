@@ -1,0 +1,18 @@
+# CobranzaEspecializada
+
+Aplicación Flask para gestión de solicitudes SEF, plantillas, minutas y panel de administración.
+
+## Requisitos
+- Python 3.11
+- PostgreSQL
+- WeasyPrint
+
+## Instalación rápida
+
+```bash
+python -m venv .venv
+source .venv/bin/activate      # en macOS / Linux
+pip install -r requirements.txt
+cp .env.example .env           # crea tu .env real y ajusta valores
+python run.py
+

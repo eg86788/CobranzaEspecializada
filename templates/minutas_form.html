@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar minuta' if minuta else 'Nueva minuta' }}{% endblock %}
+{% block content %}
+<h3>{{ 'Editar minuta' if minuta else 'Nueva minuta' }}</h3>
+
+<form method="post" class="card card-body">
+  <div class="row g-3">
+    <div class="col-md-3">
+      <label class="form-label">Fecha de reunión</label>
+      <input type="date" name="fecha_reunion" class="form-control"
+             value="{{ (minuta.fecha_reunion if minuta else hoy) }}" required>
+    </div>
+    <div class="col-md-9">
+      <label class="form-label">Asunto</label>
+      <input type="text" name="asunto" class="form-control"
+             value="{{ (minuta.asunto if minuta else '') }}" required placeholder="Tema principal de la reunión">
+    </div>
+  </div>
+
+  <hr>
+
+  <h5>Asistentes</h5>
+  <div id="asistentes-list" class="mb-2"></div>
+  <button type="button" class="btn btn-sm btn-outline-primary" id="add-asistente">+ Agregar asistente</button>
+
+  <hr>
+
+  <div class="mb-3">
+    <label class="form-label">Notas de la reunión</label>
+    <textarea name="notas" class="form-control" rows="5" placeholder="Puntos discutidos, antecedentes, etc.">{{ (minuta.notas if minuta else '')|safe }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Acuerdos</label>
+    <textarea name="acuerdos" class="form-control" rows="5" placeholder="Conclusiones o acuerdos generales.">{{ (minuta.acuerdos if minuta else '')|safe }}</textarea>
+  </div>
+
+  <hr>
+
+  <h5>Compromisos</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle mb-2" id="tbl-compromisos" style="font-size: .95rem;">
+      <thead class="table-light">
+        <tr>
+          <th style="width:45%;">Descripción</th>
+          <th style="width:22%;">Responsable</th>
+          <th style="width:18%;">ETA</th>
+          <th style="width:15%;">Estatus</th>
+          <th style="width:5%;"></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <button type="button" class="btn btn-sm btn-outline-primary" id="add-compromiso">+ Agregar compromiso</button>
+
+  <div class="d-flex gap-2 mt-4">
+    <a href="{{ url_for('minutas.lista') }}" class="btn btn-outline-secondary">Cancelar</a>
+    <button class="btn btn-success">Guardar</button>
+  </div>
+</form>
+
+<script>
+(function() {
+  // --- Asistentes dinámicos ---
+  const contAsist = document.getElementById('asistentes-list');
+  const btnAddAsist = document.getElementById('add-asistente');
+
+  function asistenteRow(nombre = '', cargo = '') {
+    const div = document.createElement('div');
+    div.className = 'row g-2 align-items-end mb-2';
+    div.innerHTML = `
+      <div class="col-md-6">
+        <label class="form-label">Nombre</label>
+        <input type="text" name="asistentes_nombre[]" class="form-control" value="${nombre}">
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Cargo / Rol</label>
+        <input type="text" name="asistentes_cargo[]" class="form-control" value="${cargo}">
+      </div>
+      <div class="col-md-1">
+        <button type="button" class="btn btn-outline-danger w-100 remove-asistente">✕</button>
+      </div>
+    `;
+    div.querySelector('.remove-asistente').addEventListener('click', () => div.remove());
+    return div;
+  }
+
+  btnAddAsist.addEventListener('click', () => contAsist.appendChild(asistenteRow()));
+
+  // Prefill asistentes (si edita) o fila vacía (si nuevo)
+  const asistentesData = {{ asistentes|tojson|safe }};
+  if (asistentesData.length) {
+    asistentesData.forEach(a => contAsist.appendChild(asistenteRow(a.nombre || '', a.cargo || '')));
+  } else {
+    contAsist.appendChild(asistenteRow());
+  }
+
+  // --- Compromisos dinámicos ---
+  const tbl = document.querySelector('#tbl-compromisos tbody');
+  const btnAddComp = document.getElementById('add-compromiso');
+
+  function compRow(desc = '', resp = '', eta = '', status = 'PENDIENTE') {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" name="comp_desc[]" class="form-control" value="${desc}"></td>
+      <td><input type="text" name="comp_resp[]" class="form-control" value="${resp}"></td>
+      <td><input type="date" name="comp_eta[]" class="form-control" value="${eta}"></td>
+      <td>
+        <select name="comp_status[]" class="form-select">
+          <option value="PENDIENTE" ${status==='PENDIENTE'?'selected':''}>PENDIENTE</option>
+          <option value="EN PROCESO" ${status==='EN PROCESO'?'selected':''}>EN PROCESO</option>
+          <option value="CERRADO" ${status==='CERRADO'?'selected':''}>CERRADO</option>
+        </select>
+      </td>
+      <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm remove-comp">✕</button></td>
+    `;
+    tr.querySelector('.remove-comp').addEventListener('click', () => tr.remove());
+    return tr;
+  }
+
+  btnAddComp.addEventListener('click', () => tbl.appendChild(compRow()));
+
+  // Prefill compromisos
+  const compromisosData = {{ compromisos|tojson|safe }};
+  if (compromisosData.length) {
+    compromisosData.forEach(c => tbl.appendChild(compRow(c.descripcion||'', c.responsable||'', (c.eta||'').substring(0,10), c.estatus||'PENDIENTE')));
+  } else {
+    tbl.appendChild(compRow());
+  }
+})();
+</script>
+{% endblock %}

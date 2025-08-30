@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Editar Directorio{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-4">Editar o Agregar Miembro al Directorio</h3>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label>Nombre completo</label>
+      <input type="text" name="nombre" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label>Correo</label>
+      <input type="email" name="correo" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label>Ubicación</label>
+      <input type="text" name="ubicacion" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label>Puesto</label>
+      <input type="text" name="puesto" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label>Productos / Servicios</label>
+      <input type="text" name="productos" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label>Foto</label>
+      <input type="file" name="foto" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label>Superior jerárquico</label>
+      <select name="superior_id" class="form-select">
+        <option value="">-- Sin superior --</option>
+        {% for persona in personas %}
+        <option value="{{ persona.id }}">{{ persona.nombre_completo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+</div>
+{% endblock %}

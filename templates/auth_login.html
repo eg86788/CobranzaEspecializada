@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow border-0" style="width: 100%; max-width: 420px; border-radius: 12px;">
+    <div class="card-body p-4">
+      <div class="text-center mb-4">
+        <img src="{{ url_for('static', filename='img/banamex_neg.png') }}" alt="Logo" style="height: 40px;" class="mb-2">
+        <h1 class="h5 mb-0 text-primary">ACCESO AL SISTEMA</h1>
+        <small class="text-muted">Aquí. Para ti. Siempre</small>
+      </div>
+
+      {# Flash messages #}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show small py-2 px-3" role="alert">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth_admin.login') }}">
+        <div class="mb-3">
+          <label for="username" class="form-label">Usuario</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              placeholder="Tu usuario"
+              required
+              autofocus
+            >
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="••••••••"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-primary">Ingresar al sistema</button>
+        </div>
+      </form>
+
+      <div class="text-center mt-3">
+        <small class="text-muted">¿Tienes dudas? Contacta al administrador.</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

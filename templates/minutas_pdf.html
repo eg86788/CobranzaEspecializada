@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Minuta #{{ minuta.id }}</title>
+<style>
+  @page { size: A4 portrait; margin: 1.2cm; }
+  body { font-family: Arial, sans-serif; font-size: 12px; color: #111; }
+  h1,h2,h3 { margin: 0 0 8px 0; }
+  .muted { color: #666; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  th, td { border: 1px solid #000; padding: 6px 8px; vertical-align: top; }
+  thead tr { background: #eee; }
+  .section { margin-bottom: 16px; }
+</style>
+</head>
+<body>
+  <h2>Minuta de reunión</h2>
+  <div class="section">
+    <table>
+      <tbody>
+        <tr>
+          <th style="width: 25%;">ID</th>
+          <td>#{{ minuta.id }}</td>
+        </tr>
+        <tr>
+          <th>Fecha</th>
+          <td>{{ minuta.fecha_reunion }}</td>
+        </tr>
+        <tr>
+          <th>Asunto</th>
+          <td>{{ minuta.asunto }}</td>
+        </tr>
+        <tr>
+          <th>Creada</th>
+          <td>{{ minuta.created_at.strftime('%Y-%m-%d %H:%M') if minuta.created_at else '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Asistentes</h3>
+  <table>
+    <thead><tr><th>Nombre</th><th>Cargo / Rol</th></tr></thead>
+    <tbody>
+      {% for a in asistentes %}
+      <tr><td>{{ a.nombre }}</td><td>{{ a.cargo or '-' }}</td></tr>
+      {% else %}
+      <tr><td colspan="2" class="muted">Sin asistentes</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>Notas</h3>
+  <div class="section">
+    {{ (minuta.notas or '-')|safe }}
+  </div>
+
+  <h3>Acuerdos</h3>
+  <div class="section">
+    {{ (minuta.acuerdos or '-')|safe }}
+  </div>
+
+  <h3>Compromisos</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Descripción</th><th>Responsable</th><th>ETA</th><th>Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in compromisos %}
+      <tr>
+        <td>{{ c.descripcion }}</td>
+        <td>{{ c.responsable }}</td>
+        <td>{{ c.eta or '-' }}</td>
+        <td>{{ c.estatus }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="muted">Sin compromisos</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

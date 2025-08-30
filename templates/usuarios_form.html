@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Nuevo usuario' if modo == 'crear' else 'Editar usuario' }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h1 class="h5">{{ 'Nuevo usuario' if modo == 'crear' else 'Editar usuario' }}</h1>
+        <form method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Usuario</label>
+              <input type="text" name="username" id="username" class="form-control"
+                     required value="{{ user.username if user else '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nombre Completo</label>
+              <input type="text" name="fullname" id="fullname" class="form-control"
+                     required value="{{ user.fullname if user else '' }}">
+            </div>
+
+
+            <div class="col-md-6">
+              <label class="form-label">Rol</label>
+              <select name="role" class="form-select">
+                {% for r in roles %}
+                  <option value="{{ r }}" {% if user and user.role == r %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            {% if modo == 'crear' %}
+              <div class="col-md-6">
+                <label class="form-label">Contraseña</label>
+                <input type="password" name="password" id="password" class="form-control no-uppercase"
+                       minlength="8" autocomplete="new-password" required>
+                <div class="form-text">Mínimo 8 caracteres.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Confirmar contraseña</label>
+                <input type="password" name="password2" id="password2" class="form-control no-uppercase"
+                       minlength="8" autocomplete="new-password" required>
+              </div>
+            {% else %}
+              <div class="col-md-6">
+                <label class="form-label">Nueva contraseña</label>
+                <input type="password" name="password" id="password" class="form-control no-uppercase"
+                       minlength="8" autocomplete="new-password" placeholder="(opcional)">
+                <div class="form-text">Déjala en blanco para no cambiarla.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Confirmar nueva contraseña</label>
+                <input type="password" name="password2" id="password2" class="form-control no-uppercase"
+                       minlength="8" autocomplete="new-password" placeholder="(opcional)">
+              </div>
+            {% endif %}
+
+            <div class="col-md-6">
+              <label class="form-label">Estado</label>
+              <select name="is_active" class="form-select">
+                <option value="1" {% if not user or (user and user.is_active) %}selected{% endif %}>Activo</option>
+                <option value="0" {% if user and not user.is_active %}selected{% endif %}>Inactivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{{ url_for('users_admin.listar_usuarios') }}" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check2-circle me-1"></i> Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="text-uppercase text-muted mb-2">Ayuda</h6>
+        <p class="small mb-2">• <strong>Usuario</strong> es obligatorio y debe ser único.</p>
+        <p class="small mb-2">• El <strong>rol</strong> controla lo que puede hacer (admin/user).</p>
+        <p class="small mb-2">• <strong>Contraseña</strong> mínima 8 caracteres. Al editar, es opcional.</p>
+        <p class="small">• El estado <em>inactivo</em> bloquea el acceso sin eliminar al usuario.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

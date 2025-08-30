@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Contrato Servicios de Efectivo Tradicional</title>
+ 
+    <style>
+      @page {
+        size: A4 portrait;
+        margin: 1cm 1cm 1cm 1cm;
+        @top-center {
+          content: element(header);
+        }
+        @bottom-right {
+          content: "Página " counter(page) " de " counter(pages);
+          font-family: 'Arial Narrow', Arial, sans-serif;
+          font-size: 10px;
+          color: #666;
+        }
+      }
+    
+      #header {
+        position: running(header);
+        width: 100%;
+      }
+    
+      .header-inner {
+        margin: 0 auto;
+        width: calc(100% - 4cm); /* 2 cm de margen izquierdo y derecho */
+        box-sizing: border-box;
+      }
+    
+      .header-content {
+        background-color: #003746;
+        color: white;
+        width: 100%;
+        padding: 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 50px;
+      }
+    
+      .header-content img {
+        height: 36px;
+        width: auto;
+        max-height: 36px;
+      }
+    
+      .header-content h1 {
+        line-height: 1.2;
+        font-size: 14px;
+        margin: 0;
+      }
+    
+      body {
+        font-family: 'Arial Narrow', Arial, sans-serif;
+        font-size: 11px;
+        color: #000000;
+      }
+    
+      p, h2, h3, h4, th, td {
+        color: #000000;
+        font-family: 'Arial Narrow', Arial, sans-serif;
+        font-size: 11px;
+      }
+
+      h1 {
+        color: #ffffff;
+        font-family: 'Arial Narrow', Arial, sans-serif;
+        font-size: 18px;
+      }
+    
+      hr {
+        border: none;
+        height: 2px;
+        background-color: #003746;
+      }
+    
+      ul {
+        padding-left: 20px;
+      }
+    
+      p {
+        text-align: justify;
+      }
+    </style>
+  
+  
+
+</head>
+<body>
+  <!-- Contenedor general del encabezado -->
+    <div style="display: flex; align-items: center;">
+      <!-- Logo con fondo blanco -->
+      <div style="background-color: white; padding: 5px;">
+        <img src="file:/Users/edgargarcia/Documents/CobranzaSEF/static/banamex_neg.png" alt="Logo Banamex" style="height: 60px;">
+      </div>
+
+      <!-- Fondo azul ocupa todo el ancho restante -->
+      <div style="background-color: #003746; color: white; padding: 10px 20px; flex: 1;">
+        <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">Contrato de Servicios de Efectivo</h1>
+        <p style="margin: 0; font-size: 12px; color: white;">Cascarón 8</p>
+      </div>
+    </div>
+    
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Contrato Servicios de Efectivo Tradicional</title>
+ 
+      </head>
+    <body>
+          <P>CONTRATO DE PRESTACIÓN DE SERVICIOS DE EFECTIVO QUE EN LOS TÉRMINOS DE LAS DECLARACIONES Y LAS CLÁUSULAS QUE APARECEN A CONTINUACIÓN, CELEBRAN POR UNA PARTE <strong>BANCO NACIONAL DE MÉXICO, S.A., INTEGRANTE DEL GRUPO FINANCIERO BANAMEX</strong>, A QUIEN EN LO SUCESIVO SE DENOMINARÁ COMO EL "BANCO" O "BANAMEX" Y, POR LA OTRA PARTE <strong>{{frame1.razon_social}}</strong>, REPRESENTADA POR <strong>{{firmantes.apoderado_legal}}</strong>, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO EL "CLIENTE". </P>
+          <h2 style="text-align: center; font-size: 14px;">DECLARACIONES</h2>
+      <p><strong>I. DECLARA EL CLIENTE:</strong></p>
+      <p>A) Que sus datos generales, así como las facultades de sus representantes, están contenidos en la información que ha proporcionado al Banco, la cual se encuentra en el expediente del Cliente no. <strong>{{frame1.numero_cliente}}</strong>.</p>
+      <p>B) Que siendo una Persona Moral o Persona Física con Actividad Empresarial reconocida y regulada legalmente, se encuentra debidamente constituida y existente de conformidad con las leyes del país en el que está constituida, tal y como lo acredita el documento emitido por fedatario público u órgano facultado, cuya copia se encuentra en poder del Banco.</p>
+      <p>C) Que siendo una entidad jurídica reconocida y regulada por las leyes, su(s) Apoderados Legales se cuentan con las facultades suficientes y necesarias para obligarle en términos de este Contrato, de conformidad con el(los) documento(s) emitido(s) por fedatario público u órgano facultado cuya(s) copia(s) obra(n) en poder del Banco, y que dichas facultades no le(s) ha(n) sido limitadas, revocadas ni modificadas en forma alguna a la fecha de ejecución del presente y de los documentos del que éste forma parte.</p>
+      <p>D) Que tiene celebrado con el Banco Contrato(s) de Depósito a la vista o de cuenta corriente con la finalidad de establecer la(s) cuenta(s) en las que el Banco podrá realizar los cargos y/o abonos automáticos, las cuales se identifican en el Anexo Operativo, derivados de los servicios objeto del presente, y conforme a los conceptos indicados en el Anexo Operativo.</p>
+      <p>E) Que de acuerdo a sus necesidades operativas, requiere que el Banco le preste el (los) servicio(s) identificado(s) en el presente Contrato, conforme a los términos y condiciones aquí contenidos.</p>
+      
+      <p><strong>II. DECLARA EL BANCO:</strong></p>
+      <p>A) Que es una Sociedad Anónima integrante del Grupo Financiero Banamex constituida de conformidad con las Leyes de los Estados Unidos Mexicanos, plenamente facultada para celebrar el presente, según Decreto Publicado en el Diario Oficial de la Federación del 16 de agosto de 1991, inscrito en el Registro Público de Comercio del Distrito Federal en el Folio Mercantil 65,126 el 9 de septiembre de 1991.</p>
+      <p>B) Que se encuentra debidamente facultada para la prestación de los servicios a que se refiere este Contrato.</p>
+      <p>C) Que cuenta con una amplia red de sucursales en los Estados Unidos Mexicanos, y cuenta con la infraestructura tecnológica, así como la capacidad técnica, personal y controles operativos suficientes para prestar los servicios pactados en este Contrato.</p>
+      <p>D) En virtud de las anteriores Declaraciones convienen en someterse en los términos de las siguientes:</p>
+      
+      <h2 style="text-align: center; font-size: 14px;">CLÁUSULAS</h2>
+      <p><strong>PRIMERA. Servicios.</strong></p>
+      <p>El Banco conviene en prestarle al Cliente los servicios denominados “Servicios de Efectivo”, los cuales se mencionan en la presente cláusula, para cuya aceptación en cada caso, el Cliente conviene y establece aquel(los) que será(n) aplicable(s) mediante la selección en el recuadro correspondiente.</p>
+      <p>Cada uno de los servicios que integren el objeto del presente Contrato, se describen en las cláusulas correspondientes; así como, en el Anexo Operativo, el cual forma parte integrante de este Contrato.</p>
+
+      <table style="width:100%; border-collapse: collapse; margin-top: 15px;">
+        <thead>
+            <th style="border: 1px solid #000; padding: 5px; text-align: left;">SERVICIO</th>
+            <th style="border: 1px solid #000; padding: 5px; text-align: center;">MARCA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #000; padding: 5px;">DEPÓSITO</td>
+            <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+              X
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000; padding: 5px;">DOTACIÓN</td>
+            <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>SEGUNDA. Definiciones.</strong></p>
+
+      <p>Salvo que se indique lo contrario en el presente Contrato, las Partes están de acuerdo que los términos establecidos a continuación, tendrán los significados que se indican, los cuales podrán ser utilizados en singular o plural indistintamente:</p>
+
+      <p><strong>1. Archivo, imagen o mensaje de datos</strong><br>
+      Significa la información generada, archivada o transmitida por medios electrónicos, ópticos o de cualquier otra tecnología relacionada con el objeto del presente documento.</p>
+      
+      <p><strong>2. Bolsa o envase</strong><br>
+      Es el envase de alta seguridad que contiene los diferentes tipos de valores como billetes, monedas y/o documentos en Moneda Nacional; cerradas con un sello de plomo / plástico aprobado por el Banco o segurisello, que se emplea para la movilización del efectivo, los cuales deberán estar ordenados por denominación o en pequeños paquetes sin separación para ser recibidos en el CPAE para abono en cuenta del Cliente.<br>
+      * La recepción de bolsa segurisello será total y completa responsabilidad del Cliente, quedando el Banco sin responsabilidad alguna en caso de presentarse una diferencia o alguna desviación al procedimiento.</p>
+      
+      <p><strong>3. Certificado digital</strong><br>
+      Significa el registro electrónico generado por el Banco o un tercero autorizado respecto a la identidad del Cliente, el cual evidencia el registro de sus claves públicas. Dicho certificado contiene como mínimo: (i) el nombre del Cliente, (ii) un número de serie asignado, (iii) fecha de vencimiento y (iv) la llave pública del Cliente. El Cliente podrá utilizar el Certificado Digital para transmitir mensajes de datos firmando con su clave privada, de conformidad con lo establecido en la legislación aplicable.</p>
+      
+      <p><strong>4. Clave de acceso / password</strong><br>
+      Significan las claves con caracteres alfanuméricos para que el Cliente, representante y/o Usuario, tengan acceso al servicio que se hace referencia en el presente Contrato.</p>
+      
+      <p><strong>5. Cliente</strong><br>
+      Persona Física con Actividad Empresarial o Persona Moral que contrata los Servicios de Efectivo Electrónico del Banco.</p>
+      
+      <p><strong>6. Comprobante de servicio</strong><br>
+      Es el comprobante emitido por la Empresa de Traslado de Valores, en el cual el Cliente indica el importe del Depósito trasladado y el cual acompaña la(s) bolsa(s) o envase(s) y/o caseteros.</p>     
+    
+      <p><strong>7. Contacto</strong><br>
+      Es la persona asignada por el Cliente para atender cualquier situación que surja durante la prestación de los servicios.</p>
+      
+      <p><strong>8. CPAE</strong><br>
+      Centro de Proceso y Administración de Efectivo.</p>
+      
+      <p><strong>9. Cuenta</strong><br>
+      Significa la cuenta bancaria propia del Cliente o que pertenece al mismo Grupo Económico aperturada por el Banco y designada por el Cliente para recibir los cargos y/o abonos en Territorio Nacional de las operaciones en general objeto del presente.</p>
+      
+      <p><strong>10. Cuenta Eje / de comisiones</strong><br>
+      Significa la cuenta de cheques, designada por el Cliente para que el Banco realice los cargos de las comisiones que se deriven por la prestación del servicio indicado en este Contrato. La cuenta será en Moneda Nacional e incorporada como propia al número de Cliente que tenga contratado este servicio.</p>
+      
+      <p><strong>11. Depósito Global billete y/o moneda</strong><br>
+      Recepción y recuento de efectivo de billetes ordenados por denominación en fajillas y un máximo de 150 monedas de diferentes denominaciones en Moneda Nacional.</p>
+      
+      <p><strong>12. Depósito Parcial billete y/o moneda</strong><br>
+      Recepción y recuento de efectivo billete y moneda, en Moneda Nacional en pequeños paquetes de billetes, sin separación por denominación, los cuales se encuentran encapsulados en bolsas de plásticos, ligas o cintas de papel.</p>
+      
+      <p><strong>13. Depósito de documentos (cheques)</strong><br>
+      Recepción, validación y abono de cheques BANAMEX o de otros Bancos, para abono en cuentas en Moneda Nacional.</p>
+      
+      <p><strong>14. Día hábil bancario</strong><br>
+      Es cualquier día de la semana que las instituciones de crédito de la localidad en donde se otorgan los servicios realizan operaciones bancarias, de conformidad a lo estipulado por la Comisión Nacional Bancaria y de Valores, exceptuando los días sábado y domingo.</p>
+      
+      <p><strong>15. Diferencia</strong><br>
+      Faltante o sobrante entre la cantidad reportada por el Cliente en sus Fichas de Depósito y/o Comprobante de servicio y lo recibido físicamente por el Banco.</p>
+      
+      <p><strong>16. Documentos</strong><br>
+      Están formados por cheques BANAMEX o de otros Bancos para abono en cuentas en Moneda Nacional.</p>
+      
+      <p><strong>17. Dotación Preestablecida y/o 24 horas</strong><br>
+      Entrega de billetes y monedas necesarias para cubrir las denominaciones de la solicitud recibida en Moneda Nacional, preestablecida o solicitada con 24 horas de anticipación. En moneda extranjera (dólares americanos), únicamente billetes.</p>
+      
+      <p><strong>18. Dotación Urgente</strong><br>
+      Entrega de billetes y monedas necesarias para cubrir las denominaciones de la solicitud recibida en la plaza, en Moneda Nacional, programada con 90 minutos de anticipación. En moneda extranjera (dólares americanos), únicamente billetes.</p>
+      
+      <p><strong>19. Efectivo</strong><br>
+      Se refiere exclusivamente a los billetes y monedas acuñadas y de curso legal en México.</p>
+      
+      <p><strong>20. ETV</strong><br>
+      Empresa de Traslado de Valores, a través de la cual se realiza el traslado de efectivo entre el Cliente y el Banco.</p>
+      
+      <p><strong>21. Ficha de Depósito</strong><br>
+        Es el formato que llena el Cliente con las cantidades a depositar, la identificación del titular de la cuenta, el número de la misma, la (s) referencia (s) y que se envía dentro de la bolsa o envase para realizar el abono del efectivo y los documentos.</p>
+        
+      <p><strong>22. Grupo Económico</strong><br>
+      Significa grupo de Personas Morales que tengan acuerdos, de cualquier naturaleza, para tomar decisiones en un mismo sentido. Se presume, salvo prueba en contrario, que constituyen un Grupo Económico:</p>
+      <p>a. Las Sociedades o entidades legales que formen parte de un mismo Consorcio o Grupo Empresarial y la Persona Moral o conjunto de Personas Morales que tengan el control de dichas sociedades.</p>
+      <p>b. Sean un Grupo Empresarial, consideradas como el conjunto de Personas Morales organizadas bajo esquemas de participación directa o indirecta del Capital Social, en las que una misma Sociedad mantiene el control de dichas Personas Morales. Asimismo, se considerarán como Grupo Empresarial a los Grupos Financieros constituidos conforme a la Ley para Regular las Agrupaciones Financieras.</p>
+      
+      <p><strong>23. Horario de servicio</strong><br>
+      Significa el período en días hábiles durante el cual el Cliente podrá hacer uso del servicio el cual se encuentra definido en el Anexo Operativo, el cual podrá ser modificado en un futuro conforme lo determine el Banco en cualquier tiempo.</p>
+      
+      <p><strong>24. Material operativo</strong><br>
+      Aquel que está compuesto principalmente por: tenaza machihembradora, bolsas o envases, sellos de plomo o plástico, con los cuales el Cliente pueda realizar la preparación del envase del efectivo a trasladar.</p>
+      
+      <p><strong>25. Referencias</strong><br>
+      Son los números de control asociados con la cuenta, los cuales fueron otorgados al momento de aperturar la cuenta con dichas características, que servirán para la identificación de los abonos derivados de los servicios.</p>
+      
+      <p><strong>26. Sello de plomo / plástico</strong><br>
+      Instrumento de seguridad que se utiliza para el cerrado de la bolsa o envase el cual deberá ostentar un número visible y legible, que debe ser indicado en el Comprobante de servicio.</p>
+      
+      <p><strong>27. Servicios de Efectivo</strong><br>
+      Es el servicio de Depósito y Dotación en todas sus modalidades.</p>
+      
+      <p><strong>28. SEF Electrónico / Software</strong><br>
+      Medio electrónico a través del cual el Cliente podrá enviar sus solicitudes de Dotación para ser operadas por el Banco. El Software significa todos aquellos programas de cómputo en su forma de aplicaciones que forman parte de sistemas automatizados de procesamiento o comunicación, propiedad o bajo licencia o sub-licencia del Banco, los cuales permiten que el Cliente y el Banco envíen y reciban información relacionada con ciertos servicios bancarios en forma electrónica y/o remota; asimismo, ayuda a funcionar al hardware y a la computadora, esto incluye el sistema operativo, controladores de dispositivos, herramientas de diagnóstico, servidores, sistema de ventanas, utilidades, entre otros.</p>
+      
+      <p><strong>29. Subenvase</strong><br>
+      Bolsa interior que contiene el Depósito para ser abonado a un Cliente del mismo Grupo Económico, o para ser abonado a otro Cliente siempre y cuando éste también sea contratante del servicio; la cual será entregada dentro del mismo Envase, para proteger los valores durante su traslado.</p>
+      
+      <p><strong>30. Sucursal promotora</strong><br>
+      Es la sucursal en donde fue aperturada la cuenta de operación para el servicio, en la cual se podrá realizar la entrega de cheques devueltos.</p>
+      
+      <p><strong>31. Traslado de valores</strong><br>
+      Servicio de recolección de Dotaciones y concentraciones del Cliente, que incluye entre otros, cuota por viaje, cuota de riesgo y administración de traslado por cada unidad de negocio.</p>
+
+    <p><strong>TERCERA. Depósito de Efectivo</strong></p>
+
+    <p><strong>I. RECEPCIÓN DE BOLSAS / ENVASES PARA DEPÓSITO</strong><br>
+    El traslado de efectivo y/o documentos se hará por medio de la ETV indicada por el Cliente en el Anexo Operativo, sinedo a cargo exclusivo del Cliente dicha relación.</p>
+    
+    <p><strong>A.</strong>El Banco recibirá de la ETV, el efectivo y/o documentos en el domicilio indicado por el Banco, siempre y cuando cumpla con lo siguiente:</p>
+    
+    <p>a. El Cliente prepare el Depósito de acuerdo a las condiciones señaladas en el Manual de Depósito en el entendido de que el Cliente no cuenta con Equipo Recontador. En el desapego de los procedimientos, el Banco podrá cobrar cargos adicionales señalados en la Cláusula Novena y en el Anexo Operativo.</p>
+    
+    <p>b. El Comprobante de servicio muestre visiblemente el número de folio, número del plomo o cintillo de cada bolsa o envase por entregar, e indique como destinatario el Banco, además de detallar claramente el importe del efectivo y/o documentos que se dice estar entregando.</p>
+    
+    <p>c. En caso de utilizar la bolsa o envase, ésta no deberá presentar indicios de haber sido violada o manipulada. En caso de que la bolsa o envase presente cualquier daño o evidencia que haga suponer que el efectivo y/o documentos del interior de los Envases fueron sustraídos, el Banco...</p>
+    
+    <p>d. Cliente enviará los envases a los domicilios indicados por el Banco en el Anexo Operativo.</p>
+    
+    <p>e. La recepción de bolsa segurisello será total y completa responsabilidad del Cliente, quedando el Banco sin responsabilidad alguna en caso de presentarse una diferencia o alguna desviación al procedimiento.</p>
+    
+    <p><strong>B.</strong>El Banco registrará la hora de recepción con reloj checador, sello o por escrito y no será responsable de abonar el mismo día, si la ETV llega después de los horarios especificados en el Directorio de CPAES.</p>
+    
+    <p><strong>C.</strong>En caso de que se incluyan Depósitos a cuentas de mismo Grupo Económico, la entrega del efectivo y/o documentos podrá realizarse en envases separados o a través de subenvases (bolsas introducidas dentro del envase). El Cliente acepta que las normas de seguridad establecidas en este Contrato respecto de los envases presentados por la ETV, aplican únicamente al envase, no así al o los subenvases contenidos en éste, o al contenido de los propios subenvases.</p>
+    
+    <p><strong>D.</strong>En caso de que se incluyan subenvases de Depósitos para cuentas que no sean propias del Cliente ni de su mismo Grupo Económico, será indispensable que el Cliente dueño de las cuentas de Depósito, firme por separado, el Contrato de Servicios de Efectivo o Servicios de Efectivo Electrónico, según sea necesario, con el Banco. Los depósitos que no cumplan con estos requisitos seguirán el proceso de aclaración que forma parte del presente.</p>
+    
+    <p><strong>E.</strong>Se recibirán subenvases dentro de los envases de Depósito siempre y cuando se cumplan con las siguientes condiciones:</p>
+    
+    <p>a. El Cliente prepara el subenvase de acuerdo a las condiciones señaladas para envases en el Manual de Usuario Depósito. El desapego de los procedimientos descritos derivará en cargos adicionales señalados en el Anexo Operativo.</p>
+    
+    <p>b. Los subenvases deberán incluir cada uno su Ficha de Depósito correspondiente dentro de la misma bolsa o envase del Cliente.</p>
+    
+    <p><strong>II. ACREDITACION</strong></p>
+    
+    <p><strong>A.</strong>
+    Es requisito indispensable para la acreditación de los Depósitos que el Cliente envíe las Fichas de Depósito legibles y corretamente llenas, incluyendo las referencias numéricas y alfanuméricas, cuando maneje cuentas con estas características.</p>
+    
+    <p><strong>B.</strong>
+    El Cliente autoriza al Banco a abonar a la cuenta(s) del Cliente establecidas en el Anexo Operativo, el importe anotado en las Fichas de Depósito, el mismo día hábil bancario de su entrega en el domicilio indicado por el Banco, siempre y cuando, la ETV llegue a más tardar en el horario marcado por cada CPAE; y al día hábil bancario siguiente, si los Depósitos son recibidos después de esta hora, o en horario nocturno. Asimismo, en caso de existir diferencias entre el efectivo físico recibido y el importe indicado en la Ficha de Depósito, el Cliente autoriza al Banco a realizar un cargo o abono según los mecanismos establecidos en el apartado reporte de diferencias.</p>
+    
+    <p><strong>C.</strong>
+    Las cuentas para abono de los Depósitos deberán ser cuentas en Moneda Nacional y/o dólares americanos, según corresponda, propiedad del Cliente contratante o del mismo Grupo Económico. En caso de que se envíen subenvases para Depósito a cuentas que no sean propias del Cliente o del mismo Grupo Económico, será indispensable que el Cliente dueño de las cuentas tenga un Contrato de Servicios de Efectivo o Servicios de Efectivo Electrónico con el Banco.</p>
+    
+    <p><strong>D.</strong>
+    Los números de Referencia serán considerados, siempre y cuando el Cliente haya aperturado su(s) cuenta(s) con estas características. Los datos de la(s) Referencias deberán estar especificados clara y correctamente en la(s) Ficha(s) de Depósito(s) correspondientes.</p>
+    
+    <p><strong>E.</strong>
+    Por ningún motivo el Banco deberá alterar el Comprobante de servicio Depósito de efectivo que emite SEF Electrónico o el comprobante de servicio de la ETV. Asimismo, cualquier enmendadura, dato no legible o tachadura sobre el Comprobante de servicio Depósito de efectivo son causas para no acreditar los importes y reportarlo al Cliente como anomalía(s) al(los) contacto(s) establecido(s) en el Anexo Operativo.</p>
+    
+    <p><strong>F.</strong>
+    Las modalidades de Depósito Parcial y Global son excluyentes por CPAE, conforme se especifique en el Anexo Operativo.</p>
+    
+    <p><strong>G.</strong>
+    Se podrán acreditar los Depósitos de Clientes del mismo Grupo Económico, siempre y cuando el Cliente envíe las Fichas de Depósito legibles y debidamente requisitadas.</p>
+    
+    <p><strong>III. REPORTE DE DIFERENCIAS (FALTANTES Y/O SOBRANTES)</strong></p>
+    
+    <p><strong>A.</strong>
+    El Cliente autoriza al Banco a abonar los importes anotados en el Comprobante de servicio Depósito de efectivo en las cuentas establecidas en el Anexo Operativo y a realizar el cargo o abono por separado por concepto de diferencia en las cuentas indicadas anteriormente, la cual podrá realizarse en forma automática o por medio de confirmación, observando los mecanismos acordados de aviso al y por el Cliente, según su monto, como se establece a continuación:</p>
+    
+    <p>a. En caso de existir diferencias entre el efectivo físico recibido y el importe indicado en el Comprobante de servicio Depósito de efectivo menor o igual al indicado como diferencia permitida en el Anexo Operativo, el Cliente autoriza al Banco a realizar un cargo o abono automático por el total de la diferencia, en la(s) cuenta(s) del Cliente citada(s) para tal efecto en el Anexo Operativo.</p>
+    
+    <p>b. En el momento en que el Banco detecte una diferencia mayor a la permitida indicada en el Anexo Operativo, se suspenderá el abono del Depósito continuando con el mismo, una vez recibida la autorización escrita, telefónica o electrónica por parte de los Contactos designados por el Cliente en cada plaza en el Anexo Operativo. Una vez autorizada la diferencia no habrá evidencia física (en
+      vase, sello de plomo, cintillo, sub-envase) en caso de solicitar la revisión de video.</p>
+      <p>c. Las Diferencias en Depósitos Parciales serán reportadas una vez que se concluya el proceso de verificación de todos los Depósitos Parciales, solo se considera la diferencia máxima permitida al concluir el proceso. Cuando se rebase la diferencia máxima permitida dicho Depósito solo será aplicado hasta tener la autorización de los contactos definidos por el Cliente en el anexo operativo. Proporcionando al Cliente los elementos necesarios para la identificación del faltante, en su caso, (envase, sello de plomo / plástico, cintillas, subenvases, parcial).</p>
+
+      <p><strong>B.</strong> El Cliente se compromete a dar una respuesta sobre la diferencia que se le reportó cuando el depósito este retenido por una diferencia de importe mayor a lo permitido indicada en Anexo Operativo, a más tardar 3 (tres) Días hábiles bancarios después de haber recibido el reporte por parte del Banco. En caso de no dar respuesta a dicha diferencia en el plazo antes referido, el Banco hará la acreditación al siguiente Día hábil bancario del importe total indicado en el Comprobante de servicio de SEF Electrónico o la Ficha de Depósito y se efectuará el cargo o abono por la diferencia resultante, quedando el Banco sin responsabilidad alguna por dicho abono o cargo. El Banco no podrá resguardar depósitos pendientes por más de 3 (tres) Días hábiles bancario.</p>
+      
+      <p><strong>C.</strong> Exclusivamente en los casos con diferencias mayores a $100.00 (cien pesos 00/100 M.N.), se levantará el Acta correspondiente. Asimismo, cuando se detecte una diferencia con motivo de Billetes Presuntamente Falsos, Alterados o Mutilados, se levantará el acta correspondiente.</p>
+      
+      <p><strong>D.</strong> Adicionalmente, el Cliente tendrá disponible en SEF Electrónico hasta por 120 (ciento veinte) días naturales la notificación de diferencias sin importar el monto, la cual incluye la siguiente información y que podrá imprimir en cualquier momento:</p>
+      
+      <p>a. Razón Social del Cliente</p>
+      <p>b. Importe total del Depósito</p>
+      <p>c. Importe de la diferencia</p>
+      <p>d. Concepto (faltante o sobrante)</p>
+      <p>e. Cuenta incluida en la Ficha de Depósito</p>
+      <p>f. No. De la Unidad de Negocio</p>
+      <p>g. No. Del comprobante de servicio</p>
+      
+      <p><strong>E.</strong> Los billetes presuntamente falsos, alterados o mutilados, serán considerados como faltante, cargándose a la cuenta del Cliente especificada en el Anexo Operativo y serán concentrados a Banco de México para su dictamen. El Banco elaborará el Acta correspondiente misma que será entregada al Cliente. El Cliente podrá consultar el estatus de la dictaminación de su billete presuntamente falso ingresando al portal de Banco de México mediante su número de folio SAM, el cual le será confirmado por el área de Atención a Clientes del CPAE correspondiente.</p>
+      
+      <p><strong>F.</strong> Horarios de reporte de diferencias: el reporte de diferencia se hará en horario de 09:00 hrs. a 18:00 hrs. Las diferencias no permitidas que se detecten fuera del horario mencionado anteriormente, se turnarán a bóveda los envases y serán reportadas el siguiente día hábil dentro en el mismo horario.</p>
+      
+      <p><strong>G.</strong> El Banco tiene prohibido recibir o entregar físicamente el efectivo y/o documentos del Cliente para compensar las diferencias.</p>
+      
+      <p><strong>H.</strong> La diferencia máxima permitida será la misma para todos los Clientes del mismo Grupo Económico.</p>
+      
+      <p><strong>I.</strong> El cargo o abono de diferencias se realizará a cada Cliente del mismo Grupo Económico, tal y como se indica dentro del Anexo Operativo.</p>
+      
+      <p><strong>J.</strong> A solicitud del Cliente se le entregará copia de la Fichas o Acta de Diferencia o evidencias de la diferencia de manera digital a través de Servicio a Clientes de CPAE siempre y cuando estén sujetos a una aclaración.</p>
+      
+      <p><strong>Proceso para solicitar Comprobantes de servicio (actas de diferencia y evidencias):</strong><br>
+      
+        Cliente solicitará un requerimiento a través del Servicio al cliente del CPAE donde deposita, considerando los siguientes requisitos:</p>
+              
+      <table style="width:100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr>
+            <th style="border: 1px solid black; padding: 5px;">Tipo</th>
+            <th style="border: 1px solid black; padding: 5px;">Requisitos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid black; padding: 5px;">Acta</td>
+            <td style="border: 1px solid black; padding: 5px;">
+              Razón Social, sucursal y cuenta, referencias (solo si aplica), fecha, importe de la diferencia, Naturaleza de la operación (cargo o abono), número o nombre de CPAE en donde se recibió el depósito.
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid black; padding: 5px;">Evidencias de Diferencia.</td>
+            <td style="border: 1px solid black; padding: 5px;">
+              Razón Social, sucursal y cuenta, referencias (solo si aplica), fecha, importe de la diferencia, Naturaleza de la operación (cargo o abono), número o nombre de CPAE en donde se recibió el depósito.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>La solicitud de Comprobantes de servicio se deberá hacer por los contactos autorizados en el Anexo Operativo.
+        El Banco atenderá la solicitud de evidencias vía imagen a través del área de servicio de Clientes asignado por el Banco, enviando la información a los contactos autorizados en el Anexo Operativo.
+        Para los casos extraordinarios de entrega de evidencias de documentos físicos, el Banco confirmará al Cliente la disponibilidad de los Comprobantes de servicio en la Sucursal indicada en el Anexo Operativo.
+        El Cliente reconoce y acepta que la sucursal solo podrá resguardar por un periodo máximo de 2 años (dos) las copias de los Comprobantes de servicio, por lo que solo podrán ser solicitados por el Cliente dentro del plazo anteriormente previsto contado a partir de la emisión del comprobante respectivo. Una vez concluido el plazo antes referido, las copias de los Comprobantes de servicio serán destruidas previo aviso dado a los contactos autorizados en el Anexo.</p>
+        
+        <p><strong>IV. COMPROBANTE DE SERVICIO DEPÓSITOS DE EFECTIVO</strong></p>
+        <p>A. Es requisito indispensable para la acreditación de los Depósitos que el Cliente envíe el Comprobante de servicio Depósitos de efectivo. El Banco no puede realizar modificación alguna a este documento.</p>
+        <p>B. El Banco pondrá a disposición del Cliente a través de SEF Electrónico, el Comprobante de servicio de Depósitos de efectivo hasta 120 días contados a partir del día en que quede registrado como “Entregado a ETV” en SEF Electrónico. Las Fichas que el Cliente pudiera llegar a enviar dentro de su envase, estas no se entregarán en original selladas por el Banco, ya que el servicio cuenta con Fichas electrónicas disponibles únicamente en SEF Electrónico.</p>
+        <p>C. Si el Cliente por necesidades de su operación, requiere el cambio de domicilio de entrega de Fichas de Depósito, deberá realizar el trámite de cambio correspondiente mediante el Anexo Operativo.</p>
+        <p><strong>V. REVISIÓN DE VIDEOS</strong></p>
+        <p>A. El tiempo máximo para que el Cliente solicite la revisión del video será de 5 (cinco) días hábiles contados a partir de que el Banco notifique la diferencia. El tiempo máximo para obtener la fecha de revisión de video por parte del CPAE será de 5 (cinco) días hábiles.</p>
+        <p>B. A la Revisión de Video podrán acudir como máximo 2 (dos) personas por parte del Cliente. Contando con un máximo de 2 (dos) revisiones para el mismo Envase.</p>
+        <p>C. La revisión de videos se realizará a partir de $200.00 (doscientos pesos 00/100 M.N.) o equivalencia en dólares americanos, según corresponda al servicio.</p>
+        <p>D. No se realizarán revisiones de video por el concepto de “billete presuntamente falso”. El Cliente podrá consultar el estatus de la dictaminación de su billete presuntamente falso a través del portal de Banco de México mediante su número de folio SAM.</p>
+        <p>E. Si los depósitos están en resguardo, una vez que el Cliente haya revisado el video, deberá enviar la liberación del Depósito en máximo 3 (tres) días hábiles; en caso contrario, se procederá con la aplicación del Depósito con la diferencia, sin que lo anterior represente una renuncia al procedimiento de aclaración, y dejando como único elemento de validación el video.</p>
+        <p>F. La revisión del video por parte del Cliente deberá ser en apego al Manual de consideraciones para Revisión de Video.</p>
+        
+        <p><strong>CUARTA. Depósito de Documentos</strong></p>
+        <p>A. Cuando el Depósito incluya documentos, estos deberán ser preparados por el Cliente, según el Manual del Usuario Depósito, y serán recibidos en el domicilio designado por el Banco especificado en el Anexo Operativo.</p>
+        <p>B. Se podrán recibir cheques BANAMEX o de otros Bancos para abono en cuentas en Moneda Nacional; no se recibirá otro tipo de documentos.</p>
+        <p>C. El Banco tiene prohibido modificar las cantidades o información que aparece en las Fichas de Depósito.</p>
+        <p>D. Todos los documentos recibidos, deberán ostentar los datos del Cliente: cuenta y sucursal en donde se acreditará el Depósito. En caso de cheques endosados, el Banco abonará a la última cuenta que aparezca en el reverso del cheque, siempre y cuando esta sea propia del Cliente contratante o cuenta del mismo Grupo Económico, que sea legible y corresponda a las cuentas especificadas en el Anexo Operativo. El Banco no está autorizado a abonar en cuentas diferentes a éstas.</p>
+        <p>E. Los documentos BANAMEX serán abonados en firme siempre y cuando cumplan con los requisitos de seguridad y cuenten con fondos, los documentos de otros Bancos serán abonados salvo buen cobro.</p>
+        <p>F. Los documentos se abonarán únicamente a las cuentas señaladas en el Anexo Operativo mismas que deberán estar escritas en la Ficha de Depósito. El Banco acreditará en la cuenta del Cliente, especificada en el Anexo Operativo, únicamente el importe anotado en la(s) Ficha(s) de Depósito, por lo que se realizarán los cargos automáticos de los importes de los cheques devueltos y rechazados, así como de las comisiones según corresponda.</p>
+        <p>G. En caso de existir devoluciones de documentos el Banco cargará el importe de dichas devoluciones a la cuenta especificada en el Anexo Operativo, cuenta en que se acreditaron los documentos presentados, así como la comisión correspondiente por dicha devolución. Estos documentos se concentrarán en la sucursal especificada en el Anexo Operativo. En caso de extravío de un cheque devuelto en el traslado a la sucursal especificada en el Anexo Operativo, el Cliente deslindará de toda responsabilidad legal por este hecho, al Banco.</p>
+        <p>H. En caso de extravío de un cheque devuelto, el Banco no pagará el importe del mismo, el Banco se compromete a entregar la imagen digitalizada de los cheques así como una carta certificada de deslinde de responsabilidades.</p>
+        <p><strong>QUINTA. Dotación de Efectivo</strong></p>
+        <p>A. El traslado de efectivo se hará por medio de la ETV indicada por el Cliente en el Anexo Operativo, la cual podrá ser contratada por el Cliente o por el Banco. La entrega de Dotación de efectivo se realizará única y exclusivamente a los domicilios incluidos en el Anexo Operativo, mismos que se darán de alta en SEF Electrónico.</p>
+        <p>B. El Cliente autoriza al Banco, a procesar cualesquiera instrucciones de Dotación de efectivo, emitidos mediante SEF Electrónico para actuar en nombre del Cliente con relación a su(s) cuenta(s) establecidas en el Anexo Operativo.</p>
+        <p>C. El Cliente acepta plena responsabilidad por las instrucciones de cargo a su cuenta para entrega del efectivo en los domicilios indicados en el Anexo Operativo, conforme a los puntos precedentes, recibidos y procesados por el Banco, emitidas o no por el Cliente.</p>
+        <p>D. El Cliente autoriza al Banco, sujeto a previa notificación, a modificar, a su exclusiva discreción, cualquier condición de medios de recepción autorizados por el Banco.</p>
+        <p>E. Si el Banco no contara con la denominación solicitada por el Cliente, el Cliente autoriza al Banco la entrega de la denominación inmediata inferior o superior con la que se cuente en ese momento.</p>
+        <p>F. En caso de Dotaciones urgentes (mismo día) el Banco realizará, bajo mejor esfuerzo, la entrega de las denominaciones solicitadas, sin garantizar que estas sean entregadas en su totalidad tal y como fue solicitada por el Cliente a través de SEF Electrónico.</p>
+        <p>G. La solicitud de Dotación se recibirá con 24 horas de anticipación en días hábiles bancarios, en los horarios especificados en el Anexo Operativo y Directorio de CPAES. En caso de ser una Dotación urgente, ésta se podrá solicitar dentro del horario establecido para ser entregada el mismo día a la ETV.</p>
+        <p>H. Los horarios en los que el Banco aceptará comunicaciones e instrucciones transmitidas por los medios de recepción autorizados serán los señalados en el Anexo Operativo y Directorio de CPAES, pudiendo ser modificados por el Banco.</p>
+        <p>I. En caso de que existan regulaciones especiales emitidas por parte de Banco de México sobre el manejo del efectivo, éstas serán aplicadas a las solicitudes de Dotación del Cliente (denominaciones, envases, número de piezas, etc.).</p>
+        <p>J. Si el Cliente por necesidades de su operación, requiere que la entrega se realice en un domicilio distinto al que se encuentra registrado, deberá realizar el trámite correspondiente mediante el Anexo Operativo.</p>
+        
+        <p><strong>SEXTA. Proceso de Contingencia para Dotaciones de Efectivo</strong></p>
+        <p>A. La solicitud de Dotación se realizará mediante carta membretada de la Empresa vía correo electrónico, debiendo incluir los datos necesarios para la Dotación como son: fecha de solicitud, fecha de entrega, montos y denominaciones requeridas, ubicación en donde será entregado el efectivo, nombre y firma de la persona que solicita la Dotación, así como la firma autógrafa de los firmantes de la cuenta sean individual o mancomunada, CPAE al que va dirigida la solicitud. Se recibirán en días y horarios hábiles bancarios, en los horarios especificados en el Anexo Operativo. En caso de que sea una Dotación urgente, ésta podrá solicitarse dentro del horario establecido; debiendo entregarse a la ETV, bajo mejor esfuerzo, en un tiempo de 90 (noventa) minutos posteriores de haberse realizado la solicitud.</p>
+        <p>B. El Cliente autoriza al Banco a establecer, a su exclusiva discreción, las medidas de validación para autentificar la procedencia de dichas solicitudes a través de llamadas de confirmación (call back a contactos de contingencia) a las solicitudes que hayan sido recibidas por los medios de recepción autorizados y que hayan pasado satisfactoriamente el proceso de confirmación de firmas del Banco.</p>
+        <p>C. El Cliente autoriza al Banco a grabar cualquier conversación telefónica incluyendo las llamadas de confirmación efectuadas por el Banco a su exclusiva discreción, a cualquiera de las personas indicadas, a los números telefónicos indicados en el Anexo Operativo.</p>
+        <p>D. En caso de que el Banco no pueda realizar la confirmación vía telefónica o call back por cualquier circunstancia, el Cliente autoriza al Banco a rechazar la instrucción recibida.</p>
+        <p>E. El Cliente reconoce que las instrucciones enviadas al Banco en los casos de contingencias serán dirigidas únicamente a direcciones de correo electrónico predefinidas. Estos serán informados por el Banco y podrán ser modificados previa notificación al Cliente.</p>
+        <p>F. El Cliente autoriza al Banco, sujeto a previa notificación, a modificar, a su exclusiva discreción, cualquier condición de medios de recepción autorizados para contingencias.</p>
+        <p>G. Los horarios que el Banco acepta comunicaciones e instrucciones transmitidas por los medios de recepción autorizados se especifican en el Anexo Operativo y Directorio de CPAES.</p>
+        
+        <p><strong>SÉPTIMA. Aclaraciones</strong></p>
+        <p>A. La solicitud de aclaraciones deberá realizarse a través del área de Servicio a Clientes, o directamente en el CPAE que generó dicha aclaración.</p>
+        <p>B. El Cliente dispondrá de 45 (cuarenta y cinco) días naturales contados a partir de la emisión de su estado de cuenta para realizar las solicitudes de aclaración, de lo contrario el Banco asumirá que el Cliente está conforme con los cargos y / o abonos que se hayan realizado en ese periodo, quedando sin responsabilidad alguna de posteriores solicitudes sobre ese periodo o anteriores a ese.</p>
+        <p>C. El Banco se compromete a dar una respuesta sobre las aclaraciones a más tardar en 60 (sesenta) días naturales contados a partir de la fecha de recepción de la aclaración, ya sea en Servicio a Clientes o directamente en el CPAE que generó la aclaración.</p>
+        <p>D. El Cliente confirma que recibió y leyó los directorios de atención a Clientes de cada CPAE en donde se establecen los horarios máximos para acreditación el mismo día (T) y acreditación en veinticuatro (24) horas hábiles (T+1) así como la entrega de Dotaciones preestablecidas, 24 hrs., y urgentes. En este mismo Contrato se establecen los datos de contacto para realizar las aclaraciones correspondientes de su operación.</p>
+        <p>E. Para aclaraciones relacionadas con el proceso de Dotación deberá remitirse al Manual de requisitos para aclaraciones de Dotaciones de efectivo. Toda aclaración se efectuará por escrito entre el Banco y el Cliente, de acuerdo a lo establecido en el presente Contrato y su Anexo Operativo.</p>
+        <p>El Banco no será responsable por el incumplimiento de cualquiera de las obligaciones que le deriven de este Contrato, en caso que dicho incumplimiento se deba a causas derivadas, en cualquier medida, a la(s) Empresas de Traslado de Valores o que estén fuera de su control o que no le sean imputables, incluyendo sin limitar, cualquier nacionalización, expropiación, restricción de moneda, actos de guerra, huelgas, terrorismo, conmoción civil, insurrección, revolución, cambio en las disposiciones legales o cualquier otro acto fortuito o causa de fuerza mayor, en el entendido de que el Banco informará al Cliente a la ocurrencia de cualquiera de dichos eventos que le impidan cumplir con cualquiera de las obligaciones que le derivan de este Contrato.</p>
+        
+        <p><strong>OCTAVA. Condiciones Generales</strong></p>
+        <p>A. El Cliente está de acuerdo que en casos de contingencia mayor por: desastre natural, rebelión civil o casos fortuitos que impliquen no poder acceder a las instalaciones del Banco, y que imposibiliten la operación de los servicios contratados, dichos servicios no le serán proporcionados, notificando al Cliente.</p>
+        <p>B. A solicitud del Cliente, el Banco podrá ofrecer alternativas para los casos descritos en el inciso anterior y estará en la decisión del Cliente tomar alguna de ellas o no en su favor. En este último caso, los servicios no serán proporcionados hasta que se restablezcan las condiciones operativas, sin que esto repercuta en cargos adicionales que se establezcan en el presente Contrato.</p>
+        <p>C. En caso de presentarse alguna aclaración derivada de los servicios que presta el Banco, el Cliente deberá comunicarse al número telefónico indicado en el domicilio del Banco indicado para cada plaza en el Anexo Operativo y Directorio de CPAES.</p>
+        <p>D. Cuando no se estuvieran cumpliendo las condiciones pactadas en este Contrato, se proporcionen mal los servicios contratados, se presenten eventualidades, irregularidades, o casos de contingencia, tanto el Cliente como el Banco, según corresponda, deberán remitirse a la matriz de escalamiento descrita en el Directorio de CPAES para reportar dichas anomalías.</p>
+        <p>E. Todas las cuentas que se habiliten al servicio deberán estar incorporadas como propias en el número de Cliente contratante.</p>
+        <p>F. El otorgamiento del servicio se sujeta a Clientes cuyas cuentas bajo el número de cliente contratante, tengan una antigüedad igual o mayor a 6 meses.</p>
+
+        <p><strong>NOVENA. Comisiones</strong></p>
+        <p>A. Como contraprestación a los servicios aquí pactados, el Cliente se obliga a pagar al Banco las comisiones vigentes que resulten aplicables, de acuerdo con la tabla de comisiones del Anexo Operativo. Las comisiones pueden ser modificadas en cualquier momento enviando para tal efecto una notificación del Banco con por lo menos 30 (treinta) días naturales de anticipación a aquel en que deba surtir efectos dicha modificación.</p>
+        <p>B. Todas las comisiones causan conforme a la legislación vigente el impuesto al valor agregado (IVA), a la tasa que corresponda.</p>
+        <p>C. El cobro se llevará a cabo dependiendo del tipo de servicio contratado.</p>
+        <p>D. La falta de cobro de las comisiones por los servicios, dentro del periodo indicado, no establece la preclusión o renuncia al derecho de cobro.</p>
+        <p>E. En caso de que el Cliente solicite cobro centralizado de comisiones, se generará un reporte del cobro de las mismas, desglosado por cada CPAE en que el Banco proporcione el servicio al Cliente.</p>
+        <p>F. En caso de que el Banco no pueda realizar el cobro de las comisiones en la cuenta establecida en el Anexo Operativo, el Cliente autoriza mediante la aceptación de este Contrato y sin previa notificación, al Banco a realizar el cobro de dichas comisiones en cualquier cuenta que el Cliente tenga abierta con el Banco, hasta por el total del monto adeudado.</p>
+        <p>G. El Banco se reserva el derecho de suspender y/o cancelar el servicio en caso que no sea posible ejecutar el cobro de comisiones al Cliente.</p>
+        <p>H. La cuenta para el cobro de comisiones será aquella que tenga el Cliente y estará habilitada bajo el mismo número de Cliente que contrata el servicio.</p>
+        <p>I. El Cliente autoriza al Banco a realizar los cargos y/o abonos correspondientes a la prestación de los servicios del Banco en términos de lo señalado en el Anexo Operativo, sea para operaciones relacionadas con la prestación de los servicios en su favor o del mismo Grupo Económico.</p>
+        <p>J. Comisiones Depósito a mismo Grupo Económico. El cobro de comisiones se realizará en los primeros 10 (diez) días del mes posterior a la prestación de servicios a cada una de las cuentas del mismo Grupo Económico especificada en el Anexo Operativo.</p>
+        <p><strong>DÉCIMA. Anexo Operativos</strong></p>
+        <p>Las Partes manifiestan que para todos los efectos legales que el(los) Anexo Operativo(s) y el Directorio de CPAES forman parte integral del presente Contrato.</p>
+        
+        <p><strong>DÉCIMA PRIMERA. Confidencialidad</strong></p>
+        <p>A. En virtud del presente Contrato, las Partes se obligan a no divulgar ni revelar datos, especificaciones técnicas, secretos, métodos, sistemas y en general cualquier mecanismo relacionado con la tecnología e información a la cual tendrán acceso y que será revelada por una Parte a la otra, en consecuencia, ambas Partes se obligan a mantener en absoluta confidencialidad la información que se maneje durante la vigencia de éste Contrato y hasta por cinco años después de concluido el mismo, en caso de existir duda sobre si determinada información es considerada como secreto comercial, deberá ser tratada como confidencial.</p>
+        <p>B. Las Partes se obligan expresamente a utilizar todas las medidas que fueren necesarias y convenientes para que su personal cumpla y observe dicha confidencialidad, absteniéndose de divulgar o reproducir total o parcialmente la información que obtengan o produzcan con motivo de la prestación del servicio objeto del presente Contrato. El Cliente notificará inmediatamente al Banco de cualquier violación o sospecha de violación al compromiso de seguridad aquí descrito.</p>
+        <p>C. Las Partes no podrán utilizar en beneficio propio y/o de terceros la información que les sea de alguna manera revelada, en el entendido de que la misma solo la utilizará conforme a lo previsto en el presente Contrato.</p>
+        <p>D. En caso de violación a la obligación antes mencionada, la Parte afectada podrá ejercer las acciones legales correspondientes, así como rescindir el presente Contrato, sin perjuicio de exigir el pago de los daños y perjuicios que corresponda.</p>
+        <p>E. Los datos, información y resultados que sean revelados por una parte a la otra o a los que tenga acceso su personal; será propiedad de la parte que la proporcione y constituye un secreto industrial de ésta en términos del título tercero, capitulo único de la Ley de la Propiedad Industrial y por lo tanto quedan sujetos a lo establecido por los artículos 82, 83, 85, y 86 de dicho ordenamiento legal, por lo que las Partes o su personal no podrán divulgarlos sin la autorización expresa y por escrito de la otra, aceptando ambas desde este momento, que la violación o incumplimiento de lo dispuesto en la presente cláusula podrá encuadrarse dentro de los supuestos contemplados en las fracciones III, IV y V del artículo 223 de la Ley de la Propiedad Industrial, así como de las Leyes Civiles y Penales.</p>
+        <p>F. Al término de este Contrato, las Partes seguirán obligadas a no divulgar o usar la información y a devolverse de inmediato todos los documentos y materiales utilizados con motivo de la ejecución del presente.</p>
+        <p>G. El Cliente expresamente manifiesta su consentimiento para que el Banco en cumplimiento de disposiciones legales aplicables, realice a su discreción la validación de cualquier información o datos proporcionados u operaciones realizadas.</p>
+        <p>H. Con independencia de lo anteriormente estipulado, la siguiente información no será considerada como confidencial:</p>
+        <p>a. Cualquier Información que hubiere sido legítimamente conocida y obtenida por la parte receptora, o que ya formara parte de sus archivos, con anterioridad a la celebración del presente Contrato;</p>
+        <p>b. Cualquier Información que regularmente fuere del conocimiento público; y</p>
+        <p>c. Cualquier Información que eventualmente fuere del dominio público, y que hubiere sido legítimamente revelada, no derivado de alguna violación o incumplimiento de la parte receptora respecto de sus obligaciones aquí adquiridas.</p>
+        
+        <p><strong>DÉCIMA SEGUNDA. Responsabilidades</strong></p>
+        <p>A. Para todos los efectos del presente Contrato, así como de todos y cada uno de los Anexos que de éste se deriven, las Partes se obligan a cumplir con las disposiciones legales que regulen el Sistema Financiero y aquellas que sean emitidas en un futuro por las autoridades competentes, incluyendo de forma enunciativa más no limitativa, las disposiciones relativas al secreto bancario y lavado de dinero.</p>
+        <p>B. Las Partes convienen en indemnizar y en sacar en paz y a salvo a la otra Parte, su compañía controladora, subsidiarias, filiales, licenciatarias, funcionarios y empleados; en contra de daños, pérdidas y gastos, incluyendo honorarios y gastos de defensa, que se deriven de:</p>
+        <p>a. La negligencia, cumplimiento defectuoso o incumplimiento de sus agentes, empleados o dependientes, a cualquiera de sus obligaciones derivadas del presente Contrato.</p>
+        <p>b. La violación o incumplimiento de sus agentes, empleados o dependientes, de cualquier ley, reglamento o disposiciones legales aplicables.</p>
+        <p>C. Las Partes se obligan a sacar en paz y a salvo a la otra parte, respecto de cualquier demanda, queja o reclamo que se pudieren derivar como consecuencia de violaciones cometidas en contra de las disposiciones aplicables de Propiedad Industrial e Intelectual, derivadas de las prestaciones que las Partes convienen conforme a éste Contrato, las que entre otras pudieren ser, asuntos relacionados con Patentes, Marcas, Logotipos o Tipografía, Nombres Comerciales, Nombres y Secretos Profesionales. Igualmente las Partes se obligan a indemnizar a la otra Parte por todos y cualesquier daño y perjuicio que pudiere sufrir con motivo de las violaciones arriba descritas, incluyendo dicha indemnización y sin estar limitada a erogados como consecuencia de cualquier controversia, gastos razonables de abogados, y cualquier otro que le derive.</p>
+        <p>D. Ninguna de las Partes podrá promocionar o publicitar, ya sea de manera conjunta o en lo individual, las marcas, nombres, nombres comerciales, logotipos y demás distintivos, propiedad de la otra parte, a no ser que cuente con una autorización expresa y por escrito que le otorgue previamente la parte propietaria.</p>
+        <p>E. En virtud de lo anterior, la parte incumplida no será responsable por daños indirectos o pérdidas consecuenciales o por cualquier otro daño o pérdida que no sean ocasionados en forma inmediata, directa y comprobada por su incumplimiento, incluyendo daños que pudieren surgir de circunstancias especiales.</p>
+        <p>F. En ningún evento, la parte afectada será responsable por pérdidas o costos ocasionados por cualesquiera tercera persona, incluyendo (exclusivamente como ejemplo) fallas mecánicas o de sistemas que afecten a dichas terceras personas. Asimismo, las Partes quedan liberadas de cualquier responsabilidad cuando por causa de fuerza mayor o caso fortuito no les sea posible cumplir con sus obligaciones derivadas de este Contrato.</p>
+        <p>H. Sin perjuicio de lo anterior, las Partes acuerdan en otorgarse un término de 10 (diez) días naturales previos a la rescisión del presente Contrato, para subsanar el incumplimiento parcial o total a las obligaciones derivadas del presente Contrato en que pudieran incurrir, sin perjuicio de las demás responsabilidades establecidas en el presente Contrato.</p>
+        <p>I. Asimismo, las Partes reconocen ser entidades independientes cuya relación contractual es únicamente de naturaleza mercantil. Ambas Partes expresamente convienen que todo el personal que se utilice para cualquier actividad relacionada con el objeto del presente, será personal preponderantemente contratado para dicha función, por lo que dicha parte será exclusivamente responsable de las obligaciones laborales y de seguridad social que surjan de las relaciones existentes con su personal, tales como salarios, indemnizaciones y riesgos profesionales o de cualquier otra obligación o por la prestación de servicios que derive de las citadas actividades según sea el caso. En ningún caso y por ningún concepto podrá considerarse al Banco o al Cliente, según sea el caso, como patrón directo o sustituto del personal de la otra parte, por lo que se obligan mutuamente a hacerse responsable de todas las reclamaciones individuales o colectivas que por cualquier razón puedan presentar sus respectivos trabajadores; así como, las sanciones que pudieran imponerles las autoridades administrativas o judiciales del trabajo, sacando la otra parte en paz y a salvo frente a toda reclamación, demanda, litigio o sanción que su personal o cualquier autoridad pretendiese fincar o entablar en perjuicio a consecuencia de la citada relación laboral.</p>
+        <p>J. El Cliente manifiesta su consentimiento en que, mientras no se compruebe al Banco negligencia inexcusable, mala fe o dolo, y siempre y cuando el Banco haya actuado de conformidad con las presentes especificaciones operativas, el Banco será indemnizado y sacado en paz y a salvo de cualquier tipo de responsabilidad, así como de cualquier cobro, reclamación, pérdida o responsabilidad de cualquier naturaleza, directa o indirecta que resulte de cualquier acción, omisión o retraso de respuesta a las instrucciones que se le den al Banco para la Dotación de efectivo, junto con los gastos y costos en que el Banco haya incurrido, incluyendo los honorarios legales que se hayan generado. El Cliente acepta que, previa solicitud, indemnizará y sacará a paz y a salvo de cualquier pérdida y, previa solicitud, pagará dichas cantidades al Banco. La obligación enunciada en el presente párrafo se mantendrá vigente aún después de la terminación del presente.</p>
+        <p>K. Responsabilidad del manejo de Usuarios: el Banco únicamente realizará el alta de los usuarios de SEF Electrónico indicados en el Anexo Operativo. El Cliente será responsable por el uso, robo o extravío de los medios y claves electrónicos de acceso a SEF Electrónico.</p>
+        <p><strong>DÉCIMA TERCERA. Vigencia</strong></p>
+        <p>El presente Contrato tendrá una duración indefinida y podrá ser terminado anticipadamente por cualquiera de las Partes, sin responsabilidad alguna, mediante notificación por escrito dada a la otra Parte con 30 (treinta) días hábiles de anticipación a la fecha de terminación, en el entendido que las obligaciones de las Partes continuarán vigentes hasta la fecha efectiva de la terminación del Contrato, y en el entendido de que la obligación del Cliente de pagar las comisiones subsistirá hasta el momento en que las mismas sean cubiertas en su totalidad.</p>
+        <p>Las Partes convienen que todo Contrato, negocio o acto jurídico por el que se hubieren prestado en el pasado, servicios equivalentes, similares, conexos o idénticos a los contenidos en este Contrato, quedan terminados a partir de la presente fecha, por lo que las consecuencias jurídicas de los mismos se revocan y se dejan sin efecto legal alguno.</p>
+        
+        <p><strong>DÉCIMA CUARTA. Firma Electrónica</strong></p>
+        <p>Las Partes convienen que en los términos del capítulo segundo del Título segundo del Código de Comercio y cualquier otra disposición aplicable, podrán establecer la identidad y expresión de consentimiento de las mismas por medios electrónicos, óptico o de cualquier otra tecnología mediante el uso de la “firma electrónica avanzada”, a fin de que los mensajes de datos sean comunicados entre las Partes de manera segura en su identificación, auténticos e íntegros en su contenido y no repudiables respecto del emisor y receptor.</p>
+        
+        <p><strong>DÉCIMA QUINTA. Seguridad</strong></p>
+        <p>Las Partes aceptan que el Banco está facultado para adoptar las medidas de seguridad que considere convenientes de SEF Electrónico, por lo que desde este momento, el Cliente acepta las medidas de seguridad que el Banco elija para tal fin.</p>
+        <p>Las Partes reconocen expresamente que el Banco no será responsable de los daños y perjuicios que llegaren a causársele por la no disponibilidad de SEF Electrónico. No obstante, el Cliente podrá llevar a cabo la Dotación mediante el proceso de contingencia descrito en este Contrato, o a través de las sucursales del Banco.</p>
+        
+        <p><strong>DÉCIMA SEXTA. Relación entre las Partes</strong></p>
+        <p>Las Partes reconocen ser entidades independientes cuya relación contractual es únicamente de naturaleza civil. Por lo anterior, aceptan que es su responsabilidad cumplir con las obligaciones legales, impuestas por las leyes, respecto al personal que participe con motivo de la celebración del presente Contrato, obligándose a sacar en paz y a salvo a la otra Parte, según corresponda, de cualquier juicio o reclamación en su contra por alguna de estas personas.</p>
+        <p>Ambas Partes expresamente convienen en que todo el personal que se utilice para cualquier actividad relacionada con el objeto del presente Contrato será personal precisa y exclusivamente contratado para dicha función. Dicha Parte será exclusivamente responsable de las obligaciones laborales y de seguridad social que surjan de las relaciones existentes con su personal, tales como salarios, indemnizaciones y riesgos profesionales o de cualquier otra obligación o por la prestación de servicios que derive de las citadas actividades según sea el caso. En ningún caso y por ningún concepto podrá considerarse al Banco como patrón directo o sustituto del personal del Cliente o viceversa, por lo que se obligan mutuamente a hacerse responsable de todas las reclamaciones individuales o colectivas que por cualquier razón puedan presentar sus trabajadores, así como las sanciones que pudieran imponerles las autoridades administrativas o judiciales del trabajo, sacando la otra Parte en paz y a salvo frente a toda reclamación, demanda, litigio o sanción que su personal o cualquier autoridad pretendiese fincar o entablar en perjuicio a consecuencia de la citada relación laboral.</p>
+        
+        <p><strong>DÉCIMA SÉPTIMA. Modificaciones</strong></p>
+        <p>El Banco podrá realizar modificaciones a los términos y condiciones del servicio establecido en el presente, previa notificación por escrito a la otra Parte con cinco (5) días hábiles de anticipación. En el caso de modificaciones provenientes del cumplimiento del Banco de disposiciones legales o corporativas, las mismas se podrán realizar de manera electrónica ante el Cliente bastando para ello que el Cliente continúe utilizando los servicios a fin de expresar su consentimiento y aceptación a dichas modificaciones.</p>
+        <p>Las Partes convienen que en caso de que alguna de las cuentas que el Cliente tiene incorporadas a este servicio, sea cancelada, el Banco podrá desincorporarla, sin que haya responsabilidad alguna para éste. El Cliente podrá incorporar las cuentas al servicio mediante la firma del Anexo Operativo, siempre que cumplan con las características especificadas en la cláusula TERCERA II.C.</p>
+        <p>El presente Contrato constituye la totalidad del acuerdo entre las Partes con relación al objeto del mismo, y sustituye cualesquiera comunicaciones verbales y escritas anteriores con él relacionados.</p>
+        <p>Las Partes aceptan que ninguna de ellas tendrá facultad de ceder o transmitir en forma alguna los derechos y obligaciones derivados del presente Contrato, a no ser que se encuentren pactados o se haya otorgado previamente y por escrito el consentimiento de la otra Parte.</p>
+        
+        <p><strong>DÉCIMA OCTAVA. Legalidad de las obligaciones del Cliente</strong></p>
+        <p>El Cliente reconoce que todas las operaciones que realice a través de las cuentas de cheques que forman parte del presente servicio, se derivan de su operación ordinaria y que son producto de actividades lícitas, siendo de su absoluta responsabilidad la procedencia de los recursos que se deriven de Depósitos, comprometiéndose a liberar al Banco de cualquier responsabilidad que sobre estas operaciones pudiera derivarse.</p>
+        <p>En caso de que los Depósitos recibidos para abono, o los cargos realizados para efectuar de Dotación en las cuentas, a juicio de cualquier autoridad nacional o extranjera, sean considerados como derivados de una operación ilícita, y dicha autoridad requiera al Banco la reversión del abono o cargo, el Cliente autoriza al Banco a cargar de inmediato su importe y el de las penalizaciones y gastos de defensa que tengan lugar en cualquiera de sus cuentas establecidas para este servicio, haciéndose directamente responsable de las consecuencias legales que en su caso procedan, liberando al Banco de toda responsabilidad civil, mercantil, penal, fiscal o cualquier otra acción legal que respecto de estas operaciones pudiera derivarse.</p>
+        <p>El Cliente consiente y autoriza a que cualquier instrucción u operación realizada al amparo o con base en lo estipulado en este Contrato, o de cualquier otro que regule la instrucción u operación específica de que se trate, podrá ser objeto, según corresponda, de cancelación, reversión, suspensión y, en general, de cualquier otro acto por parte del Banco, en caso de que la instrucción u operación de que se trate haya sido realizada mediante el uso indebido de las claves de acceso, o bien, haya presentado errores respecto de, entre otros aspectos y sin limitación alguna, la cuenta destino, el monto, la fecha de aplicación, el concepto de aplicación o el tipo de instrucción u operación. Asimismo, en caso de que el Banco hubiese abonado por error dinero a una Cuenta, el Cliente en este acto faculta al Banco para cargar el importe respectivo a la referida Cuenta con el propósito de corregir el error cometido. En todo caso el derecho aquí conferido al Banco de realizar cualquiera de dichos actos, podrá ejercerlo en cualquier momento, sin previo aviso y sin tener responsabilidad alguna. El Cliente libera al Banco de cualquier responsabilidad por actuar conforme a lo dispuesto en esta cláusula y desde ahora conviene en sacarlo en paz y a salvo e indemnizarle por cualquier reclamación, daños y/o perjuicios causados al Cliente, a su Grupo Económico y/o a Otros por cancelar, suspender e inclusive revocar y revertir cualquier instrucción o movimiento de fondos realizada por el Cliente en los términos antes mencionados.</p>
+        
+        <p><strong>DÉCIMA NOVENA. Patentes y Marcas</strong></p>
+        <p>El Cliente reconoce que las patentes y marcas del Equipo Recontador así como la conexión hacia SEF Electrónico con la que operan los Equipos Recontadores, será en todo momento propiedad exclusiva del Banco o, en su caso, se encuentran licenciadas al Banco, por lo que el Cliente no estará facultado para disponer o alterar las mismas en forma alguna.</p>
+        
+        <p><strong>VIGÉSIMA. Rescisión</strong></p>
+        <p>El presente Contrato podrá rescindirse sin necesidad de resolución judicial por cualquiera de las Partes, cuando incumplan con las estipulaciones contenidas en el mismo, de conformidad con lo dispuesto en el artículo 1949 del Código Civil vigente para el Distrito Federal.</p>
+        <p>La rescisión de este Contrato, será independiente a la responsabilidad y demandas que en su caso procedan por los daños y perjuicios que se llegaren a ocasionar a la parte afectada.</p>
+        <p>Ambas Partes convienen en que los siguientes casos, cada uno en lo individual, será causa de rescisión o terminación anticipada del presente Contrato, sin responsabilidad alguna para las Partes, y sin perjuicio de las acciones legales procedentes, previo aviso por escrito a la otra parte:</p>
+        <p><strong>A.</strong> El hecho de que antes o durante la vigencia del mismo, surja algún conflicto de intereses entre las Partes.</p>
+        <p><strong>B.</strong> El hecho de que cualquiera de las Partes incumpla con cualquiera de sus obligaciones derivadas del presente Contrato y no sea subsanado dentro del término establecido en el presente.</p>
+        <p><strong>C.</strong> Si alguna de las Partes inicia en forma voluntaria o involuntaria, un proceso de concurso mercantil en términos de las disposiciones legales vigentes.</p>
+        <p><strong>D.</strong> Si alguna de las Partes es intervenida judicialmente o por cualquier autoridad competente.</p>
+        <p><strong>E.</strong> En caso de que alguna de las Partes ceda sus derechos derivados del presente Contrato a algún tercero sin contar con la autorización por escrito de la otra parte, con excepción que se trate de su compañía controladora, filial o subsidiaria.</p>
+        
+        <p><strong>VIGÉSIMA PRIMERA. Domicilios y Notificaciones</strong></p>
+        <p>Para todo lo relativo a las comunicaciones y notificaciones que las Partes deban hacerse en relación con este Contrato, las Partes señalan como sus domicilios convencionales los siguientes:</p>
+
+        <table style="width:100%; border-collapse: collapse;">
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #000;">El Banco:</td>
+              <td style="border: 1px solid #000;"><strong>Roberto Medellín 800. Col. Santa Fe C.P. 01210</strong></td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000;">El Cliente:</td>
+              <td style="border: 1px solid #000;"><strong>{{frame1.domicilio_cliente}}</strong></td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000;">Apoderado Legal:</td>
+              <td style="border: 1px solid #000;"><strong>{{firmantes.apoderado_legal}}</strong></td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000;">Correo Electrónico del Apoderado Legal:</td>
+              <td style="border: 1px solid #000;"><strong>{{frame1.correo_apoderado_legal}}</strong></td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000;">Teléfono del Apoderado Legal:</td>
+              <td style="border: 1px solid #000;"><strong><{{frame1.telefono_cliente}}/strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+    <p>
+      Mientras las Partes no se notifiquen por escrito el cambio de sus respectivos domicilios, todas las diligencias judiciales y extrajudiciales que deban efectuarse, se entenderán en los domicilios aquí señalados.
+      </p>
+      
+      <h4>VIGÉSIMA SEGUNDA. Jurisdicción y Leyes aplicables</h4>
+      
+      <p>
+      Para la interpretación, cumplimiento y ejecución del presente Contrato, las Partes están de acuerdo en que serán aplicables las leyes Federales de los Estados Unidos Mexicanos y competentes los tribunales Federales de la Ciudad de México, renunciando expresamente a cualquier otro fuero o jurisdicción que pudiera corresponderles en razón de sus domicilios presentes o futuros, o por otra cualquier causa.
+      </p>
+      
+      <p>
+        Leído el presente Contrato y Anexo Operativo por las Partes y enteradas de su valor, consecuencias y alcances legales, lo ratifican firmándolo de conformidad al margen y al calce extendiéndose por duplicado en la Ciudad de México, {{ firmantes.fecha_firma | fecha_a_texto }}, quedando un tanto en poder de cada parte.
+      </p>
+
+      <h2 style="text-align: center; font-size: 14px;">FIRMAS DE CONFORMIDAD</h2>
+ 
+      <div>
+          <div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ccc; padding: 6px;">Apoderado Legal (Cliente)</th>
+                  <th style="border: 1px solid #ccc; padding: 6px;">Autorizador (Banco)</th>
+                  <th style="border: 1px solid #ccc; padding: 6px;">Director Divisional (Banco)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ccc; padding: 6px;">
+                    <strong>Razón Social:</strong> {{ frame1.razon_social }}<br>
+                    <strong>Nombre:</strong> {{ firmantes.apoderado_legal }}
+                  </td>
+                  <td style="border: 1px solid #ccc; padding: 6px;">
+                    <strong>Banco:</strong>BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                    <strong>Nombre:</strong> {{ firmantes.nombre_autorizador }}
+                  </td>
+                  <td style="border: 1px solid #ccc; padding: 6px;">
+                    <strong>Banco:</strong>BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                    <strong>Nombre:</strong> {{ firmantes.nombre_director_divisional }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                    <strong>Firma:</strong><br><hr>
+                  </td>
+                  <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                    <strong>Firma:</strong><br><hr>
+                  </td>
+                  <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                    <strong>Firma:</strong><br><hr>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+          
+</body>
+</html>

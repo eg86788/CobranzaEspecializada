@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block title %}Unidades de Negocio{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Resumen de la solicitud</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- ============================
+     FRAME 1 – DATOS GENERALES
+     ============================ -->
+<div class="card mb-3">
+  <div class="card-header">Datos Generales del Cliente</div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <tbody>
+        <tr>
+          <th>Cliente</th>
+          <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+          <th>Segmento</th>
+          <td>{{ frame1.segmento or '-' }}</td>
+        </tr>
+        <tr>
+          <th>Contrato</th>
+          <td>{{ frame1.numero_contrato }}</td>
+          <th>Tipo Trámite</th>
+          <td>{{ frame1.tipo_tramite }}</td>
+        </tr>
+        <tr>
+          <th>Tipo Contrato</th>
+          <td>{{ frame1.tipo_contrato or '-' }}</td>
+          <th>Servicio</th>
+          <td id="servicio_general">{{ frame1.tipo_servicio }}</td>
+        </tr>
+        <tr>
+          <th>Tipo Cobro Comisión</th>
+          <td>{{ frame1.tipo_cobro }}</td>
+          <th>Importe Máximo de Diferencias</th>
+          <td>{{ frame1.importe_maximo_dif }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer text-end">
+    <a href="{{ url_for('frames.frame1') }}" class="btn btn-outline-secondary btn-sm">✎ Editar</a>
+  </div>
+</div>
+
+<h2 class="mb-4">Unidades de Negocio</h2>
+
+<form method="POST" enctype="multipart/form-data">
+  <!-- Campo oculto para usar valor en JS -->
+  <input type="hidden" id="servicio_tipo_oculto" value="{{ frame1.tipo_servicio }}">
+  <input type="hidden" name="origen_unidad" id="origen_unidad" value="">
+
+  {% if frame1.tipo_tramite == "SUSTITUCIÓN" %}
+  <div class="mb-3">
+    <label class="form-label">¿Qué tipo de Sustitución desea hacer?</label>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_sustituir" value="sustituir" checked>
+      <label class="form-check-label" for="radio_sustituir">
+        Actualizar algún dato de una unidad existente
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_agregar" value="agregar">
+      <label class="form-check-label" for="radio_agregar">
+        Incorporar una nueva Unidad del mismo Contrato
+      </label>
+    </div>
+  </div>
+  {% endif %}
+
+<!-- Switch de activación de carga masiva -->
+<div class="form-check form-switch mb-3" id="switch_modo_masivo" style="display: none;">
+  <input class="form-check-input" type="checkbox" role="switch" id="check_masivo">
+  <label class="form-check-label" for="check_masivo">Activar carga masiva mediante archivo Excel</label>
+</div>
+
+
+
+
+  <!-- Contenedor que alterna entre carga masiva y formulario -->
+  <div id="contenedor_captura">
+    <div class="mb-3" id="grupo_carga_masiva" style="display: none;">
+      <label class="form-label">Archivo Excel para captura masiva:</label>
+      <input type="file" class="form-control" id="archivo_excel" name="archivo_masivo" accept=".xls,.xlsx" required>
+      <div class="form-text">
+        La plantilla debe respetar el formato establecido y permitir hasta 1000 registros. Si el archivo no cumple con la estructura, se mostrará un mensaje de error al procesarlo.
+      </div>
+      <button type="button" class="btn btn-primary mt-2" onclick="validarExcel()">Validar Archivo</button>
+
+    </div>
+    
+    <div id="carga-masiva-section" style="display: none;"></div>
+    <div id="errores_excel" class="mt-3 text-danger" style="white-space: pre-wrap;"></div>
+      <div id="tabla_unidades_excel" class="mt-3"></div>
+    </div>
+    
+    
+      <!-- Aquí se ocultan los campos del formulario normal -->
+      <div id="grupo_formulario_normal">
+    
+      <input type="hidden" name="origen_unidad" id="origen_unidad" value="">
+    
+    
+      <div class="row mb-3" id="grupo_terminal">
+        <div class="col-md-6">
+          <label class="form-label">
+            Número de Terminal SEF
+            <i id="icono-ayuda" class="bi bi-info-circle-fill text-primary ms-2" style="cursor:pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="Número de Terminal SEF asignada por el sistema. Se solicita solo si el trámite es SUSTITUCIÓN."></i>
+          </label>
+          <input type="text" class="form-control" id="numero_terminal_sef" name="numero_terminal_sef">
+        </div>
+      </div>
+    
+      <div class="mb-3" id="grupo_nombre_unidad">
+        <label class="form-label">
+            Nombre de la Unidad *
+            <i class="bi bi-info-circle-fill text-primary ms-2" style="cursor:pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="Nombre de la Unidad de Negocio SEF es asignada por el Cliente. Se solicita solo si el trámite es ALTA."></i>
+        </label>
+        <input type="text" class="form-control" name="nombre_unidad" id="nombre_unidad">
+      </div>
+    
+      <div class="mb-3">
+        <label class="form-label">CPAE *</label>
+        <select class="form-select" name="cpae" required id="cpaeSelect">
+          <option value="">Selecciona…</option>
+          {% for cpae in catalogo_cpae %}
+            <option value="{{ cpae[0] }}">{{ cpae[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    
+      <div class="mb-3">
+        <label class="form-label">Servicio en la Unidad *</label>
+        <select class="form-select" name="tipo_servicio_unidad" id="tipo_servicio_unidad" required>
+          <option value="">Selecciona…</option>
+          <option value="DEPÓSITO TRADICIONAL">DEPÓSITO TRADICIONAL</option>
+          <option value="DEPÓSITO ELECTRÓNICO">DEPÓSITO ELECTRÓNICO</option>
+          <option value="DOTACIÓN ELECTRÓNICA">DOTACIÓN ELECTRÓNICA</option>
+          <option value="DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA">DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA</option>
+          <option value="CENTRALIZADA (SOLO DOTACIÓN)">CENTRALIZADA (SOLO DOTACIÓN)</option>
+          <option value="INTEGRADORA (SOLO DEPÓSITO)">INTEGRADORA (SOLO DEPÓSITO)</option>
+          <option value="DEPOSITO CLIENTE CERTIFICADO">DEPOSITO CLIENTE CERTIFICADO</option>
+          <option value="CENTRALIZADA CLIENTE CERTIFICADO">CENTRALIZADA CLIENTE CERTIFICADO</option>
+        </select>
+      </div>
+    
+      <div class="mb-3">
+        <label class="form-label">Empresa de Traslado de Valores *</label>
+        <select class="form-select" name="empresa_traslado" required>
+          <option value="">SELECCIONA...</option>
+          {% for etv in catalogo_etv %}
+            <option value="{{ etv[0] }}">{{ etv[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    
+    <!-- Dirección -->
+    <div class="row mb-2">
+      <div class="col-md-4">
+        <label class="form-label">Calle y número *</label>
+        <input type="text" class="form-control" name="calle_numero" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Colonia *</label>
+        <input type="text" class="form-control" name="colonia" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Código Postal *</label>
+        <input type="text" class="form-control" name="codigo_postal" id="codigo_postal">
+      </div>
+    </div>
+    
+    <div class="row mb-3">
+    
+      <div class="col-md-6">
+        <label class="form-label">Estado *</label>
+        <select class="form-select" name="estado" id="estadoSelect" required>
+          <option value="">Selecciona…</option>
+          {% for estado in catalogo_estados %}
+            <option value="{{ estado[0] }}">{{ estado[1] }}</option>          
+          {% endfor %}
+        </select>
+      </div>
+    
+      <div class="col-md-6">
+        <label class="form-label">Ciudad/Municipio *</label>
+        <select class="form-select" name="municipio_id" id="municipioSelect" required>
+          <option value="">Selecciona...</option>
+        </select>
+      </div>
+    </div>
+    
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">No. Terminal Integradora</label>
+          <input type="text" class="form-control" name="terminal_integradora" id="terminal_integradora">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">No. Terminal Dotación Centralizada</label>
+          <input type="text" class="form-control" name="terminal_dotacion_centralizada" id="terminal_dotacion_centralizada">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">No. Terminal Cliente Certificado Centralizada</label>
+          <input type="text" class="form-control" name="terminal_certificado_centralizada" id="terminal_certificado_centralizada">
+        </div>
+      </div>
+      </div>
+  </div>
+
+  <div id="errores_excel" class="mt-3 text-danger" style="white-space: pre-wrap;"></div>
+  <div id="tabla_unidades_excel" class="mt-3"></div>
+
+  <button type="submit" class="btn btn-success mt-3" id="btn_agregar">Agregar Unidad</button>
+  <button type="submit" class="btn btn-primary mt-3" id="btn_subir_archivo" style="display: none;">Subir Archivo</button>
+
+</form>
+
+<hr>
+<h4>Unidades Capturadas:</h4>
+{% if unidades %}
+  <div class="accordion" id="accordionUnidades">
+    {% for unidad in unidades %}
+      <div class="accordion-item mb-2 border rounded">
+        <h2 class="accordion-header" id="heading{{ loop.index }}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
+                  aria-controls="collapse{{ loop.index }}" >
+            <strong>#{{loop.index }} - {{ unidad.origen_unidad or '-' }}</strong>&nbsp;–{{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}
+          </button>
+        </h2>
+        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse"
+             aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionUnidades">
+          <div class="accordion-body small">
+            <div class="row">
+              <div class="col-md-6"><strong>ETV:</strong> {{ unidad.etv_nombre or '-' }}</div>
+              <div class="col-md-6"><strong>Ciudad:</strong> {{ unidad.municipio_nombre or '-' }}</div>
+              <div class="col-md-6"><strong>Estado:</strong> {{ unidad.estado_nombre or '-' }}</div>              
+              <div class="col-md-6"><strong>Código Postal:</strong> {{ unidad.codigo_postal or '-' }}</div>
+              <div class="col-md-6"><strong>Calle y Número:</strong> {{ unidad.calle_numero or '-' }}</div>
+              <div class="col-md-6"><strong>Colonia:</strong> {{ unidad.colonia or '-' }}</div>
+              <div class="col-md-6"><strong>Terminal Integradora:</strong> {{ unidad.terminal_integradora or '-' }}</div>
+              <div class="col-md-6"><strong>Dotación Centralizada:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }}</div>
+              <div class="col-md-6"><strong>Terminal Certificado:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}</div>
+              <div class="col-md-6"><strong>No. Terminal SEF:</strong> {{ unidad.numero_terminal_sef or '-' }}</div>
+            </div>
+            <form method="POST" class="mt-3 text-end">
+              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+              <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash"></i> Eliminar Unidad
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <form method="GET" action="{{ url_for('frames.frame3') }}">
+    <button type="submit" class="btn btn-primary mt-4">Siguiente – Cuentas</button>
+  </form>
+{% else %}
+  <p class="text-muted">Aún no se ha agregado ninguna unidad.</p>
+{% endif %}
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tipoTramite = "{{ frame1.tipo_tramite }}";
+    const radioAgregar = document.getElementById("radio_agregar");
+    const radioSustituir = document.getElementById("radio_sustituir");
+    const switchMasivo = document.getElementById("switch_modo_masivo");
+    const checkMasivo = document.getElementById("check_masivo");
+    const grupoCargaMasiva = document.getElementById("grupo_carga_masiva");
+    const grupoFormulario = document.getElementById("grupo_formulario_normal");
+
+    function mostrarSwitchMasivo() {
+      if (tipoTramite === "ALTA" || (tipoTramite === "SUSTITUCIÓN" && radioAgregar?.checked)) {
+        switchMasivo.style.display = "block";
+      } else {
+        switchMasivo.style.display = "none";
+        checkMasivo.checked = false;
+        grupoCargaMasiva.style.display = "none";
+        grupoFormulario.style.display = "block";
+      }
+    }
+    function alternarModoCaptura() {
+  const cargaMasivaSection = document.getElementById("tabla_unidades_excel");
+  const camposRequeridos = document.querySelectorAll("#grupo_formulario_normal [required]");
+
+  if (checkMasivo.checked) {
+    grupoCargaMasiva.style.display = "block";
+    grupoFormulario.style.display = "none";
+    if (cargaMasivaSection) cargaMasivaSection.style.display = "block";
+
+    camposRequeridos.forEach(c => c.removeAttribute("required"));  // 👈 importante
+  } else {
+    grupoCargaMasiva.style.display = "none";
+    grupoFormulario.style.display = "block";
+    if (cargaMasivaSection) cargaMasivaSection.style.display = "none";
+
+    camposRequeridos.forEach(c => c.setAttribute("required", "true"));  // 👈 restaurar
+  }
+}
+
+    mostrarSwitchMasivo();
+    alternarModoCaptura();
+
+    radioAgregar?.addEventListener("change", function () {
+      mostrarSwitchMasivo();
+      alternarModoCaptura();
+    });
+    radioSustituir?.addEventListener("change", function () {
+      mostrarSwitchMasivo();
+      alternarModoCaptura();
+    });
+    checkMasivo?.addEventListener("change", alternarModoCaptura);
+  });
+</script>
+
+
+
+<!-- Script 2: Filtrar dinámicamente las opciones de 'tipo_servicio_unidad' -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const servicioGeneral = document.getElementById('servicio_tipo_oculto')?.value?.trim();
+    const selectServicioUnidad = document.getElementById("tipo_servicio_unidad");
+
+    // Reglas de visibilidad según el tipo de servicio general
+    const reglas = {
+      "DEPÓSITO TRADICIONAL": ["DEPÓSITO TRADICIONAL"],
+      "DEPÓSITO ELECTRÓNICO": [
+        "DEPÓSITO ELECTRÓNICO",
+        "INTEGRADORA (SOLO DEPÓSITO)",
+        "DEPOSITO CLIENTE CERTIFICADO",
+        "CENTRALIZADA CLIENTE CERTIFICADO"
+      ],
+      "DOTACIÓN ELECTRÓNICA": [
+        "DOTACIÓN ELECTRÓNICA",
+        "CENTRALIZADA (SOLO DOTACIÓN)"
+      ],
+      "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA": [
+        "DEPÓSITO ELECTRÓNICO",
+        "DOTACIÓN ELECTRÓNICA",
+        "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA",
+        "CENTRALIZADA (SOLO DOTACIÓN)",
+        "INTEGRADORA (SOLO DEPÓSITO)",
+        "DEPOSITO CLIENTE CERTIFICADO",
+        "CENTRALIZADA CLIENTE CERTIFICADO"
+      ]
+    };
+
+    // Elimina todas las opciones y vuelve a mostrar solo las válidas
+    const visibles = reglas[servicioGeneral] || [];
+    const todasOpciones = Array.from(selectServicioUnidad.options);
+    selectServicioUnidad.innerHTML = "";
+
+    todasOpciones.forEach(opt => {
+      if (visibles.includes(opt.value) || opt.value === "") {
+        selectServicioUnidad.appendChild(opt);
+      }
+    });
+  });
+</script>
+
+<!-- Script 3: Inicializar tooltips de Bootstrap -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Buscar todos los elementos con atributo data-bs-toggle="tooltip"
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+    // Inicializar cada uno como Tooltip de Bootstrap
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+  });
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('cpaeSelect');
+    if (select) {
+      new Choices(select, {
+        searchEnabled: true,
+        itemSelectText: '',
+        placeholderValue: 'Escribe para buscar…',
+        searchPlaceholderValue: 'Buscar CPAE…'
+      });
+    }
+  });
+  </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const estadoSelect = document.getElementById('estadoSelect');
+    const municipioSelect = document.getElementById('municipioSelect');
+  
+    estadoSelect.addEventListener('change', function () {
+      const estadoId = this.value;
+  
+      municipioSelect.innerHTML = '<option value="">Cargando...</option>';
+      municipioSelect.disabled = true;
+  
+      if (!estadoId) {
+        municipioSelect.innerHTML = '<option value="">Selecciona el estado primero</option>';
+        municipioSelect.disabled = true;
+        return;
+      }
+  
+      fetch(`/api/municipios/${estadoId}`)
+        .then(response => response.json())
+        .then(data => {
+          municipioSelect.innerHTML = '<option value="">Selecciona…</option>';
+          data.municipios.forEach(function (mun) {
+            const option = document.createElement('option');
+            option.value = mun.id;  // AHORA guarda el ID
+            option.textContent = mun.nombre;
+            municipioSelect.appendChild(option);
+          });
+          municipioSelect.disabled = false;
+        })
+        .catch(error => {
+          municipioSelect.innerHTML = '<option value="">Error al cargar</option>';
+          console.error('Error:', error);
+        });
+    });
+  });
+  </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tipoTramite = "{{ frame1.tipo_tramite }}";
+    const radioAgregar = document.getElementById("radio_agregar");
+    const grupoCargaMasiva = document.getElementById("grupo_carga_masiva");
+
+    function evaluarCargaMasiva() {
+      if (tipoTramite === "ALTA") {
+        grupoCargaMasiva.style.display = "block";
+      } else if (tipoTramite === "SUSTITUCIÓN" && radioAgregar?.checked) {
+        grupoCargaMasiva.style.display = "block";
+      } else {
+        grupoCargaMasiva.style.display = "none";
+      }
+    }
+
+    evaluarCargaMasiva();
+    radioAgregar?.addEventListener("change", evaluarCargaMasiva);
+    document.getElementById("radio_sustituir")?.addEventListener("change", evaluarCargaMasiva);
+  });
+</script>
+  
+<script>
+  function validarExcel() {
+    const input = document.getElementById("archivo_excel");
+    const archivo = input.files[0];
+
+    if (!archivo) {
+      alert("Selecciona un archivo Excel.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("archivo_excel", archivo);
+
+    fetch("/validar_excel_unidades", {
+      method: "POST",
+      body: formData
+    })
+    .then(async (response) => {
+      const erroresDiv = document.getElementById("errores_excel");
+      const tablaDiv = document.getElementById("tabla_unidades_excel");
+
+      erroresDiv.innerHTML = "";
+      erroresDiv.style.display = "block";  // aseguramos visibilidad
+      tablaDiv.innerHTML = "";
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.errores) {
+          erroresDiv.innerText = data.errores.join("\n");
+          console.error("Errores encontrados al validar Excel:");
+          data.errores.forEach(err => console.error(err));  // Imprime cada uno
+        } else {
+          const msg = "Ocurrió un error al procesar el archivo.";
+          erroresDiv.innerText = msg;
+          console.error(msg);
+        }
+        return;
+      }
+
+      // Mostrar registros válidos
+      if (data.registros) {
+        const tabla = document.createElement("table");
+        tabla.className = "table table-bordered table-striped";
+
+        const encabezados = Object.keys(data.registros[0]);
+        const thead = tabla.createTHead();
+        const encabezadoFila = thead.insertRow();
+
+        encabezados.forEach(enc => {
+          const th = document.createElement("th");
+          th.textContent = enc;
+          encabezadoFila.appendChild(th);
+        });
+
+        const tbody = tabla.createTBody();
+        data.registros.forEach(reg => {
+          const fila = tbody.insertRow();
+          encabezados.forEach(col => {
+            const celda = fila.insertCell();
+            celda.textContent = reg[col] || "";
+          });
+        });
+
+        tablaDiv.appendChild(tabla);
+        console.log("Archivo Excel validado correctamente con", data.registros.length, "registros.");
+      }
+    })
+    .catch(error => {
+      const erroresDiv = document.getElementById("errores_excel");
+      erroresDiv.innerText = "Error de red o del servidor.";
+      erroresDiv.style.display = "block";
+      console.error("Error en fetch:", error);
+    });
+  }
+</script>
+
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+{% endblock %}

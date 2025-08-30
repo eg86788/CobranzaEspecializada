@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Catálogos disponibles</h2>
+  <ul class="list-group mb-4">
+    {% for clave in catalogos %}
+      <li class="list-group-item">
+        <a href="{{ url_for('catalogos.administrar_catalogo', catalogo=clave) }}">{{ clave|capitalize }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {# Campo de búsqueda dinámica para registros del catálogo seleccionado (ejemplo) #}
+  {% if registros %}
+  <label for="registroSelect" class="form-label">Buscar registro:</label>
+  <select id="registroSelect" class="form-select">
+    {% for registro in registros %}
+      <option value="{{ registro.id }}">{{ registro.nombre }}</option>
+    {% endfor %}
+  </select>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('registroSelect');
+    if (select) {
+      new Choices(select, {
+        searchEnabled: true,
+        itemSelectText: '',
+        placeholderValue: 'Escribe para buscar…',
+        searchPlaceholderValue: 'Buscar registro…'
+      });
+    }
+  });
+</script>
+{% endblock %}

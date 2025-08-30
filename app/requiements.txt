@@ -1,0 +1,24 @@
+# Web framework
+flask>=2.2.0
+
+# Conexión a PostgreSQL
+psycopg2-binary>=2.9.0
+
+# Generación de PDFs
+weasyprint>=59.0
+
+# Manejo de archivos Excel y DataFrames
+pandas>=2.3.0
+openpyxl>=3.1.2         # Para leer y escribir archivos .xlsx
+xlrd>=2.0.1             # Para leer archivos .xls si los aceptaras
+
+# Manejo de fechas y zonas horarias (ya incluido indirectamente por pandas, pero puede declararse explícito)
+python-dateutil>=2.8.0
+pytz>=2023.3
+tzdata>=2023.3
+
+# Utilidades
+six>=1.16.0
+
+# Manejo de variables de entorno (opcional pero útil)
+python-dotenv>=1.0.0

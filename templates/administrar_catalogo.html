@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Administrar catálogo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1>Catálogo: {{ catalogo|capitalize }}</h1>
+
+  <form method="post" class="mb-3">
+    <input class="form-control" type="text" name="nuevo" placeholder="Nuevo {{ campo }}" required>
+    <button class="btn btn-primary mt-2" type="submit">Agregar</button>
+  </form>
+  
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>{{ campo|capitalize }}</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td>{{ item.id }}</td>          {# YA NO item[0] #}
+          <td>{{ item.valor }}</td>       {# YA NO item[1] #}
+          <td>
+            <a class="btn btn-outline-secondary btn-sm"
+               href="{{ url_for('catalogos.editar_catalogo', catalogo=catalogo, item_id=item.id) }}">Editar</a>
+            <a class="btn btn-outline-danger btn-sm"
+               href="{{ url_for('catalogos.eliminar_catalogo', catalogo=catalogo, item_id=item.id) }}">Eliminar</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+</div>
+{% endblock %}

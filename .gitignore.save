@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.log
+*.tmp
+
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+
+# Config local / secretos
+.env
+.env.*
+instance/
+
+# Base de datos local / sqlite (si existiera)
+*.sqlite3
+
+# IDE / SO
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+
+# Builds / artefactos
+dist/
+build/
+
+# Archivos generados (WeasyPrint / zips)
+*.pdf
+*.zip
+
+# Cachés
+.cache/
+.pytest_cache/
+

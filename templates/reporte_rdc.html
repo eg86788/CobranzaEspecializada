@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Reporte de Diferencias Centralizadas</title>
+    <style>
+      @page {
+        size: A4 portrait;
+        margin: 1cm 1cm 1cm 1cm;
+        @top-center {
+          content: element(header);
+        }
+        @bottom-right {
+          content: "Página " counter(page) " de " counter(pages);
+          font-family: 'Arial Narrow', Arial, sans-serif;
+          font-size: 10px;
+          color: #666;
+        }
+      }
+    
+      #header {
+        position: running(header);
+        width: 100%;
+      }
+    
+      .header-inner {
+        margin: 0 auto;
+        width: calc(100% - 4cm); /* 2 cm de margen izquierdo y derecho */
+        box-sizing: border-box;
+      }
+    
+      .header-content {
+        background-color: #003746;
+        color: white;
+        width: 100%;
+        padding: 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 50px;
+      }
+    
+      .header-content img {
+        height: 36px;
+        width: auto;
+        max-height: 36px;
+      }
+    
+      .header-content h1 {
+        line-height: 1.2;
+        font-size: 14px;
+        margin: 0;
+      }
+    
+      body {
+        font-family: 'Banamex', Arial, sans-serif;
+        font-size: 11px;
+        color: #000000;
+      }
+    
+      p, h2, h3, h4, th, td {
+        color: #000000;
+        font-family: 'Arial Narrow', Arial, sans-serif;
+        font-size: 11px;
+      }
+
+      h1 {
+        color: #ffffff;
+        font-family: 'Arial Narrow', Arial, sans-serif;
+        font-size: 18px;
+      }
+    
+      hr {
+        border: none;
+        height: 2px;
+        background-color: #003746;
+      }
+    
+      ul {
+        padding-left: 20px;
+      }
+    
+      p {
+        text-align: justify;
+      }
+    </style>
+    
+</head>
+<body>
+      <!-- Contenedor general del encabezado -->
+    <div style="display: flex; align-items: center;">
+      <!-- Logo con fondo blanco -->
+      <div style="background-color: white; padding: 5px;">
+        <img src="file:/Users/edgargarcia/Documents/CobranzaSEF/static/banamex_neg.png" alt="Logo Banamex" style="height: 60px;">
+      </div>
+
+      <!-- Fondo azul ocupa todo el ancho restante -->
+      <div style="background-color: #003746; color: white; padding: 10px 20px; flex: 1;">
+        <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">Reporte de Diferencias Centralizadas</h1>
+        <p style="margin: 0; font-size: 12px; color: white;">Cascarón 204</p>
+      </div>
+    </div>
+    
+
+    <h2 style="text-align: center; font-size: 14px;">ANEXO AL CONTRATO DE PRESTACIÓN DE SERVICIOS DE EFECTIVO Y/O SERVICIOS DE EFECTIVO ELECTRÓNICO PARA RECEPCIÓN DE DÓLARES (HASTA 14 MIL DÓLARES MENSUALES)</h2>
+
+    <p>ANEXO QUE CELEBRAN POR UNA PARTE <strong>BANCO NACIONAL DE MÉXICO, S.A. INTEGRANTE DEL GRUPO FINANCIERO BANAMEX</strong>, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO EL “BANCO” Y, POR LA OTRA PARTE <strong>{{ frame1.razon_social }}</strong>, REPRESENTADA POR <strong>{{ firmantes.apoderado_legal }}</strong>, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO EL “CLIENTE”.</p>
+
+    <h3>ANTECEDENTES</h3>
+    <p>PRIMERO. Las Partes celebran o celebraron un Contrato de Prestación de Servicios de Efectivo (el “Contrato”), el cual se encuentra vigente y en el que se describe el proceso denominado Servicio de Depósito.</p>
+    <p>SEGUNDO. Para todos los efectos del presente Anexo, los términos empleados con mayúscula inicial tendrán el significado que se les atribuye en su Cláusula Primera o en el Contrato, mismo que será igualmente aplicable en su forma singular y plural.</p>
+
+    <h3>DECLARACIONES</h3>
+    <h4>A. DECLARA EL CLIENTE:</h4>
+    <ul>
+        <li>Que derivado de su actividad comercial, tiene necesidad de depositar en la Cuenta en dólares, dólares en efectivo hasta 14 mil mensuales.</li>
+        <li>Que el importe de los dólares en efectivo cuyo depósito realizará en la Cuenta en dólares, deriva de las actividades comerciales que lícitamente realiza en sus establecimientos ubicados en los Municipios Autorizados.</li>
+        <li>Que conoce el contenido y alcance de las Disposiciones y para el cumplimiento del objeto de este Anexo acepta sujetarse a las mismas, según sean modificadas, reformadas o adicionadas de tiempo en tiempo.</li>
+    </ul>
+
+    <h4>B. DECLARA EL BANCO:</h4>
+    <p>Que es una Sociedad Anónima integrante del Grupo Financiero Banamex constituida de conformidad con las Leyes de los Estados Unidos Mexicanos, plenamente facultada para celebrar el presente, según Decreto Publicado en el Diario Oficial de la Federación del 16 de agosto de 1991, inscrito en el Registro Público de Comercio del Distrito Federal en el Folio Mercantil 65,126 el 9 de septiembre de 1991.</p>
+
+    <h4>C. DECLARAN LAS PARTES:</h4>
+    <ul>
+        <li>Que reconocen su capacidad jurídica, así como las facultades con las que sus representantes se ostentan.</li>
+        <li>Que en virtud de ser facultad exclusiva del Banco la recepción de dólares en efectivo para depósito en cuenta.</li>
+        <li>Las referencias a la legislación aplicable, ya sea que se trate de disposiciones, leyes o reglamentos, significarán la legislación aplicable en vigor de tiempo en tiempo y las referencias a cualquier legislación específica aplicable significará dicha legislación aplicable, según sea modificada reformada o adicionada de tiempo en tiempo y cualquier legislación aplicable que sustituya a la misma.</li>
+    </ul>
+
+    <h3>CLÁUSULAS</h3>
+    <h4>PRIMERA.- Definiciones</h4>
+    <p>1. Cuenta en dólares: Significa en su conjunto, las cuentas de depósito bancario de dinero a la vista en dólares, abiertas por el Cliente en el Banco, que se relacionan en el “Apartado A” del presente Anexo, y que pertenecen al cliente contratante o a su Grupo Económico.</p>
+    <p>2. Dólares: Significa la moneda de curso legal en los Estados Unidos de América.</p>
+    <p>3. Municipios Autorizados: Significa los municipios o delegaciones en los que económicamente se justifique que el Cliente sea receptor de Dólares en efectivo, en función del alto flujo de personas físicas extranjeras y la derrama de ingresos de dichas personas sea significativa respecto de la actividad económica del municipio o delegación de que se trate, o en municipios cuyas principales poblaciones se encuentren localizadas dentro de la franja de veinte kilómetros paralela a la línea divisoria internacional norte del país o en los estados de Baja California o Baja California Sur.</p>
+    <p>4. Bolsa o envase: Es el envase de alta seguridad que contiene los diferentes tipos de valores como billetes, monedas y/o documentos; cerradas con un sello de plomo / plástico o segurisello aprobado por el Banco, que se emplea para la movilización del efectivo, los cuales deberán estar ordenados por denominación o en pequeños paquetes sin separación para ser recibidos en el CPAE para abono en cuenta del Cliente. La recepción de bolsa segurisello será total y completa responsabilidad del Cliente, quedando el Banco sin responsabilidad alguna en caso de presentarse una diferencia o alguna desviación al procedimiento.</p>
+    <p>5. Comprobante de servicio: Es el comprobante emitido por la Empresa de Traslado de Valores, en el cual el Cliente indica el importe del Depósito trasladado y el cual acompaña la(s) bolsa(s) o envase(s) y/o caseteros.</p>
+    <p>6. CPAE: Centro de Proceso y Administración de Efectivo.</p>
+    <p>7. Efectivo: Se refiere exclusivamente a los billetes y monedas acuñadas y de curso legal en México.</p>
+    <p>8. ETV: Empresa de Traslado de Valores, a través de la cual se realiza el traslado de efectivo entre el Cliente y el Banco.</p>
+    <p>9. Grupo Económico: Significa grupo de Personas Morales que tengan acuerdos, de cualquier naturaleza, para tomar decisiones en un mismo sentido. Se presume, salvo prueba en contrario, que constituyen un Grupo Económico: a) Las Sociedades o entidades legales que formen parte de un mismo Consorcio o Grupo Empresarial y la Persona Moral o conjunto de Personas Morales que tengan el control de dichas sociedades. b) Sean un Grupo Empresarial, consideradas como el conjunto de Personas Morales organizadas bajo esquemas de participación directa o indirecta del Capital Social, en las que una misma Sociedad mantiene el control de dichas Personas Morales. Asimismo, se considerarán como Grupo Empresarial a los Grupos Financieros constituidos conforme a la Ley para Regular las Agrupaciones Financieras.</p>
+
+    <h4>SEGUNDA.- Objeto</h4>
+    <p>El presente Anexo tiene por objeto establecer los términos y condiciones para la recepción del depósito de dólares en efectivo en la Cuenta en Dólares, conforme al proceso del Servicio de Depósito previsto en el Contrato.</p>
+
+    <h4>TERCERA.- Recepción y acreditación de depósitos de Dólares</h4>
+    <p>El traslado de los Dólares en efectivo se realizará por medio de la ETV indicada por el Cliente en el Contrato y los envases de Dólares deberán cumplir las especificaciones indicadas en el Contrato. Los Dólares deberán ser enviados en un envase específico, sin ser mezclados con depósitos en Moneda Nacional, de lo contrario el Banco podrá rechazarlos sin responsabilidad alguna de su parte.</p>
+    <p>Para la acreditación del efectivo en Dólares será necesario que el Cliente cumpla con los requisitos y documentos descritos en el Contrato. Los Dólares serán acreditados en la Cuenta en Dólares dentro de los plazos y en la forma y términos establecidos al efecto en el Contrato.</p>
+
+    <h4>CUARTA.- Comisiones</h4>
+    <p>A. Como contraprestación a los servicios aquí pactados, el Cliente se obliga a pagar al Banco las comisiones vigentes que resulten aplicables, de acuerdo a la tabla de comisiones del “Apartado A”. Las comisiones pueden ser modificadas en cualquier momento enviando para tal efecto una notificación del Banco con por lo menos 30 (treinta) días naturales de anticipación a aquel en que deba surtir efectos dicha modificación.</p>
+    <p>B. Todas las comisiones causan conforme a la legislación vigente el impuesto al valor agregado (IVA), a la tasa que corresponda.</p>
+    <p>C. El cobro se llevará a cabo dependiendo del tipo de servicio o paquete contratado.</p>
+    <p>D. La falta de cobro de las comisiones por los servicios, dentro del periodo indicado, no establece la preclusión o renuncia al derecho de cobro.</p>
+    <p>E. En caso de que el Banco no pueda realizar el cobro de las comisiones en la cuenta establecida en el “Apartado A”, el Cliente autoriza mediante la aceptación de este Anexo, y sin previa notificación, al Banco a realizar el cobro de dichas comisiones en cualquier cuenta que el Cliente tenga aperturada con el Banco, hasta por el total del monto adeudado.</p>
+    <p>F. El Banco se reserva el derecho de cancelar el servicio en caso de que no sea posible ejecutar el cobro de comisiones al Cliente.</p>
+    <p>G. La cuenta para el cobro de comisiones será del Cliente, en Moneda Nacional, y estará habilitada bajo el mismo número de Cliente que contrata el servicio.</p>
+    <p>H. El Cliente autoriza al Banco a realizar los cargos y/o abonos correspondientes a la prestación de los servicios del Banco en términos de lo señalado en el “Apartado A”, sea para operaciones relacionadas con la prestación de los servicios en su favor o del mismo Grupo Económico.</p>
+    <p>I. Comisiones Depósito a mismo Grupo Económico. El cobro de comisiones se realizará en los primeros 10 (diez) días del mes posterior a la prestación de servicios a cada una de las cuentas del mismo Grupo Económico especificada en el “Apartado A”.</p>
+
+    <h4>QUINTA.- Límites de Operación y Responsabilidades</h4>
+    <p>El Cliente expresamente reconoce y acepta que las Operaciones y depósitos en Dólares, están sujetos al límite mensual de $14,000 (Catorce mil) dólares mensuales, acumulados.</p>
+    <p>Si en cualquier momento durante el transcurso de un mes calendario, el acumulado de los depósitos de dólares en efectivo recibidos en la Cuenta en dólares, alcanza el límite agregado para el mes de que se trate, el Cliente deberá suspender los depósitos en la Cuenta en dólares hasta el inicio del mes inmediato siguiente. En caso contrario el Banco podrá rechazar la recepción de dólares al cliente sin responsabilidad para el Banco, y/o el Banco podrá devolver los dólares al Cliente, a través de su ETV indicada en el Contrato, sin aviso previo, siendo responsabilidad del cliente el pago de los servicios de traslado.</p>
+    <p>El Banco se reserva el derecho de cancelar el servicio si el Cliente reincide en el envío de Dólares que excedan el límite permitido de $14,000 (Catorce mil) dólares mensuales, sin responsabilidad para el Banco y bastando sólo la notificación al cliente por escrito o por medios electrónicos.</p>
+
+    <h4>SEXTA.- Relación entre las Partes</h4>
+    <p>Ambas Partes expresamente convienen en que todo el personal que se utilice para cualquier actividad relacionada con el objeto del presente Anexo, será personal precisa y exclusivamente contratado por cada Parte para dicha función. Dicha Parte será exclusivamente responsable de las obligaciones laborales y de seguridad social que surjan de las relaciones existentes con su personal, tales como salarios, indemnizaciones y riesgos profesionales o de cualquier otra obligación o por la prestación de servicios que derive de las citadas actividades según sea el caso. En ningún caso y por ningún concepto podrá considerarse al Banco como patrón directo o sustituto del personal del Cliente o viceversa, por lo que se obligan mutuamente a hacerse responsable de todas las reclamaciones individuales o colectivas que por cualquier razón puedan presentar sus trabajadores, así como las sanciones que pudieran imponerles las autoridades administrativas o judiciales del trabajo, sacando la otra Parte en paz y a salvo frente a toda reclamación, demanda, litigio o sanción que su personal o cualquier autoridad pretendiese fincar o entablar en perjuicio a consecuencia de la citada relación laboral.</p>
+
+    <h4>SÉPTIMA.- Modificación</h4>
+    <p>El Banco podrá realizar modificaciones a los términos y condiciones del servicio establecido en el presente, previa notificación por escrito a la otra Parte con cinco (5) días hábiles de anticipación. En el caso de modificaciones provenientes del cumplimiento del Banco de disposiciones legales o corporativas, las mismas se podrán realizar de manera electrónica ante el Cliente bastando para ello que el Cliente continúe utilizando los servicios a fin de expresar su consentimiento y aceptación a dichas modificaciones.</p>
+    <p>El Cliente no podrá ceder o transmitir en forma alguna los derechos y obligaciones derivados del presente Anexo, a no ser que se encuentren pactados o se haya otorgado previamente y por escrito el consentimiento de la otra Parte.</p>
+
+    <h4>OCTAVA.- Domicilios y Notificaciones</h4>
+    <p>Las Partes ratifican como sus domicilios los señalados en el Contrato.</p>
+
+    <h4>NOVENA.- Vigencia</h4>
+    <p>Este Anexo tendrá la misma vigencia que el Contrato, y podrá ser terminado anticipadamente por cualquiera de las Partes, sin responsabilidad alguna, mediante notificación por escrito dada a la otra Parte con 30 (treinta) días hábiles de anticipación a la fecha de terminación, en el entendido que las obligaciones de las Partes continuarán vigentes hasta la fecha efectiva de la terminación del Contrato, y en el entendido de que la obligación del Cliente de pagar las comisiones subsistirá hasta el momento en que las mismas sean cubiertas en su totalidad. No obstante lo anterior, en caso de incumplimientos por parte del Cliente el Banco podrá ejecutar las acciones establecidas en la cláusula Quinta.- Límites de Operación y Responsabilidades.</p>
+
+    <h4>DÉCIMA.- Jurisdicción y Leyes aplicables</h4>
+    <p>Para la interpretación, cumplimiento y ejecución del presente Anexo, las Partes están de acuerdo en que serán aplicables las leyes de los Estados Unidos Mexicanos y competentes los tribunales de la Ciudad de México, renunciando expresamente a cualquier otro fuero o jurisdicción que pudiera corresponderles en razón de sus domicilios presentes o futuros.</p>
+    <h3>FIRMAS DE CONFORMIDAD</h3>
+    <p>Debidamente enteradas de la validez y alcances legales del presente Anexo, las Partes lo firman en dos tantos quedando uno en poder del Banco y otro en poder del Cliente, a los __ días del mes de _____ de ____.</p>
+
+    <div>
+        <div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #ccc; padding: 6px;">Apoderado Legal (Cliente)</th>
+                <th style="border: 1px solid #ccc; padding: 6px;">Autorizador (Banco)</th>
+                <th style="border: 1px solid #ccc; padding: 6px;">Director Divisional (Banco)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Razón Social:</strong> {{ frame1.razon_social }}<br>
+                  <strong>Nombre:</strong> {{ firmantes.apoderado_legal }}
+                </td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Banco:</strong> BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                  <strong>Nombre:</strong> {{ firmantes.nombre_autorizador }}
+                </td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Banco:</strong> BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                  <strong>Nombre:</strong> {{ firmantes.nombre_director_divisional }}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+
+    <div style="page-break-before: always;"></div>
+
+    <!-- Contenedor general del encabezado -->
+    <div style="display: flex; align-items: center;">
+      <!-- Logo con fondo blanco -->
+      <div style="background-color: white; padding: 5px;">
+        <img src="file:/Users/edgargarcia/Documents/CobranzaSEF/static/banamex_neg.png" alt="Logo Banamex" style="height: 60px;">
+      </div>
+
+      <!-- Fondo azul ocupa todo el ancho restante -->
+      <div style="background-color: #003746; color: white; padding: 10px 20px; flex: 1;">
+        <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">Anexo al Contrato | Dólares hasta 14,000 USD </h1>
+        <p style="margin: 0; font-size: 12px; color: white;">Cascarón 204</p>
+      </div>
+    </div>
+
+    <h2 style="text-align: center; font-size: 14px;">APARTADO A DEL ANEXO AL CONTRATO DE PRESTACIÓN DE SERVICIOS DE EFECTIVO Y/O SERVICIOS DE EFECTIVO ELECTRÓNICO PARA RECEPCIÓN DE DÓLARES (HASTA 14 MIL DÓLARES MENSUALES)</h2>
+    <h3>I. COMISIONES</h3>
+    <p>Por medio del presente, el Cliente autoriza al Banco, a realizar cargos a las cuentas descritas en el punto II. Cuentas para Depósitos de los Dólares en Efectivo, para el cargo de las Comisiones que a continuación se mencionan:</p>
+    <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+        <thead>
+          <tr style="background-color: #003746; color: #ffffff;">
+            <th style="border: 1px solid #ccc; padding: 4px; color: #ffffff;">Concepto</th>
+            <th style="border: 1px solid #ccc; padding: 4px; color: #ffffff;">Descripción</th>
+            <th style="border: 1px solid #ccc; padding: 4px; color: #ffffff;">Tarifa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #ccc; padding: 4px;" rowspan="2">Depósito*</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">Servicio de depósito que se ofrece cuando el cliente envía subenvases dentro de un envase para el conteo y depósito por cada uno de ellos. (Por evento)</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">0.90 x millar</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ccc; padding: 4px;">Servicio de depósito que se ofrece cuando el cliente envía un envase para el depósito de un total de su efectivo. (Por evento)</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">0.75 x millar</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ccc; padding: 4px;">Depósito seguro de documentos</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">Depósito seguro de documentos (Cheques). (Por evento)</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">5.00 x docto</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ccc; padding: 4px;">Envases</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">Tarifa por cada envase o bolsa recibida. (Por evento)</td>
+            <td style="border: 1px solid #ccc; padding: 4px;">4.00 x envase</td>
+          </tr>
+        </tbody>
+      </table>
+
+    <p>* Las Tarifas son en M.N. y deberá adicionarse IVA.</p>
+
+    <h3>II. CUENTAS PARA EL DEPÓSITO DE LOS DÓLARES EN EFECTIVO</h3>
+    <p>En este acto, el Cliente autoriza y expresamente instruye al Banco a realizar los cargos y/o abonos que se deriven de los servicios contratados a las siguientes cuentas de depósito bancario de dinero a la vista en Dólares, que el Cliente mantiene abiertas en el Banco:</p>
+
+    <p>El Cliente se obliga a mantener la(s) cuenta(s) activas y con fondos suficientes con por lo menos 24 hrs. de anticipación a la fecha en que se deberán cubrir las operaciones de cargo que realice el Banco.</p>
+    <p>El Cliente acepta mediante la firma del presente Apartado que únicamente podrá incorporar cuentas propias o de su mismo Grupo Económico, para el Servicio de Depósito de dólares en efectivo. En caso de tener cuentas de depósito incorporadas a su servicio, o incorporar nuevas cuentas de depósito, que no cumplan con estas condiciones, serán dadas de baja, sin responsabilidad alguna para el Banco, limitándose éste último a notificar al Cliente a la brevedad.</p>
+    <p>El reporte de diferencias se llevará a cabo a partir de $200.00 dólares. La cuenta de Comisiones deberá ser la misma establecida en el Contrato.</p>
+
+    <h3>FIRMAS DE CONFORMIDAD</h3>
+    <p>Debidamente enteradas de la validez y alcances legales del presente Apartado "A", las Partes lo firman en dos tantos quedando uno en poder del Banco y otro en poder del Cliente, a los __ días del mes de _____ de ____.</p>
+
+    <div>
+        <div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #ccc; padding: 6px;">Apoderado Legal (Cliente)</th>
+                <th style="border: 1px solid #ccc; padding: 6px;">Autorizador (Banco)</th>
+                <th style="border: 1px solid #ccc; padding: 6px;">Director Divisional (Banco)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Razón Social:</strong> {{ frame1.razon_social }}<br>
+                  <strong>Nombre:</strong> {{ firmantes.apoderado_legal }}
+                </td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Banco:</strong> BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                  <strong>Nombre:</strong> {{ firmantes.nombre_autorizador }}
+                </td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Banco:</strong> BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                  <strong>Nombre:</strong> {{ firmantes.nombre_director_divisional }}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    <div style="page-break-before: always;"></div>
+
+    <!-- Contenedor general del encabezado -->
+    <div style="display: flex; align-items: center;">
+      <!-- Logo con fondo blanco -->
+      <div style="background-color: white; padding: 5px;">
+        <img src="file:/Users/edgargarcia/Documents/CobranzaSEF/static/banamex_neg.png" alt="Logo Banamex" style="height: 60px;">
+      </div>
+
+      <!-- Fondo azul ocupa todo el ancho restante -->
+      <div style="background-color: #003746; color: white; padding: 10px 20px; flex: 1;">
+        <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">Anexo al Contrato | Dólares hasta 14,000 USD </h1>
+        <p style="margin: 0; font-size: 12px; color: white;">Cascarón 204</p>
+      </div>
+    </div>
+
+    <h2 style="text-align: center; font-size: 14px;">APARTADO B DEL ANEXO AL CONTRATO DE PRESTACIÓN DE SERVICIOS DE EFECTIVO Y/O SERVICIOS DE EFECTIVO ELECTRÓNICO PARA RECEPCIÓN DE DÓLARES (HASTA 14 MIL DÓLARES MENSUALES)</h2>
+    <h3>DEVOLUCIONES</h3>
+    <p>El Cliente se compromete a realizar depósitos que no superen el importe máximo 14,000 (Catorce mil) dólares mensuales, en caso de rebasar el monto máximo autorizado por el Banco, el Cliente en este acto instruye y autoriza al Banco a aplicar un cargo a la cuenta de cheques a la que fue depositado y posteriormente a hacer el envío del efectivo físico a la unidad de negocio que señale el Cliente.</p>
+    <p>En caso de que surja un excedente del monto contenido en el envase respecto al monto disponible, el Banco rechazará el depósito y devolverá el envase a su remitente a través de la ETV a costa del Cliente.</p>
+
+    <h3>FIRMAS DE CONFORMIDAD</h3>
+    <p>Debidamente enteradas de la validez y alcances legales del presente Apartado “B”, las Partes lo firman en dos tantos quedando uno en poder del Banco y otro en poder del Cliente, a los ___ días del mes de _____ del ____.</p>
+
+    <div>
+        <div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #ccc; padding: 6px;">Apoderado Legal (Cliente)</th>
+                <th style="border: 1px solid #ccc; padding: 6px;">Autorizador (Banco)</th>
+                <th style="border: 1px solid #ccc; padding: 6px;">Director Divisional (Banco)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Razón Social:</strong> {{ frame1.razon_social }}<br>
+                  <strong>Nombre:</strong> {{ firmantes.apoderado_legal }}
+                </td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Banco:</strong> BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                  <strong>Nombre:</strong> {{ firmantes.nombre_autorizador }}
+                </td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
+                  <strong>Banco:</strong> BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+                  <strong>Nombre:</strong> {{ firmantes.nombre_director_divisional }}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+                <td style="border: 1px solid #ccc; padding: 30px 6px;">
+                  <strong>Firma:</strong><br><hr>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+</body>
+</html>

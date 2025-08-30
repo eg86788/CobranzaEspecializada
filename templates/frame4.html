@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Frame 4 - Usuarios SEF{% endblock %}
+
+{% block content %}
+<h2>Resumen de la solicitud</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Datos Generales del Cliente -->
+<div class="card mb-3">
+    <div class="card-header">Datos Generales del Cliente</div>
+    <div class="card-body p-0">
+      <table class="table table-sm mb-0">
+        <tbody>
+          <tr>
+            <th>Cliente</th>
+            <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th>Segmento</th>
+            <td>{{ frame1.segmento or '-' }}</td>
+          </tr>
+          <tr>
+            <th>Contrato</th>
+            <td>{{ frame1.numero_contrato }}</td>
+            <th>Tipo Trámite</th>
+            <td>{{ frame1.tipo_tramite }}</td>
+          </tr>
+          <tr>
+            <th>Tipo Contrato</th>
+            <td>{{ frame1.tipo_contrato }}</td>
+            <th>Servicio</th>
+            <td>{{ frame1.tipo_servicio }}</td>
+          </tr>
+          <tr>
+            <th>Tipo Cobro Comisión</th>
+            <td>{{ frame1.tipo_cobro }}</td>
+            <th>Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="post" class="d-inline">
+        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame1">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+
+<!-- Unidades de Negocio -->
+<div class="card mb-3">
+  <div class="card-header">Unidades de Negocio</div>
+  <div class="card-body p-0">
+    <table class="table table-bordered table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Nombre de Unidad</th>
+          <th>CPAE</th>
+          <th>Tipo Servicio</th>
+          <th>Empresa TV</th>
+          <th>Terminal SEF</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for unidad in unidades %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ unidad.nombre_unidad }}</td>
+          <td>{{ unidad.cpae_nombre }}</td>
+          <td>{{ unidad.tipo_servicio_unidad }}</td>
+          <td>{{ unidad.etv_nombre }}</td>
+          <td>{{ unidad.numero_terminal_sef or '-' }}</td>
+        </tr>
+        <tr class="table-light small">
+          <td colspan="7">
+            <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.municipio_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.<br>
+            <strong>Terminal Integradora:</strong> {{ unidad.terminal_integradora or '-' }} |
+            <strong>Dotación Centralizada:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
+            <strong>Certificado Centralizado:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer text-end">
+    <form method="post" class="d-inline">
+      <button class="btn btn-outline-secondary btn-sm" name="regresar_frame2">✎ Editar</button>
+    </form>
+  </div>
+</div>
+  
+<!-- Cuentas Capturadas -->
+<div class="card mb-3">
+    <div class="card-header">Cuentas</div>
+    <div class="card-body p-0">
+      <table class="table table-sm table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Servicio</th>
+            <th>No. Sucursal</th>
+            <th>No. Cuenta</th>
+            <th>Moneda</th>
+            <th>Terminal SEF Aplica</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cuenta in cuentas %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ cuenta.servicio }}</td>
+            <td>{{ cuenta.sucursal }}</td>
+            <td>{{ cuenta.cuenta }}</td>
+            <td>{{ cuenta.moneda }}</td>
+            <td>{{ cuenta.terminal_aplica or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="POST" class="d-inline">
+        <button name="regresar_frame3" class="btn btn-outline-secondary btn-sm">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+  
+  
+  <h2 class="mb-4">Usuarios de SEF</h2>
+
+<!-- Formulario de Usuarios SEF -->
+<form method="POST">
+    <div class="row mb-3">
+
+        <div class="col-md-6">
+            <label class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control" name="nombre_usuario" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Clave de Usuario</label>
+            <input type="text" class="form-control" id="clave_usuario" name="clave_usuario" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Perfil</label>
+        <select class="form-select" name="perfil" id="perfil">
+            <option value="">Selecciona...</option>
+            <option>USUARIO</option>
+            <option>TESORERO</option>
+        </select>
+    </div>
+            
+          
+        <div class="col-md-4">
+            <label class="form-label">Maker/Checker</label>
+            <select class="form-select" name="maker_checker">
+                <option value="">Selecciona...</option>
+                <option>MAKER</option>
+                <option>CHECKER</option>
+                <option>NO APLICA</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" name="correo">
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" name="telefono">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Terminal SEF a donde aplica *</label>
+          <select class="form-select" name="terminal_aplica" required>
+              <option value="">Selecciona...</option>
+              {% for unidad in unidades %}
+              <option value="#{{loop.index }} – {{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}">#{{loop.index }} – {{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}</option>
+              {% endfor %}
+          </select>
+      </div>      
+    </div>
+    </div>
+    <button type="submit" class="btn btn-success">Agregar Usuario</button>
+</form>
+
+<hr>
+<h4>Usuarios Capturados:</h4>
+{% if usuarios %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Clave Usuario</th>
+          <th>Perfil</th>
+          <th>Maker/Checker</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Terminal SEF Aplica</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ usuario.nombre_usuario }}</td>
+          <td>{{ usuario.clave_usuario }}</td>
+          <td>{{ usuario.perfil }}</td>
+          <td>{{ usuario.maker_checker }}</td>
+          <td>{{ usuario.correo }}</td>
+          <td>{{ usuario.telefono }}</td>
+          <td>{{ usuario.terminal_aplica }}</td>
+          <td class="text-center">
+            <form method="POST" class="m-0">
+              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+              <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar usuario">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">Aún no se han capturado usuarios.</p>
+{% endif %}
+
+
+<form action="{{ url_for('frames.frame5') }}" method="get">
+    <button type="submit" class="btn btn-primary mt-4">Siguiente - Contactos</button>
+</form>
+{% endblock %}

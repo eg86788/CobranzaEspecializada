@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Versiones: {{ slug }}</h3>
+<table class="table table-sm">
+  <thead><tr><th>Versión</th><th>Activa</th><th>Actualizada</th><th>Acciones</th></tr></thead>
+  <tbody>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.version }}</td>
+        <td>{{ it.is_active and 'Sí' or 'No' }}</td>
+        <td>{{ it.updated_at }}</td>
+        <td class="d-flex gap-2">
+          <form method="post" action="{{ url_for('templates_admin.activate', slug=slug, tpl_id=it.id) }}">
+            <button class="btn btn-outline-primary btn-sm">Activar</button>
+          </form>
+          <form method="post" action="{{ url_for('templates_admin.revert', slug=slug, tpl_id=it.id) }}">
+            <button class="btn btn-outline-warning btn-sm">Revertir</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>{{ item and 'Editar' or 'Nuevo' }} número de adhesión</h3>
+<form method="post" class="row g-3">
+  <div class="col-md-4">
+    <label class="form-label">Clave (ej. SEF_TRADICIONAL)</label>
+    <input class="form-control" name="clave" value="{{ item and item.clave or '' }}" required>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Número</label>
+    <input class="form-control" name="numero" value="{{ item and item.numero or '' }}" required>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Vigente desde</label>
+    <input class="form-control" type="date" name="vigente_desde" value="{{ item and item.vigente_desde or '' }}" required>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Vigente hasta</label>
+    <input class="form-control" type="date" name="vigente_hasta" value="{{ item and item.vigente_hasta or '' }}">
+  </div>
+  {% if item %}
+  <div class="col-md-2">
+    <label class="form-label">Activo</label><br>
+    <input type="checkbox" name="activo" value="1" {% if item.activo %}checked{% endif %}>
+  </div>
+  {% endif %}
+  <div class="col-12">
+    <button class="btn btn-success">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('adh_admin.list_adh') }}">Volver</a>
+  </div>
+</form>
+{% endblock %}

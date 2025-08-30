@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Editar elemento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Editar elemento</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label for="nuevo_valor" class="form-label">Nombre</label>
+      <input type="text" class="form-control" name="nuevo_valor" id="nuevo_valor" value="{{ valor_actual }}">
+    </div>
+
+    {% if catalogo == 'municipios' %}
+    <div class="mb-3">
+      <label for="estado" class="form-label">Estado asociado</label>
+      <select class="form-select" name="estado" id="estado">
+        {% for estado in estados %}
+          <option value="{{ estado.id }}" {% if estado.id == estado_actual_id %}selected{% endif %}>
+            {{ estado.nombre }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a href="{{ url_for('catalogos.administrar_catalogo', catalogo=catalogo) }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

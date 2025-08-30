@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Frame 3 - Cuentas{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Resumen de la solicitud</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Datos Generales del Cliente -->
+<div class="card mb-3">
+    <div class="card-header">Datos Generales del Cliente</div>
+    <div class="card-body p-0">
+      <table class="table table-sm mb-0">
+        <tbody>
+          <tr>
+            <th>Cliente</th>
+            <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th>Segmento</th>
+            <td>{{ frame1.segmento or '-' }}</td>
+          </tr>
+          <tr>
+            <th>Contrato</th>
+            <td>{{ frame1.numero_contrato }}</td>
+            <th>Tipo Trámite</th>
+            <td>{{ frame1.tipo_tramite }}</td>
+          </tr>
+          <tr>
+            <th>Tipo Contrato</th>
+            <td>{{ frame1.tipo_contrato }}</td>
+            <th>Servicio</th>
+            <td>{{ frame1.tipo_servicio }}</td>
+          </tr>
+          <tr>
+            <th>Tipo Cobro Comisión</th>
+            <td>{{ frame1.tipo_cobro }}</td>
+            <th>Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="post" class="d-inline">
+        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame1">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+  
+<!-- Unidades de Negocio -->
+<div class="card mb-3">
+  <div class="card-header">Unidades de Negocio</div>
+  <div class="card-body p-0">
+    <table class="table table-bordered table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Nombre de Unidad</th>
+          <th>CPAE</th>
+          <th>Tipo Servicio</th>
+          <th>Empresa TV</th>
+          <th>Terminal SEF</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for unidad in unidades %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ unidad.nombre_unidad }}</td>
+          <td>{{ unidad.cpae_nombre }}</td>
+          <td>{{ unidad.tipo_servicio_unidad }}</td>
+          <td>{{ unidad.etv_nombre }}</td>
+          <td>{{ unidad.numero_terminal_sef or '-' }}</td>
+        </tr>
+        <tr class="table-light small">
+          <td colspan="7">
+            <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.municipio_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.<br>
+            <strong>Terminal Integradora:</strong> {{ unidad.terminal_integradora or '-' }} |
+            <strong>Dotación Centralizada:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
+            <strong>Certificado Centralizado:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer text-end">
+    <form method="post" class="d-inline">
+      <button class="btn btn-outline-secondary btn-sm" name="regresar_frame2">✎ Editar</button>
+    </form>
+  </div>
+</div>
+
+
+
+  <h2 class="mb-4">CUENTAS</h2>
+
+<!-- Formulario de Cuentas -->
+<form method="POST">
+  <div class="row mb-3">
+      <div class="col-md-6">
+          <label class="form-label">Terminal SEF a donde aplica *</label>
+          <select class="form-select" name="terminal_aplica" required>
+              <option value="">Selecciona...</option>
+              <option value="TODAS">APLICA PARA TODAS LAS UNIDADES REGISTRADAS</option>
+              {% for unidad in unidades %}
+                  <option value="{{ unidad.nombre_unidad }}">#{{loop.index }} – {{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-md-6">
+          <label class="form-label">Servicio *</label>
+          <select class="form-select" name="servicio" required>
+              <option value="">Selecciona...</option>
+              <option>DOTACIÓN</option>
+              <option>DEPÓSITO</option>
+              <option>COMISIÓN</option>
+          </select>
+      </div>
+  </div>
+
+  <div class="row mb-3">
+      <div class="col-md-4">
+          <label class="form-label">Sucursal *</label>
+          <input type="text" class="form-control" name="sucursal" id="sucursal" required>
+      </div>
+      <div class="col-md-4">
+          <label class="form-label">Cuenta *</label>
+          <input type="text" class="form-control" name="cuenta" id="cuenta" required>
+      </div>
+      <div class="col-md-4">
+          <label class="form-label">Moneda *</label>
+          <select class="form-select" name="moneda" required>
+              <option value="">Selecciona...</option>
+              <option>MXN - (PESOS)</option>
+              <option>USD - DÓLARES</option>
+          </select>
+      </div>
+  </div>
+  <input type="hidden" id="hidden_confirmacion_usd" name="confirmacion_usd" value="">
+  <button type="submit" class="btn btn-success">Agregar Cuenta</button>
+</form>
+
+<hr>
+<h4>Cuentas Capturadas:</h4>
+{% if cuentas %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Servicio</th>
+          <th>Cuenta</th>
+          <th>Sucursal</th>
+          <th>Moneda</th>
+          <th>Terminal Aplicable</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cuenta in cuentas %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ cuenta.servicio }}</td>
+          <td>{{ cuenta.cuenta }}</td>
+          <td>{{ cuenta.sucursal }}</td>
+          <td>{{ cuenta.moneda }}</td>
+          <td>{{ cuenta.terminal_aplica }}</td>
+          <td class="text-center">
+            <form method="POST" class="m-0">
+              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+              <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar cuenta">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <form method="GET" action="{{ url_for('frames.frame4') }}">
+    <button type="submit" class="btn btn-primary mt-4">Siguiente – Usuarios SEF</button>
+
+  </form>
+{% else %}
+  <p class="text-muted">Aún no se ha agregado ninguna cuenta.</p>
+{% endif %}
+
+<div class="modal fade" id="modalConfirmacionUSD" tabindex="-1" aria-labelledby="modalConfirmacionUSDLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalConfirmacionUSDLabel">Confirmar servicio en dólares</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        Esta ingresando una cuenta en dólares. ¿El cliente tiene contratado el servicio en dólares (hasta $14,000 USD mensuales)?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="btnUsdSi" data-bs-dismiss="modal">Sí</button>
+        <button type="button" class="btn btn-danger" id="btnUsdNo" data-bs-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const terminalSelect = document.querySelector('select[name="terminal_aplica"]');
+    const servicioSelect = document.querySelector('select[name="servicio"]');
+  
+    // Reglas por tipo de servicio
+    const reglas = {
+      "DEPÓSITO TRADICIONAL": ["DEPÓSITO", "COMISIÓN"],
+      "DEPÓSITO ELECTRÓNICO": ["DEPÓSITO", "COMISIÓN"],
+      "DOTACIÓN ELECTRÓNICA": ["DOTACIÓN", "COMISIÓN"],
+      "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA": ["DEPÓSITO", "DOTACIÓN", "COMISIÓN"],
+      "CENTRALIZADA (SOLO DOTACIÓN)": ["DOTACIÓN", "COMISIÓN"],
+      "INTEGRADORA (SOLO DEPÓSITO)": ["DEPÓSITO", "COMISIÓN"],
+      "DEPOSITO CLIENTE CERTIFICADO": ["DEPÓSITO", "COMISIÓN"],
+      "CENTRALIZADA CLIENTE CERTIFICADO": ["DEPÓSITO", "COMISIÓN"]
+    };
+  
+    // Datos de tipo servicio de cada unidad
+    const tiposServiciosPorUnidad = {
+      {% for unidad in unidades %}
+        "{{ unidad.nombre_unidad }}": "{{ unidad.tipo_servicio_unidad }}",
+      {% endfor %}
+    };
+  
+    function actualizarOpcionesServicio() {
+      // Restaurar todas las opciones
+      servicioSelect.innerHTML = '<option value="">Selecciona...</option><option>DOTACIÓN</option><option>DEPÓSITO</option><option>COMISIÓN</option>';
+  
+      let opcionesValidas = new Set();
+  
+      if (terminalSelect.value === "TODAS") {
+        // Reunir todos los tipos de servicio
+        const tiposServiciosUnidades = Object.values(tiposServiciosPorUnidad);
+        tiposServiciosUnidades.forEach(tipo => {
+          const permitidos = reglas[tipo] || [];
+          permitidos.forEach(op => opcionesValidas.add(op));
+        });
+  
+      } else {
+        // Una unidad específica seleccionada
+        const tipoServicioUnidad = tiposServiciosPorUnidad[terminalSelect.value];
+        const permitidos = reglas[tipoServicioUnidad] || [];
+        permitidos.forEach(op => opcionesValidas.add(op));
+      }
+  
+      // Si no hay tipos definidos o set vacío, no restringir
+      if (opcionesValidas.size === 0) {
+        servicioSelect.disabled = false;
+        return;
+      }
+  
+      // Filtrar opciones
+      let hayValido = false;
+      Array.from(servicioSelect.options).forEach(opt => {
+        if (opt.value !== "" && !opcionesValidas.has(opt.value)) {
+          opt.disabled = true;
+          opt.style.display = "none";
+        } else {
+          opt.disabled = false;
+          opt.style.display = "block";
+          if (opt.value === servicioSelect.value) {
+            hayValido = true;
+          }
+        }
+      });
+  
+      // Si el valor actual ya no es válido, resetear
+      if (!hayValido) {
+        servicioSelect.value = "";
+      }
+  
+      servicioSelect.disabled = false;
+    }
+  
+    if (terminalSelect && servicioSelect) {
+      terminalSelect.addEventListener('change', actualizarOpcionesServicio);
+      actualizarOpcionesServicio();
+    }
+  });
+  </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const monedaSelect = document.querySelector('select[name="moneda"]');
+    let confirmacionUSD = null; // variable local temporal
+  
+    monedaSelect.addEventListener('change', function () {
+      if (this.value.includes("USD")) {
+        // Mostrar modal
+        const modal = new bootstrap.Modal(document.getElementById('modalConfirmacionUSD'));
+        modal.show();
+  
+        // Botón Sí
+        document.getElementById('btnUsdSi').onclick = function () {
+          confirmacionUSD = "SI";
+          document.getElementById('hidden_confirmacion_usd').value = confirmacionUSD;
+        };
+  
+        // Botón No
+        document.getElementById('btnUsdNo').onclick = function () {
+          confirmacionUSD = "NO";
+          document.getElementById('hidden_confirmacion_usd').value = confirmacionUSD;
+        };
+      } else {
+        // Si cambian a otra moneda, limpiar
+        document.getElementById('hidden_confirmacion_usd').value = "";
+      }
+    });
+  });
+  </script>
+  
+  
+  
+
+{% endblock %}

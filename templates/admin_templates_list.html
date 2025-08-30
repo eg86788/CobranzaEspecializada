@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Plantillas</h2>
+<a class="btn btn-primary btn-sm" href="{{ url_for('templates_admin.create_template', token=request.args.get('token')) }}">
+  Nueva plantilla
+</a>
+<table class="table table-sm mt-3">
+  <thead><tr><th>Slug</th><th>Nombre</th><th>Versión</th><th>Vigente</th><th>Acciones</th></tr></thead>
+  <tbody>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.slug }}</td>
+        <td>{{ it.name }}</td>
+        <td>{{ it.version }}</td>
+        <td>{{ 'Sí' if it.is_active else 'No' }}</td>
+        <td>
+          <a class="btn btn-outline-secondary btn-sm"
+             href="{{ url_for('templates_admin.edit_template', slug=it.slug, token=request.args.get('token')) }}">Editar</a>
+          <a class="btn btn-outline-info btn-sm"
+             href="{{ url_for('templates_admin.preview', slug=it.slug, token=request.args.get('token')) }}" target="_blank">Vista previa</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

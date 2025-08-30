@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Accesos por producto{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="h5 mb-3">Accesos por producto (roles)</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat=='error' else cat }} py-2">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('admin_product_access.config') }}">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            {% for role in roles %}
+              <th class="text-center">{{ role|upper }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in productos %}
+          <tr>
+            <td>
+              <strong>{{ p.nombre }}</strong><br>
+              <span class="text-muted small">{{ p.code }}</span>
+            </td>
+            {% for role in roles %}
+              {% set checked = habilitados.get((role, p.code), False) %}
+              <td class="text-center">
+                <input type="checkbox"
+                       name="flag_{{ role }}_{{ p.code }}"
+                       {% if checked %}checked{% endif %}>
+              </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin.inicio') }}" class="btn btn-outline-secondary">Volver</a>
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

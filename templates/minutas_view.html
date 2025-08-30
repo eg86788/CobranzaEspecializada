@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Minuta #{{ minuta.id }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Minuta de reunión</h3>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('minutas.lista') }}">← Volver</a>
+    <a class="btn btn-outline-primary" href="{{ url_for('minutas.editar', minuta_id=minuta.id) }}">Editar</a>
+    <a class="btn btn-outline-info" href="{{ url_for('minutas.pdf', minuta_id=minuta.id) }}" target="_blank">PDF</a>
+    <form class="d-inline" method="post" action="{{ url_for('minutas.eliminar', minuta_id=minuta.id) }}" onsubmit="return confirm('¿Eliminar la minuta?');">
+      <button class="btn btn-outline-danger">Eliminar</button>
+    </form>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="text-muted">Fecha</div>
+        <div class="fw-semibold">{{ minuta.fecha_reunion }}</div>
+      </div>
+      <div class="col-md-9">
+        <div class="text-muted">Asunto</div>
+        <div class="fw-semibold">{{ minuta.asunto }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header fw-semibold">Asistentes</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead class="table-light">
+        <tr><th>Nombre</th><th>Cargo / Rol</th></tr>
+      </thead>
+      <tbody>
+        {% for a in asistentes %}
+        <tr><td>{{ a.nombre }}</td><td>{{ a.cargo or '-' }}</td></tr>
+        {% else %}
+        <tr><td colspan="2" class="text-muted">Sin asistentes</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-3 h-100">
+      <div class="card-header fw-semibold">Notas</div>
+      <div class="card-body">
+        {% if minuta.notas %}{{ minuta.notas|safe }}{% else %}<span class="text-muted">–</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card mb-3 h-100">
+      <div class="card-header fw-semibold">Acuerdos</div>
+      <div class="card-body">
+        {% if minuta.acuerdos %}{{ minuta.acuerdos|safe }}{% else %}<span class="text-muted">–</span>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Compromisos</div>
+  <div class="card-body p-0">
+    <table class="table mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Descripción</th>
+          <th>Responsable</th>
+          <th>ETA</th>
+          <th>Estatus</th>
+          <th class="text-end">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in compromisos %}
+        <tr>
+          <td>{{ c.descripcion }}</td>
+          <td>{{ c.responsable }}</td>
+          <td>{{ c.eta or '-' }}</td>
+          <td>{{ c.estatus }}</td>
+          <td class="text-end">
+            <form method="post" action="{{ url_for('minutas.compromiso_estatus', comp_id=c.id) }}" class="d-inline">
+              <select name="estatus" class="form-select form-select-sm d-inline-block w-auto">
+                <option value="PENDIENTE" {{ 'selected' if c.estatus=='PENDIENTE' else '' }}>Pendiente</option>
+                <option value="EN PROCESO" {{ 'selected' if c.estatus=='EN PROCESO' else '' }}>En proceso</option>
+                <option value="CERRADO" {{ 'selected' if c.estatus=='CERRADO' else '' }}>Cerrado</option>
+              </select>
+              <button class="btn btn-sm btn-outline-primary">Actualizar</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">Sin compromisos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

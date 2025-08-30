@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Frame 5 - Contactos{% endblock %}
+
+{% block content %}
+<h2>Resumen de la solicitud</h2>
+
+<!-- Datos Generales del Cliente -->
+<div class="card mb-3">
+    <div class="card-header">Datos Generales del Cliente</div>
+    <div class="card-body p-0">
+      <table class="table table-sm mb-0">
+        <tbody>
+          <tr>
+            <th>Cliente</th>
+            <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th>Segmento</th>
+            <td>{{ frame1.segmento or '-' }}</td>
+          </tr>
+          <tr>
+            <th>Contrato</th>
+            <td>{{ frame1.numero_contrato }}</td>
+            <th>Tipo Trámite</th>
+            <td>{{ frame1.tipo_tramite }}</td>
+          </tr>
+          <tr>
+            <th>Tipo Contrato</th>
+            <td>{{ frame1.tipo_contrato }}</td>
+            <th>Servicio</th>
+            <td>{{ frame1.tipo_servicio }}</td>
+          </tr>
+          <tr>
+            <th>Tipo Cobro Comisión</th>
+            <td>{{ frame1.tipo_cobro }}</td>
+            <th>Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="post" class="d-inline">
+        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame1">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Unidades de Negocio -->
+  <div class="card mb-3">
+    <div class="card-header">Unidades de Negocio</div>
+    <div class="card-body p-0">
+      <table class="table table-sm table-bordered align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Nombre Unidad</th>
+            <th>CPAE</th>
+            <th>Tipo Unidad</th>
+            <th>Servicio</th>
+            <th>Tipo Servicio</th>
+            <th>Empresa Traslado</th>
+            <th>Terminal SEF</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for unidad in unidades %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ unidad.nombre_unidad }}</td>
+            <td>{{ unidad.cpae }}</td>
+            <td>{{ unidad.tipo_unidad }}</td>
+            <td>{{ unidad.servicio }}</td>
+            <td>{{ unidad.tipo_servicio }}</td>
+            <td>{{ unidad.empresa_traslado }}</td>
+            <td>{{ unidad.numero_terminal_sef or '-' }}</td>
+          </tr>
+          <tr>
+            <td colspan="8" class="bg-light small">
+              <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.ciudad_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.
+              <strong>Term. Int.:</strong> {{ unidad.terminal_integradora or '-' }} |
+              <strong>Dot. Central.:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
+              <strong>Cert. Central.:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="post" class="d-inline">
+        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame2">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+
+<!-- Cuentas Capturadas -->
+<div class="card mb-3">
+    <div class="card-header">Cuentas Capturadas</div>
+    <div class="card-body p-0">
+      <table class="table table-sm table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Servicio</th>
+            <th>No. Sucursal</th>
+            <th>No. Cuenta</th>
+            <th>Moneda</th>
+            <th>Terminal SEF Aplica</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cuenta in cuentas %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ cuenta.servicio }}</td>
+            <td>{{ cuenta.sucursal }}</td>
+            <td>{{ cuenta.cuenta }}</td>
+            <td>{{ cuenta.moneda }}</td>
+            <td>{{ cuenta.terminal_aplica or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="POST" class="d-inline">
+        <button name="regresar_frame3" class="btn btn-outline-secondary btn-sm">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+  
+  
+<!-- Resumen Usuarios SEF -->
+<div class="card mb-3">
+    <div class="card-header">Usuarios SEF (Frame 4)</div>
+    <div class="card-body p-0">
+      <table class="table table-sm table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Clave</th>
+            <th>Perfil</th>
+            <th>Maker/Checker</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Terminal SEF</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ u.nombre_usuario }}</td>
+            <td>{{ u.clave_usuario }}</td>
+            <td>{{ u.perfil }}</td>
+            <td>{{ u.maker_checker }}</td>
+            <td>{{ u.correo }}</td>
+            <td>{{ u.telefono }}</td>
+            <td>{{ u.terminal_aplica }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-end">
+      <form method="POST">
+        <button name="regresar_frame4" class="btn btn-outline-secondary btn-sm">✎ Editar</button>
+      </form>
+    </div>
+  </div>
+  <h2 class="mb-4">Contactos</h2>
+
+<!-- Formulario Contactos -->
+<form method="POST">
+    <div class="mb-3">
+        <label>Terminal SEF</label>
+        <select class="form-select" name="terminal_aplica" required>
+          <option value="">Selecciona...</option>
+          <option value="TODAS">APLICA PARA TODAS LAS UNIDADES REGISTRADAS</option>
+          {% for unidad in unidades %}
+              <option value="{{ unidad.nombre_unidad }}">{{ unidad.nombre_unidad }} - {{ unidad.numero_terminal_sef }}</option>
+          {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre_contacto" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Teléfono</label>
+        <input type="tel" name="telefono" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Correo electrónico</label>
+        <input type="email" name="correo" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Tipo de Contacto</label><br>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Diferencias Locales">
+            <label class="form-check-label">Diferencias Locales</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Diferencias Centralizadas">
+            <label class="form-check-label">Diferencias Centralizadas</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Contingencia">
+            <label class="form-check-label">Contingencia</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Capacitacion Dotación o Depósito">
+            <label class="form-check-label">Capacitación Dotación o Depósito</label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agregar Contacto</button>
+</form>
+
+<hr>
+<h4>Contactos Capturados:</h4>
+{% if contactos %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Terminal SEF</th>
+          <th>Tipo(s) de Contacto</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contacto in contactos %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ contacto.nombre_contacto }}</td>
+          <td>{{ contacto.correo }}</td>
+          <td>{{ contacto.telefono }}</td>
+          <td>{{ contacto.numero_terminal_sef or '-' }}</td>
+          <td>
+            {% if contacto.tipos_contacto %}
+              {{ contacto.tipos_contacto | join(', ') }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td class="text-center">
+            <form method="POST" class="m-0">
+              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+              <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar contacto">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">Aún no se han capturado contactos.</p>
+{% endif %}
+
+<div class="modal fade" id="modalConfirmacionUSD" tabindex="-1" aria-labelledby="modalConfirmacionUSDLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalConfirmacionUSDLabel">Confirmar servicio en dólares</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        Esta ingresando una cuenta en dólares. ¿El cliente tiene contratado el servicio en dólares (hasta $14,000 USD mensuales)?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="btnUsdSi" data-bs-dismiss="modal">Sí</button>
+        <button type="button" class="btn btn-danger" id="btnUsdNo" data-bs-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+<form method="GET" action="{{ url_for('frames.finalizar') }}" class="mt-4">
+    <button type="submit" class="btn btn-success">Finalizar Captura</button>
+</form>
+
+{% endblock %}

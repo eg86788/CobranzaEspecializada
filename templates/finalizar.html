@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+
+{% block title %}Resumen y Finalización{% endblock %}
+
+{% block content %}
+
+{% if imprimir_pdf %}
+<style>
+  @font-face {
+    font-family: 'Inter';
+    src: url("{{ url_for('static', filename='fonts/Inter-Regular.ttf') }}") format('truetype');
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 1cm;
+
+    @bottom-right {
+      content: "Página " counter(page) " de " counter(pages);
+      font-family: 'Arial Narrow', Arial, sans-serif;
+      font-size: 9px;
+      color: #666;
+    }
+  }
+
+  body, h2, h3, p, th, td {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    color: #0a0a0a;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: inherit;
+  }
+
+  thead tr {
+    background-color: #DAE9EE;
+  }
+
+  th, td {
+    border: 1px solid #cccccc;
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .card-header {
+    background-color: #F0F0F0;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .bg-light {
+    background-color: #f9f9f9 !important;
+  }  
+</style>
+{% endif %}
+
+{% if imprimir_pdf %}
+<!-- Contenedor general del encabezado -->
+<div style="display: flex; align-items: center;">
+  <!-- Logo con fondo blanco -->
+  <div style="background-color: white; padding: 5px;">
+    <img src="file:/Users/edgargarcia/Documents/CobranzaSEF/static/banamex_neg.png" alt="Logo Banamex" style="height: 60px;">
+  </div>
+
+  <!-- Fondo azul ocupa todo el ancho restante -->
+  <div style="background-color: #003746; color: white; padding: 10px 20px; flex: 1;">
+    <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">Servicios de Efectivo | Anexo Operativo</h1>
+    <p style="margin: 0; font-size: 12px; color: white;">Cascarón 204</p>
+  </div>
+</div>
+
+{% else %}
+<h2 class="mt-4">Resumen de la Solicitud</h2>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Datos Generales del Cliente - Diseño Moderno Compacto -->
+<div class="card shadow-sm rounded-4 mb-4 border-0">
+  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
+    Datos Generales del Cliente
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <tbody>
+        <tr>
+          <th>Cliente</th>
+          <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+          <th>Segmento</th>
+          <td>{{ frame1.segmento or '-' }}</td>
+        </tr>
+        <tr>
+          <th>Contrato</th>
+          <td>{{ frame1.numero_contrato }}</td>
+          <th>Tipo Trámite</th>
+          <td>{{ frame1.tipo_tramite }}</td>
+        </tr>
+        <tr>
+          <th>Tipo Contrato</th>
+          <td>{{ frame1.tipo_contrato }}</td>
+          <th>Servicio</th>
+          <td>{{ frame1.tipo_servicio }}</td>
+        </tr>
+        <tr>
+          <th>Tipo Cobro Comisión</th>
+          <td>{{ frame1.tipo_cobro }}</td>
+          <th>Importe Máximo de Diferencias</th>
+          <td>{{ frame1.importe_maximo_dif }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- Unidades de Negocio - Diseño Moderno Compacto -->
+<div class="card shadow-sm rounded-4 mb-4 border-0">
+  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff;">
+    Unidades de Negocio
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm table-bordered align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 3%;">#</th>
+          <th style="width: 22%;">Nombre Unidad</th>
+          <th style="width: 18%;">CPAE</th>
+          <th style="width: 17%;">Tipo Unidad</th>
+          <th style="width: 20%;">Empresa Traslado</th>
+          <th style="width: 20%;">Terminal SEF</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for unidad in unidades %}
+        <tr>
+          <td class="fw-semibold">{{ loop.index }}</td>
+          <td>{{ unidad.nombre_unidad }}</td>
+          <td>{{ unidad.cpae_nombre }}</td>
+          <td>{{ unidad.tipo_servicio_unidad }}</td>
+          <td>{{ unidad.etv_nombre }}</td>
+          <td>{{ unidad.numero_terminal_sef or '-' }}</td>
+        </tr>
+        <tr>
+          <td colspan="6" class="bg-light text-muted small py-2 px-3">
+            <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.municipio_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.<br>
+            <strong>Term. Int.:</strong> {{ unidad.terminal_integradora or '-' }} |
+            <strong>Dot. Central.:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
+            <strong>Cert. Central.:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Cuentas – Diseño Moderno Compacto -->
+<div class="card shadow-sm rounded-4 mb-4 border-0">
+  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
+    Cuentas
+  </div>
+
+  <div class="card-body p-0">
+    <table class="table table-sm table-hover table-borderless align-middle mb-0">
+      <thead class="table-light small">
+        <tr class="border-bottom">
+          <th style="width:5%;">#</th>
+          <th style="width:25%;">Servicio</th>
+          <th style="width:15%;">No. Sucursal</th>
+          <th style="width:30%;">No. Cuenta</th>
+          <th style="width:10%;">Moneda</th>
+          <th style="width:15%;">Terminal SEF Aplica</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for cuenta in cuentas %}
+        <tr class="border-bottom">
+          <td class="text-muted">{{ loop.index }}</td>
+          <td class="fw-semibold text-dark">{{ cuenta.servicio }}</td>
+          <td>{{ cuenta.sucursal }}</td>
+          <td>{{ cuenta.cuenta }}</td>
+          <td>{{ cuenta.moneda }}</td>
+          <td class="text-muted">{{ cuenta.terminal_aplica or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Usuarios SEF – Diseño Moderno Compacto -->
+<div class="card shadow-sm rounded-4 mb-4 border-0">
+  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
+    Usuarios SEF
+  </div>
+
+  <div class="card-body p-0">
+    <table class="table table-sm table-hover table-bordered align-middle mb-0">
+      <thead class="table-light small">
+        <tr>
+          <th style="width:3%;">#</th>
+          <th style="width:14%;">Nombre</th>
+          <th style="width:10%;">Clave</th>
+          <th style="width:12%;">Perfil</th>
+          <th style="width:12%;">Maker/Checker</th>
+          <th style="width:14%;">Correo</th>
+          <th style="width:10%;">Teléfono</th>
+          <th style="width:12%;">Terminal SEF</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+        <tr>
+          <td class="text-muted">{{ loop.index }}</td>
+          <td class="fw-semibold text-dark">{{ u.nombre_usuario }}</td>
+          <td>{{ u.clave_usuario }}</td>
+          <td>{{ u.perfil }}</td>
+          <td>{{ u.maker_checker }}</td>
+          <td>{{ u.correo }}</td>
+          <td>{{ u.telefono }}</td>
+          <td>{{ u.terminal_aplica }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Contactos – Diseño Moderno Compacto -->
+<div class="card mb-3">
+  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
+    Contactos
+  </div>
+
+  <div class="card-body p-0">
+    <table class="table table-sm table-hover table-bordered align-middle mb-0">
+      <thead class="table-light small">
+        <tr>
+          <th style="width:22%;">Nombre</th>
+          <th style="width:25%;">Correo</th>
+          <th style="width:18%;">Teléfono</th>
+          <th style="width:15%;">Terminal</th>
+          <th style="width:20%;">Tipo de Contacto</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in contactos %}
+        <tr>
+          <td class="fw-semibold text-dark">{{ c.nombre_contacto }}</td>
+          <td>{{ c.correo }}</td>
+          <td>{{ c.telefono }}</td>
+          <td>{{ c.numero_terminal_sef or 'Todas' }}</td>
+          <td>{{ c.tipos_contacto | join(', ') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+{% if imprimir_pdf %}
+<div class="card mb-3">
+  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">Firmas</div>
+  <div class="card-body p-0">
+    <table>
+      <thead>
+        <tr>
+          <th>Apoderado Legal (Cliente)</th>
+          <th>Autorizador (Banco)</th>
+          <th>Director Divisional (Banco)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <strong>Razón Social:</strong><br>{{ frame1.razon_social }}<br>
+            <strong>Nombre:</strong><br>{{ apoderado_legal }}
+          </td>
+          <td>
+            <strong>Banco:</strong><br>BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+            <strong>Nombre:</strong><br>{{ nombre_autorizador }}<br>
+            <strong>Puesto:</strong><br>{{ puesto_autorizador }}
+          </td>
+          <td>
+            <strong>Banco:</strong><br>BANCO NACIONAL DE MÉXICO S.A. DE C.V.<br>
+            <strong>Nombre:</strong><br>{{ nombre_director_divisional }}<br>
+            <strong>Puesto:</strong><br>{{ puesto_director_divisional }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-top: 30px;"><strong>Firma:</strong><br><hr></td>
+          <td style="padding-top: 30px;"><strong>Firma:</strong><br><hr></td>
+          <td style="padding-top: 30px;"><strong>Firma:</strong><br><hr></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<form method="POST" class="card card-body mb-3">
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label for="apoderado_legal" class="form-label">Apoderado Legal (Cliente) <span class="text-danger">*</span></label>
+      <input type="text" name="apoderado_legal" id="apoderado_legal" class="form-control" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ 0-9]+" value="{{ frame1.apoderado_legal if frame1 else '' }}">
+    </div>
+    <div class="col-md-6">
+      <label for="fecha_firma" class="form-label">Fecha de Firma Contrato <span class="text-danger">*</span></label>
+      <input type="text" 
+             name="fecha_firma" 
+             id="fecha_firma" 
+             class="form-control" 
+             required 
+             placeholder="dd/mm/aaaa" 
+             maxlength="10" 
+             value="{{ fecha_firma or '' }}">
+      <div id="error_fecha" class="text-danger small mt-1" style="display: none;">Formato de fecha inválido</div>
+    </div>
+    
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label for="nombre_autorizador" class="form-label">Nombre del Autorizador 1 (Banamex)<span class="text-danger">*</span></label>
+      <input type="text" name="nombre_autorizador" id="nombre_autorizador" class="form-control" required value="{{ nombre_autorizador or '' }}">
+    </div>
+    <div class="col-md-6">
+      <label for="puesto_autorizador" class="form-label">Puesto<span class="text-danger">*</span></label>
+      <input type="text" name="puesto_autorizador" id="puesto_autorizador" class="form-control" required value="{{ puesto_autorizador or '' }}">
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label for="nombre_director_divisional" class="form-label">Nombre del Autorizador 2 (Banamex)<span class="text-danger">*</span></label>
+      <input type="text" name="nombre_director_divisional" id="nombre_director_divisional" class="form-control" required value="{{ nombre_director_divisional or '' }}">
+    </div>
+    <div class="col-md-6">
+      <label for="puesto_director_divisional" class="form-label">Puesto<span class="text-danger">*</span></label>
+      <input type="text" name="puesto_director_divisional" id="puesto_director_divisional" class="form-control" required value="{{ puesto_director_divisional or '' }}">
+    </div>
+  </div>
+
+</form>
+
+{% endif %}
+{% if not imprimir_pdf %}
+<form method="POST" class="mt-4">
+
+  <div class="border rounded p-3 mb-3" style="background-color: #f9f9f9;">
+    <h5 class="mb-2">Opciones de impresión</h5>
+
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="checkAnexoUSD" name="anexo_usd_14k" value="1"
+        {% if session.get('anexo_usd_14k') %}checked{% endif %}>
+      <label class="form-check-label" for="checkAnexoUSD">
+        Incluir Anexo USD 14K en el PDF final
+      </label>
+    </div>
+  </div>
+
+  {% if session.get('rdc_reporte') %}
+  <div class="alert alert-info my-3">
+    Este cliente solicitó cobro CENTRALIZADO. Se incluirá el reporte Reporte Centralizado de Difencias (RDC) para el trámite.
+  </div>
+{% endif %}
+
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <a href="{{ url_for('frames.frame5') }}" class="btn btn-outline-secondary">
+      ← Modificar solicitud
+    </a>
+    <button type="button" onclick="validarFirmantes()" class="btn btn-outline-primary">
+      📄 Exportar PDF
+    </button>
+    <button type="submit" name="confirmar" value="1" class="btn btn-success">
+      ✅ Confirmar y Guardar
+    </button>
+  </div>
+
+
+  
+  <div class="alert alert-info" role="alert">
+    Al seleccionar <strong>Exportar PDF</strong>, se descargará un archivo <code>.zip</code> que contendrá todos los documentos aplicables al trámite.
+  </div>
+
+</form>
+{% endif %}
+
+<script>
+ function validarFirmantes() {
+  const apoderado    = document.getElementById('apoderado_legal').value.trim();
+  const fechaFirma   = document.getElementById('fecha_firma').value.trim();               // ← NUEVO
+  const autorizador  = document.getElementById('nombre_autorizador').value.trim();
+  const puestoAut    = document.getElementById('puesto_autorizador').value.trim();        // ← NUEVO
+  const director     = document.getElementById('nombre_director_divisional').value.trim();
+  const puestoDir    = document.getElementById('puesto_director_divisional').value.trim();// ← NUEVO
+  const anexoUSD     = document.getElementById('checkAnexoUSD').checked ? "1" : "";
+
+  if (!apoderado || !fechaFirma || !autorizador || !puestoAut || !director || !puestoDir) {
+    alert('Completa todos los campos de firmantes antes de exportar el PDF.');
+    return;
+  }
+
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = "{{ url_for('exportar.exportar_pdf') }}";
+
+  [
+    ['apoderado_legal', apoderado],
+    ['fecha_firma', fechaFirma],                                // ← NUEVO
+    ['nombre_autorizador', autorizador],
+    ['puesto_autorizador', puestoAut],                          // ← NUEVO
+    ['nombre_director_divisional', director],
+    ['puesto_director_divisional', puestoDir],                  // ← NUEVO
+    ['anexo_usd_14k', anexoUSD]
+  ].forEach(([name, value]) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const fechaInput = document.getElementById('fecha_firma');
+  const errorDiv = document.getElementById('error_fecha');
+
+  // 🎯 1. Aplicar Flatpickr
+  flatpickr(fechaInput, {
+    dateFormat: "d/m/Y",  // DD/MM/YYYY
+    allowInput: true,
+    locale: {
+      firstDayOfWeek: 1,
+      weekdays: {
+        shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+        longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+      },
+      months: {
+        shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+        longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
+                   'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+      }
+    }
+  });
+
+  // 🎯 2. Aplicar máscara de entrada
+  Inputmask("99/99/9999", {
+    placeholder: "dd/mm/aaaa",
+    showMaskOnHover: false,
+    clearIncomplete: true
+  }).mask(fechaInput);
+
+  // 🎯 3. Validación
+  fechaInput.addEventListener('blur', function () {
+    const valor = this.value;
+
+    if (valor.length === 10) {
+      const [dia, mes, anio] = valor.split('/').map(Number);
+      const fechaObj = new Date(anio, mes - 1, dia);
+
+      if (
+        fechaObj.getFullYear() !== anio ||
+        fechaObj.getMonth() + 1 !== mes ||
+        fechaObj.getDate() !== dia
+      ) {
+        errorDiv.style.display = "block";
+        this.classList.add("is-invalid");
+      } else {
+        errorDiv.style.display = "none";
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      }
+    } else {
+      errorDiv.style.display = "block";
+      this.classList.add("is-invalid");
+    }
+  });
+
+  // 🎯 4. Limpiar estado si vuelve a editar
+  fechaInput.addEventListener('input', function () {
+    errorDiv.style.display = "none";
+    this.classList.remove("is-invalid", "is-valid");
+  });
+});
+</script>
+
+
+{% endblock %}

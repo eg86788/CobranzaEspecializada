@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Panel de administración{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="h4 mb-4">Panel de administración</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat=='error' else cat }} py-2">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <a class="text-decoration-none" href="{{ url_for('admin.admin_catalogos') }}">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="h6 mb-1">Catálogos</h2>
+            <p class="text-muted mb-0">Altas, bajas y cambios de catálogos.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a class="text-decoration-none" href="{{ url_for('admin.admin_templates') }}">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="h6 mb-1">Plantillas</h2>
+            <p class="text-muted mb-0">Edición y versión de templates.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a class="text-decoration-none" href="{{ url_for('admin.admin_adhesiones') }}">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="h6 mb-1">Contratos de adhesión</h2>
+            <p class="text-muted mb-0">Administración y vigencias.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Accesos por producto (roles)</h2>
+      <p class="text-muted mb-3">
+        Configura qué productos están disponibles para cada rol desde la pantalla de “Accesos por producto”.
+      </p>
+      <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_product_access.config') }}">Configurar accesos por producto</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

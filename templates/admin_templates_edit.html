@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ tpl and 'Editar' or 'Nueva' }} plantilla{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{{ tpl and 'Editar' or 'Nueva' }} plantilla</h2>
+
+<form id="tpl-form" method="post">
+  {% if not tpl %}
+  <div class="mb-3">
+    <label class="form-label">Slug</label>
+    <input class="form-control" name="slug" required placeholder="contrato_tradicional">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" name="name" required placeholder="Contrato SEF Tradicional">
+  </div>
+  {% endif %}
+
+  <div class="mb-3">
+    <label class="form-label">Contenido (HTML + Jinja)</label>
+    <textarea id="content_html" name="content_html">{{ tpl.content_html if tpl else '' }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">CSS (opcional)</label>
+    <textarea id="css" name="css">{{ tpl.css if tpl else '' }}</textarea>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-outline-info" onclick="previewLive()">Vista previa</button>
+  </div>
+</form>
+
+<hr>
+<h5>Vista previa</h5>
+<div id="preview-frame" class="border p-3 bg-white shadow-sm" style="min-height: 500px;">
+  <div class="text-muted">Haz clic en <strong>Vista previa</strong> para ver la plantilla renderizada.</div>
+</div>
+
+<!-- Codemirror -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/theme/eclipse.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/css/css.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/addon/edit/closetag.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/addon/edit/closebrackets.js"></script>
+
+<style>
+  .CodeMirror {
+    border: 1px solid #ced4da;
+    border-radius: .375rem;
+    font-size: 14px;
+    min-height: 400px;
+  }
+</style>
+
+<script>
+  let editorHtml, editorCss;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    editorHtml = CodeMirror.fromTextArea(document.getElementById("content_html"), {
+      mode: "htmlmixed",
+      theme: "eclipse",
+      lineNumbers: true,
+      lineWrapping: true,
+      autoCloseTags: true,
+      autoCloseBrackets: true,
+      viewportMargin: Infinity
+    });
+
+    editorCss = CodeMirror.fromTextArea(document.getElementById("css"), {
+      mode: "css",
+      theme: "eclipse",
+      lineNumbers: true,
+      lineWrapping: true,
+      autoCloseBrackets: true,
+      viewportMargin: Infinity
+    });
+
+    // Para prevenir mayúsculas automáticas globales
+    editorHtml.getInputField().classList.add("no-uppercase");
+    editorCss.getInputField().classList.add("no-uppercase");
+  });
+
+  function previewLive() {
+    editorHtml.save();
+    editorCss.save();
+
+    fetch("{{ url_for('templates_admin.preview_live') }}?token={{ request.args.get('token') }}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        content_html: document.getElementById("content_html").value,
+        css: document.getElementById("css").value
+      })
+    })
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("preview-frame").innerHTML = html;
+    })
+    .catch(err => {
+      alert("Error al generar vista previa");
+      console.error(err);
+    });
+  }
+</script>
+{% endblock %}

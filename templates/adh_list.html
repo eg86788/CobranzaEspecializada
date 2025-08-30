@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Catálogo de números de adhesión</h3>
+  <a class="btn btn-primary" href="{{ url_for('adh_admin.new_adh') }}">Nuevo</a>
+</div>
+<table class="table table-sm">
+  <thead><tr><th>Clave</th><th>Número</th><th>Vigencia</th><th>Activo</th><th></th></tr></thead>
+  <tbody>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.clave }}</td>
+        <td>{{ it.numero }}</td>
+        <td>{{ it.vigente_desde }}{% if it.vigente_hasta %} → {{ it.vigente_hasta }}{% endif %}</td>
+        <td>{{ it.activo and 'Sí' or 'No' }}</td>
+        <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('adh_admin.edit_adh', item_id=it.id) }}">Editar</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
