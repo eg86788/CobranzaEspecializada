@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Script para agregar, commitear y pushear a GitHub
+
+if [ -z "$1" ]; then
+  echo "❌ Faltó el mensaje del commit. Usa así: subir 'tu mensaje aquí'"
+  exit 1
+fi
+
+git add .
+git commit -m "$1"
+git push
