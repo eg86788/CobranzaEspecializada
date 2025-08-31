@@ -7,8 +7,7 @@ from datetime import datetime
 from ..db_legacy import fetchall, fetchone, execute
 from ..utils.session_utils import limpiar_dependientes, hay_dependientes, normalizar_unidad
 from ..auth.decorators import login_required
-
-
+# Ejemplo al finalizar frame2:
 
 frames_bp = Blueprint("frames", __name__)
 
@@ -357,10 +356,11 @@ def finalizar():
             try:
                 solicitud_id = guardar_solicitud_desde_session(session)
                 limpiar_sesion()
-                flash(f"Solicitud #{solicitud_id} guardada en BD.", "success")
-                return redirect(url_for("frames.frame1"))
+                flash(f"Solicitud #{solicitud_id} guardada.", "success")
+                return redirect(url_for("sol_portal.detalle", solicitud_id=solicitud_id))
             except Exception as e:
-                flash(f"Error BD: {e}", "danger")
+                flash(f"Error al guardar: {e}", "danger")
+                return redirect(url_for("frames.finalizar"))
 
     return render_template(
         "finalizar.html",

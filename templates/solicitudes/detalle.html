@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Solicitud #{{ sol.id }}</h2>
+<p>
+  <b>Estatus:</b> {{ sol.estatus }} |
+  <b>Paso:</b> {{ sol.paso_actual }} |
+  <b>Creado:</b> {{ sol.creado_fmt }} |
+  <b>Actualizado:</b> {{ sol.actualizado_fmt }}
+</p>
+
+<h4>Datos principales</h4>
+<ul>
+  <li><b>Número cliente:</b> {{ sol.numero_cliente }}</li>
+  <li><b>Razón social:</b> {{ sol.razon_social }}</li>
+  <li><b>Segmento:</b> {{ sol.segmento }}</li>
+  <li><b>Tipo trámite:</b> {{ sol.tipo_tramite }}</li>
+  <li><b>Tipo contrato:</b> {{ sol.tipo_contrato }}</li>
+  <li><b>Tipo servicio:</b> {{ sol.tipo_servicio }}</li>
+  <li><b>Tipo cobro:</b> {{ sol.tipo_cobro }}</li>
+</ul>
+
+<h4>Unidades ({{ unidades|length }})</h4>
+<ul>
+  {% for u in unidades %}
+  <li>{{ u.nombre_unidad }} – {{ u.tipo_servicio }} – {{ u.numero_terminal_sef or '-' }}</li>
+  {% else %}<li>Sin unidades.</li>{% endfor %}
+</ul>
+
+<h4>Cuentas ({{ cuentas|length }})</h4>
+<ul>
+  {% for c in cuentas %}
+  <li>{{ c.servicio }} – {{ c.moneda }} – {{ c.numero_cuenta }}</li>
+  {% else %}<li>Sin cuentas.</li>{% endfor %}
+</ul>
+
+<h4>Usuarios ({{ usuarios|length }})</h4>
+<ul>
+  {% for u in usuarios %}
+  <li>{{ u.nombre_usuario }} – {{ u.perfil }} – {{ u.numero_terminal_sef or '-' }}</li>
+  {% else %}<li>Sin usuarios.</li>{% endfor %}
+</ul>
+
+<h4>Contactos ({{ contactos|length }})</h4>
+<ul>
+  {% for c in contactos %}
+  <li>{{ c.nombre }} – {{ c.correo }} – {{ c.tipo_contacto }}</li>
+  {% else %}<li>Sin contactos.</li>{% endfor %}
+</ul>
+
+<div class="mt-3">
+  <a class="btn btn-primary" href="{{ url_for('sol_portal.retomar', solicitud_id=sol.id) }}">Retomar captura</a>
+  <a class="btn btn-secondary" href="{{ url_for('sol_portal.listar') }}">Volver a la lista</a>
+</div>
+{% endblock %}

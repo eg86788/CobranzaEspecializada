@@ -11,7 +11,7 @@
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title">Plantillas de Documentos</h5>
-          <p class="card-text">Crea y versiona plantillas HTML/CSS.</p>
+          <p class="card-text">Crea y versiona plantillas HTML/CSS para los formatos y reportes de productos.</p>
           <a class="btn btn-primary" href="{{ url_for('templates_admin.list_templates') }}">Ir a Templates</a>
         </div>
       </div>
@@ -22,9 +22,9 @@
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title">Contratos de Adhesión</h5>
-          <p class="card-text">Administra series y números de adhesión.</p>
+          <p class="card-text">Administra números de Contratos de Adhesión (RECA) para los formatos.</p>
           <!-- OJO: blueprint 'adh_admin', endpoint 'list_adh' -->
-          <a class="btn btn-primary" href="{{ url_for('adh_admin.list_adh') }}">Ir a Adhesiones</a>
+          <a class="btn btn-primary" href="{{ url_for('adh_admin.list_adh') }}">Ir a Contratos de Adhesión</a>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title">Catálogos</h5>
-          <p class="card-text">Mantenimientos de CPAE, ETV, estados, etc.</p>
+          <p class="card-text">Mantenimientos de CPAE, ETV, Estados, Minicipio, etc.</p>
           <!-- Después (elige un catálogo por defecto, p. ej. 'cpae') -->
           <a class="btn btn-primary" href="{{ url_for('catalogos.ver_catalogos') }}">
             Ir a Catálogos
@@ -60,7 +60,6 @@
   <div class="d-flex gap-2">
     <!-- Para probar “flujo usuario” desde admin -->
     <a class="btn btn-outline-secondary" href="{{ url_for('core.inicio_productos') }}">Ver productos (vista usuario)</a>
-    <a class="btn btn-outline-danger" href="{{ url_for('auth_admin.logout') }}">Cerrar sesión</a>
   </div>
 </div>
 {% endblock %}

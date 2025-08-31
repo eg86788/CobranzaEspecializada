@@ -64,6 +64,10 @@ def logout():
 def admin_required() -> bool:
     return session.get("role") == "admin"
 
+def usuario_required() -> bool:
+    return session.get("role") == "user"
+
+
 @auth_bp.route("/ping")
 def ping():
     # No hace nada, pero renueva la cookie de sesión al ser llamado

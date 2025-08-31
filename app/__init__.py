@@ -7,6 +7,8 @@ from .config import Config
 from .db_legacy import fetchall  # si lo usas en otros módulos, se queda
 from .errors import register_error_handlers
 from flask import Flask, redirect, url_for, session
+from .blueprints.solicitudes_portal import sol_portal
+
 
 
 
@@ -92,6 +94,8 @@ def create_app():
     app.register_blueprint(adh_bp)           # /admin/adhesiones
     app.register_blueprint(minutas_bp)
     app.register_blueprint(api_bp, url_prefix="/api")
+    app.register_blueprint(sol_portal)
+
 
     # ----- Crear tablas solo si lo activas por config o env var -----
     init_flag = app.config.get("INIT_DB") or os.getenv("INIT_DB") == "1"

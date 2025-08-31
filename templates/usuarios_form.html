@@ -30,6 +30,14 @@
               </select>
             </div>
 
+            <div class="col-md-6">
+              <label class="form-label">Estado</label>
+              <select name="is_active" class="form-select">
+                <option value="1" {% if not user or (user and user.is_active) %}selected{% endif %}>Activo</option>
+                <option value="0" {% if user and not user.is_active %}selected{% endif %}>Inactivo</option>
+              </select>
+            </div>
+
             {% if modo == 'crear' %}
               <div class="col-md-6">
                 <label class="form-label">Contraseña</label>
@@ -55,14 +63,6 @@
                        minlength="8" autocomplete="new-password" placeholder="(opcional)">
               </div>
             {% endif %}
-
-            <div class="col-md-6">
-              <label class="form-label">Estado</label>
-              <select name="is_active" class="form-select">
-                <option value="1" {% if not user or (user and user.is_active) %}selected{% endif %}>Activo</option>
-                <option value="0" {% if user and not user.is_active %}selected{% endif %}>Inactivo</option>
-              </select>
-            </div>
           </div>
 
           <div class="d-flex justify-content-between mt-4">

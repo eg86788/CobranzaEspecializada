@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mis Solicitudes</h2>
+
+<form method="get" class="mb-3">
+  <label>Estatus</label>
+  <select name="estatus" onchange="this.form.submit()">
+    <option value="">(todos)</option>
+    {% for e in ['Borrador','Registrada','En Proceso','Completada','Cancelada'] %}
+      <option value="{{e}}" {{ 'selected' if estatus==e else '' }}>{{e}}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Cliente</th>
+      <th>Razón social</th>
+      <th>Servicio</th>
+      <th>Contrato</th>
+      <th>Estatus</th>
+      <th>Paso</th>
+      <th>Actualizado</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in items %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.numero_cliente }}</td>
+      <td>{{ r.razon_social }}</td>
+      <td>{{ r.tipo_servicio }}</td>
+      <td>{{ r.tipo_contrato }}</td>
+      <td>{{ r.estatus }}</td>
+      <td>{{ r.paso_actual }}</td>
+      <td>{{ r.actualizado }}</td>
+      <td class="text-nowrap">
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('sol_portal.detalle', solicitud_id=r.id) }}">Ver</a>
+        <a class="btn btn-sm btn-primary" href="{{ url_for('sol_portal.retomar', solicitud_id=r.id) }}">Retomar</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="9" class="text-center">No hay solicitudes.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="d-flex gap-2">
+  <a href="{{ url_for('core.frame1_nuevo') }}" class="btn btn-success">
+    <i class="bi bi-plus-lg me-1"></i>Nueva solicitud
+  </a>
+  <a class="btn btn-outline-secondary" href="{{ url_for('core.inicio_productos') }}">
+    <i class="bi bi-arrow-left-short me-1"></i>Volver
+  </a>
+</div>
+{% endblock %}
