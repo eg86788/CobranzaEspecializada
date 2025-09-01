@@ -1,238 +1,144 @@
 # app/blueprints/solicitudes_portal.py
-from flask import Blueprint, render_template, redirect, url_for, session, request, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import psycopg2.extras
 from ..db_legacy import conectar
+from ..services.solicitudes_sef import cargar_solicitud_a_session, guardar_solicitud_desde_session
+from ..blueprints.exportar import render_doc_by_slug
+from weasyprint import HTML
+from io import BytesIO
+import zipfile
+from datetime import datetime
+from flask import send_file, current_app
 
-sol_portal = Blueprint("sol_portal", __name__, url_prefix="/mis-solicitudes")
+sol_portal = Blueprint("sol_portal", __name__, url_prefix="/solicitudes")
 
-# --- helpers ---
-def _user_required():
-    if session.get("role") != "user":
-        flash("Debes iniciar sesión de usuario.", "warning")
+def _ensure_user():
+    if not session.get("role"):
+        flash("Inicia sesión para continuar.", "warning")
         return False
     return True
 
-def _fetchone(q, p=()):
-    with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-        cur.execute(q, p)
-        return cur.fetchone()
-
-def _fetchall(q, p=()):
-    with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-        cur.execute(q, p)
-        return cur.fetchall()
-
-def _load_solicitud_to_session(solicitud_id: int):
-    """
-    Carga en session: frame1, unidades, cuentas, usuarios, contactos desde BD.
-    Adaptado a tus tablas reales: usuarios, unidades.
-    """
-    uid = session.get("user_id")
-    if not uid:
-        raise ValueError("Sesión expirada.")
-
-    with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-        # ---- solicitud principal -> frame1
-        cur.execute("""
-            SELECT
-              numero_cliente, numero_contrato, razon_social, segmento,
-              tipo_persona, tipo_tramite, tipo_contrato, tipo_servicio,
-              nombre_ejecutivo, tipo_cobro,
-              COALESCE(importe_maximo_dif,'-') AS importe_maximo_dif,
-              COALESCE(telefono_cliente,'') AS telefono_cliente,
-              COALESCE(domicilio_cliente,'') AS domicilio_cliente,
-              fecha_solicitud, estatus, paso_actual
-            FROM solicitudes
-            WHERE id=%s AND created_by=%s
-        """, (solicitud_id, uid))
-        s = cur.fetchone()
-        if not s:
-            raise ValueError("Solicitud no encontrada o no pertenece al usuario.")
-
-        session["frame1"] = dict(s)
-
-        # ---- UNIDADES (tus columnas reales)
-        cur.execute("""
-            SELECT
-              tipo_cobro, servicio, tipo_unidad, numero_terminal_sef,
-              nombre_unidad,
-              cpae, cpae_nombre,
-              tipo_servicio, tipo_servicio_unidad,
-              empresa_traslado, etv_nombre,
-              calle_numero, colonia, municipio_id, municipio_nombre,
-              estado, estado_nombre, codigo_postal,
-              terminal_integradora, terminal_dotacion_centralizada,
-              terminal_certificado_centralizada
-            FROM unidades
-            WHERE solicitud_id=%s
-            ORDER BY id
-        """, (solicitud_id,))
-        unidades_db = cur.fetchall()
-        unidades_sess = []
-        for r in unidades_db:
-            unidades_sess.append({
-                # claves que usan tus frames:
-                "tipo_cobro": r["tipo_cobro"],
-                "servicio": r["servicio"],
-                "tipo_unidad": r["tipo_unidad"],
-                "numero_terminal_sef": r["numero_terminal_sef"],
-                "nombre_unidad": r["nombre_unidad"],
-                "cpae": r["cpae"],
-                "tipo_servicio": r["tipo_servicio"],
-                "empresa_traslado": r["empresa_traslado"],
-                "calle_numero": r["calle_numero"],
-                "colonia": r["colonia"],
-                "municipio_id": r["municipio_id"],
-                "estado": r["estado"],
-                "codigo_postal": r["codigo_postal"],
-                "terminal_integradora": r["terminal_integradora"],
-                "terminal_dotacion_centralizada": r["terminal_dotacion_centralizada"],
-                "terminal_certificado_centralizada": r["terminal_certificado_centralizada"],
-                # extras de “nombre bonito” (no estorban en sesión)
-                "cpae_nombre": r["cpae_nombre"],
-                "tipo_servicio_unidad": r["tipo_servicio_unidad"],
-                "etv_nombre": r["etv_nombre"],
-                "municipio_nombre": r["municipio_nombre"],
-                "estado_nombre": r["estado_nombre"],
-            })
-        session["unidades"] = unidades_sess
-
-        # ---- CUENTAS (asumo tu tabla es 'cuentas' con estas columnas)
-        cur.execute("""
-            SELECT servicio, numero_sucursal AS sucursal, numero_cuenta AS cuenta,
-                   moneda, terminal_aplicable AS terminal_aplica
-            FROM cuentas
-            WHERE solicitud_id=%s
-            ORDER BY id
-        """, (solicitud_id,))
-        session["cuentas"] = [dict(r) for r in cur.fetchall()]
-
-        # ---- USUARIOS (tus columnas reales)
-        cur.execute("""
-            SELECT
-              tipo_usuario,
-              numero_terminal_sef,
-              terminal_aplica,
-              nombre_usuario,
-              clave_usuario,
-              perfil,
-              maker_checker,
-              correo,
-              telefono
-            FROM usuarios
-            WHERE solicitud_id=%s
-            ORDER BY id
-        """, (solicitud_id,))
-        usuarios_db = cur.fetchall()
-        usuarios_sess = []
-        for u in usuarios_db:
-            usuarios_sess.append({
-                "tipo_usuario": u["tipo_usuario"],
-                # tus capturas aceptan una u otra:
-                "numero_terminal_sef": u["numero_terminal_sef"],
-                "terminal_aplica": u["terminal_aplica"],
-                "nombre_usuario": u["nombre_usuario"],
-                "clave_usuario": u["clave_usuario"],
-                "perfil": u["perfil"],
-                "maker_checker": u["maker_checker"],
-                "correo": u["correo"],
-                "telefono": u["telefono"],
-                # en tu tabla no hay montos → deja None
-                "monto_mxn": None,
-                "monto_usd": None,
-            })
-        session["usuarios"] = usuarios_sess
-
-        # ---- CONTACTOS (asumo tu tabla 'contactos' con estas columnas)
-        cur.execute("""
-            SELECT
-              numero_terminal_sef,
-              nombre AS nombre_contacto,
-              telefono,
-              correo,
-              tipo_contacto AS tipos_contacto
-            FROM contactos
-            WHERE solicitud_id=%s
-            ORDER BY id
-        """, (solicitud_id,))
-        session["contactos"] = [dict(r) for r in cur.fetchall()]
-
-        # banderas usadas en exportar
-        f1 = session.get("frame1", {})
-        session["anexo_usd_14k"] = any(c.get("moneda") == "USD" for c in session.get("cuentas", []))
-        session["contrato_tradicional"] = (f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "CPAE TRADICIONAL")
-        session["contrato_electronico"] = (f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "SEF ELECTRÓNICO")
-
-        return s.get("paso_actual", 1)
-
-# --- rutas ---
-@sol_portal.route("/")
-def listar():
-    if not _user_required():
+@sol_portal.route("/lista")
+def lista():
+    if not _ensure_user():
         return redirect(url_for("auth_admin.login", next=request.path))
 
-    estatus = request.args.get("estatus")  # opcional
-    params = [session.get("user_id")]
-    where = "WHERE s.created_by=%s"
-    if estatus:
-        where += " AND s.estatus=%s"
-        params.append(estatus)
+    q = (request.args.get("q") or "").strip()
+    # Si created_by en tu DB es TEXT, usamos username. Si es INT, cambia a user_id.
+    created_by = session.get("username") or "anon"
 
-    rows = _fetchall(f"""
-        SELECT
-          s.id, s.numero_cliente, s.razon_social, s.segmento,
-          s.tipo_tramite, s.tipo_contrato, s.tipo_servicio,
-          s.estatus, s.paso_actual,
-          to_char(s.created_at, 'YYYY-MM-DD HH24:MI') AS creado,
-          to_char(s.updated_at, 'YYYY-MM-DD HH24:MI') AS actualizado
-        FROM solicitudes s
-        {where}
-        ORDER BY s.updated_at DESC
-        LIMIT 200
-    """, tuple(params))
+    where = ["created_by = %s"]
+    params = [created_by]
 
-    return render_template("solicitudes/lista.html", items=rows, estatus=estatus)
+    if q:
+        where.append("""(
+            CAST(numero_cliente AS TEXT) ILIKE %s OR
+            razon_social ILIKE %s OR
+            tipo_contrato ILIKE %s OR
+            tipo_servicio ILIKE %s
+        )""")
+        like = f"%{q}%"
+        params.extend([like, like, like, like])
 
-@sol_portal.route("/<int:solicitud_id>")
-def detalle(solicitud_id):
-    if not _user_required():
-        return redirect(url_for("auth_admin.login", next=request.path))
+    sql = f"""
+        SELECT id, numero_cliente, razon_social, tipo_servicio, tipo_contrato, tipo_tramite,
+               COALESCE(TO_CHAR(updated_at,'YYYY-MM-DD HH24:MI'), TO_CHAR(created_at,'YYYY-MM-DD HH24:MI')) AS actualizado
+        FROM solicitudes
+        WHERE {" AND ".join(where)}
+        ORDER BY updated_at DESC NULLS LAST, created_at DESC
+        LIMIT 500
+    """
+    with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(sql, params)
+        items = cur.fetchall()
 
-    sol = _fetchone("""
-        SELECT
-          s.*,
-          to_char(s.created_at, 'YYYY-MM-DD HH24:MI') AS creado_fmt,
-          to_char(s.updated_at, 'YYYY-MM-DD HH24:MI') AS actualizado_fmt
-        FROM solicitudes s
-        WHERE s.id=%s AND s.created_by=%s
-    """, (solicitud_id, session.get("user_id")))
-    if not sol:
-        abort(404)
+    return render_template("solicitudes/lista.html", items=items, q=q)
 
-    unidades = _fetchall("SELECT * FROM unidades WHERE solicitud_id=%s ORDER BY id", (solicitud_id,))
-    cuentas  = _fetchall("SELECT * FROM cuentas  WHERE solicitud_id=%s ORDER BY id", (solicitud_id,))
-    usuarios = _fetchall("SELECT * FROM usuarios WHERE solicitud_id=%s ORDER BY id", (solicitud_id,))
-    contactos= _fetchall("SELECT * FROM contactos WHERE solicitud_id=%s ORDER BY id", (solicitud_id,))
-
-    return render_template("solicitudes/detalle.html",
-                           sol=sol, unidades=unidades, cuentas=cuentas, usuarios=usuarios, contactos=contactos)
-
-@sol_portal.route("/<int:solicitud_id>/retomar")
-def retomar(solicitud_id):
-    if not _user_required():
+@sol_portal.route("/<int:solicitud_id>/detalle")
+def detalle(solicitud_id: int):
+    if not _ensure_user():
         return redirect(url_for("auth_admin.login", next=request.path))
     try:
-        paso = _load_solicitud_to_session(solicitud_id)
-        destino = {
-            1: "frames.frame1",
-            2: "frames.frame2",
-            3: "frames.frame3",
-            4: "frames.frame4",
-            5: "frames.frame5",
-            6: "exportar.exportar_pdf",
-        }.get(int(paso or 1), "frames.frame1")
-        flash("Solicitud cargada. Puedes continuar la captura.", "success")
-        return redirect(url_for(destino))
+        cargar_solicitud_a_session(solicitud_id, session)
+        flash("Solicitud cargada para edición.", "info")
+        # te manda al frame finalizar (modo edición)
+        return redirect(url_for("frames.finalizar"))
     except Exception as e:
-        flash(f"No fue posible cargar la solicitud: {e}", "danger")
-        return redirect(url_for("sol_portal.listar"))
+        flash(f"Error al cargar: {e}", "danger")
+        return redirect(url_for("sol_portal.lista"))
+
+@sol_portal.route("/<int:solicitud_id>/exportar")
+def exportar_zip(solicitud_id: int):
+    if not _ensure_user():
+        return redirect(url_for("auth_admin.login", next=request.path))
+    # Carga la solicitud a sesión
+    try:
+        cargar_solicitud_a_session(solicitud_id, session)
+    except Exception as e:
+        flash(f"Error al cargar: {e}", "danger")
+        return redirect(url_for("sol_portal.lista"))
+
+    # Validar firmantes en session
+    f = session.get("firmantes") or {}
+    faltan = [k for k in ("apoderado_legal","nombre_autorizador","nombre_director_divisional",
+                          "puesto_autorizador","puesto_director_divisional","fecha_firma") if not (f.get(k) or "").strip()]
+    if faltan:
+        flash("Faltan datos de firmantes. Entra a 'Ver' y completa para exportar.", "warning")
+        return redirect(url_for("sol_portal.detalle", solicitud_id=solicitud_id))
+
+    # Render como en exportar_pdf, pero aquí directo
+    base_url = request.url_root
+    f1 = session.get("frame1", {})
+    fecha_impresion = datetime.now().strftime("%d/%m/%Y %H:%M")
+    firmantes = session.get("firmantes", {})
+
+    ctx = {
+        "frame1": f1,
+        "usuarios": session.get("usuarios", []),
+        "cuentas": session.get("cuentas", []),
+        "unidades": session.get("unidades", []),
+        "contactos": session.get("contactos", []),
+        "firmantes": firmantes,
+        "apoderado_legal": firmantes.get("apoderado_legal",""),
+        "nombre_autorizador": firmantes.get("nombre_autorizador",""),
+        "nombre_director_divisional": firmantes.get("nombre_director_divisional",""),
+        "puesto_autorizador": firmantes.get("puesto_autorizador",""),
+        "puesto_director_divisional": firmantes.get("puesto_director_divisional",""),
+        "fecha_impresion": fecha_impresion,
+        "fecha_firma": firmantes.get("fecha_firma",""),
+        "imprimir_pdf": True,
+    }
+
+    def _pdf(slug):
+        html = render_doc_by_slug(slug, **ctx)
+        return HTML(string=html, base_url=base_url).write_pdf()
+
+    pdf_operativo = _pdf("finalizar")
+
+    pdf_usd = None
+    if firmantes.get("anexo_usd_14k") or session.get("anexo_usd_14k"):
+        pdf_usd = _pdf("anexo_usd14k")
+
+    pdf_trad = None
+    if f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "CPAE TRADICIONAL":
+        pdf_trad = _pdf("contrato_tradicional")
+
+    pdf_ele = None
+    if f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "SEF ELECTRÓNICO":
+        pdf_ele = _pdf("contrato_electronico")
+
+    pdf_rdc = None
+    if session.get("rdc_reporte"):
+        pdf_rdc = _pdf("reporte_rdc")
+
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zf:
+        zf.writestr("02_Anexo_Operativo.pdf", pdf_operativo)
+        if pdf_usd: zf.writestr("03_Anexo_USD14K.pdf", pdf_usd)
+        if pdf_trad: zf.writestr("01_Contrato_SEF_Tradicional.pdf", pdf_trad)
+        if pdf_ele: zf.writestr("01_Contrato_SEF_Electronico.pdf", pdf_ele)
+        if pdf_rdc: zf.writestr("04_RDC.pdf", pdf_rdc)
+
+    zip_buffer.seek(0)
+    filename_zip = f"documentos_{f1.get('numero_cliente','NA')}_{datetime.now().strftime('%Y-%m-%d')}.zip"
+    return send_file(zip_buffer, mimetype="application/zip", as_attachment=True, download_name=filename_zip)
