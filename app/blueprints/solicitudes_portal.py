@@ -1,144 +1,148 @@
-# app/blueprints/solicitudes_portal.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-import psycopg2.extras
-from ..db_legacy import conectar
-from ..services.solicitudes_sef import cargar_solicitud_a_session, guardar_solicitud_desde_session
-from ..blueprints.exportar import render_doc_by_slug
-from weasyprint import HTML
-from io import BytesIO
-import zipfile
-from datetime import datetime
-from flask import send_file, current_app
+from flask import Blueprint, render_template, session, redirect, url_for, flash, current_app
+import os
 
-sol_portal = Blueprint("sol_portal", __name__, url_prefix="/solicitudes")
+# Usa utilidades de tu conector legacy
+try:
+    from ..db_legacy import fetchall, fetchone
+except Exception:
+    from app.db_legacy import fetchall, fetchone  # pragma: no cover
 
-def _ensure_user():
-    if not session.get("role"):
-        flash("Inicia sesión para continuar.", "warning")
-        return False
-    return True
+# Nombre del blueprint que ya espera tu app/__init__.py
+sol_portal = Blueprint("solicitudes_portal", __name__, url_prefix="/solicitudes")
 
-@sol_portal.route("/lista")
-def lista():
-    if not _ensure_user():
-        return redirect(url_for("auth_admin.login", next=request.path))
+# Mínimo de firmantes requeridos para habilitar exportación (editable por ENV)
+REQUIRED_FIRMANTES = int(os.getenv("FIRMANTES_MIN", "3"))
 
-    q = (request.args.get("q") or "").strip()
-    # Si created_by en tu DB es TEXT, usamos username. Si es INT, cambia a user_id.
-    created_by = session.get("username") or "anon"
 
-    where = ["created_by = %s"]
-    params = [created_by]
+def _login_url():
+    """URL de login según exista el endpoint o no."""
+    return url_for("admin.login") if "admin.login" in current_app.view_functions else "/admin/login"
 
-    if q:
-        where.append("""(
-            CAST(numero_cliente AS TEXT) ILIKE %s OR
-            razon_social ILIKE %s OR
-            tipo_contrato ILIKE %s OR
-            tipo_servicio ILIKE %s
-        )""")
-        like = f"%{q}%"
-        params.extend([like, like, like, like])
 
-    sql = f"""
-        SELECT id, numero_cliente, razon_social, tipo_servicio, tipo_contrato, tipo_tramite,
-               COALESCE(TO_CHAR(updated_at,'YYYY-MM-DD HH24:MI'), TO_CHAR(created_at,'YYYY-MM-DD HH24:MI')) AS actualizado
-        FROM solicitudes
-        WHERE {" AND ".join(where)}
-        ORDER BY updated_at DESC NULLS LAST, created_at DESC
-        LIMIT 500
+def _resolve_user_id_from_username(username: str):
+    """Busca el ID del usuario por username o email. Retorna int o None."""
+    if not username:
+        return None
+    sql = """
+        SELECT id
+        FROM admin_users
+        WHERE (username = %s OR email = %s)
+        ORDER BY id ASC
+        LIMIT 1
     """
-    with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-        cur.execute(sql, params)
-        items = cur.fetchall()
-
-    return render_template("solicitudes/lista.html", items=items, q=q)
-
-@sol_portal.route("/<int:solicitud_id>/detalle")
-def detalle(solicitud_id: int):
-    if not _ensure_user():
-        return redirect(url_for("auth_admin.login", next=request.path))
+    row = fetchone(sql, (username, username))
     try:
-        cargar_solicitud_a_session(solicitud_id, session)
-        flash("Solicitud cargada para edición.", "info")
-        # te manda al frame finalizar (modo edición)
-        return redirect(url_for("frames.finalizar"))
-    except Exception as e:
-        flash(f"Error al cargar: {e}", "danger")
-        return redirect(url_for("sol_portal.lista"))
+        return int(row["id"]) if row and row.get("id") is not None else None
+    except Exception:
+        return None
 
-@sol_portal.route("/<int:solicitud_id>/exportar")
-def exportar_zip(solicitud_id: int):
-    if not _ensure_user():
-        return redirect(url_for("auth_admin.login", next=request.path))
-    # Carga la solicitud a sesión
+
+def _table_exists(schema: str, table: str) -> bool:
+    """Verifica existencia de tabla en information_schema."""
+    sql = """
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = %s AND table_name = %s
+        LIMIT 1
+    """
+    row = fetchone(sql, (schema, table))
+    return bool(row)
+
+
+def _firmantes_count_by_solicitud(table_name: str, solicitud_ids):
+    """
+    Devuelve dict { solicitud_id: count } leyendo de `table_name`.
+    Construye placeholders dinámicos para IN (...).
+    """
+    if not solicitud_ids:
+        return {}
+
+    # Placeholders (%s, %s, ...)
+    placeholders = ", ".join(["%s"] * len(solicitud_ids))
+    sql = f"""
+        SELECT solicitud_id, COUNT(*) AS cnt
+        FROM {table_name}
+        WHERE solicitud_id IN ({placeholders})
+        GROUP BY solicitud_id
+    """
+    rows = fetchall(sql, tuple(solicitud_ids)) or []
+    return {int(r["solicitud_id"]): int(r["cnt"]) for r in rows if r.get("solicitud_id") is not None}
+
+
+@sol_portal.route("/lista", methods=["GET"])
+def lista():
+    """
+    Lista de solicitudes del usuario autenticado.
+    - solicitudes.created_by es INTEGER (usamos user_id int).
+    - Usamos updated_at para fecha de referencia.
+    - Calculamos firmantes_completos si existe la tabla de firmantes.
+    """
+    user_id = session.get("user_id")
+    username = session.get("username") or session.get("user_name") or session.get("login")
+
+    # Si no hay user_id ni username, no hay sesión válida
+    if not user_id and not username:
+        return redirect(_login_url())
+
+    # Resolver user_id cuando solo tenemos username
+    if not user_id and username:
+        resolved = _resolve_user_id_from_username(username)
+        if resolved is None:
+            flash("No fue posible resolver el usuario actual. Inicia sesión de nuevo.", "warning")
+            session.pop("user_id", None)
+            return redirect(_login_url())
+        session["user_id"] = resolved
+        user_id = resolved
+
+    # Asegurar entero
     try:
-        cargar_solicitud_a_session(solicitud_id, session)
-    except Exception as e:
-        flash(f"Error al cargar: {e}", "danger")
-        return redirect(url_for("sol_portal.lista"))
+        user_id = int(user_id)
+    except Exception:
+        flash("Sesión inconsistente: identificador de usuario inválido.", "danger")
+        session.pop("user_id", None)
+        return redirect(_login_url())
 
-    # Validar firmantes en session
-    f = session.get("firmantes") or {}
-    faltan = [k for k in ("apoderado_legal","nombre_autorizador","nombre_director_divisional",
-                          "puesto_autorizador","puesto_director_divisional","fecha_firma") if not (f.get(k) or "").strip()]
-    if faltan:
-        flash("Faltan datos de firmantes. Entra a 'Ver' y completa para exportar.", "warning")
-        return redirect(url_for("sol_portal.detalle", solicitud_id=solicitud_id))
+    # 1) Traer solicitudes (sin campos inexistentes)
+    sql = """
+        SELECT
+            s.id,
+            s.updated_at,
+            s.numero_cliente,
+            s.numero_contrato,
+            s.razon_social,
+            s.tipo_tramite
+        FROM solicitudes AS s
+        WHERE s.created_by = %s
+        ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
+    """
+    solicitudes = fetchall(sql, (user_id,)) or []
 
-    # Render como en exportar_pdf, pero aquí directo
-    base_url = request.url_root
-    f1 = session.get("frame1", {})
-    fecha_impresion = datetime.now().strftime("%d/%m/%Y %H:%M")
-    firmantes = session.get("firmantes", {})
+    # 2) Preparar mapa por id
+    ids = [int(s["id"]) for s in solicitudes if s.get("id") is not None]
 
-    ctx = {
-        "frame1": f1,
-        "usuarios": session.get("usuarios", []),
-        "cuentas": session.get("cuentas", []),
-        "unidades": session.get("unidades", []),
-        "contactos": session.get("contactos", []),
-        "firmantes": firmantes,
-        "apoderado_legal": firmantes.get("apoderado_legal",""),
-        "nombre_autorizador": firmantes.get("nombre_autorizador",""),
-        "nombre_director_divisional": firmantes.get("nombre_director_divisional",""),
-        "puesto_autorizador": firmantes.get("puesto_autorizador",""),
-        "puesto_director_divisional": firmantes.get("puesto_director_divisional",""),
-        "fecha_impresion": fecha_impresion,
-        "fecha_firma": firmantes.get("fecha_firma",""),
-        "imprimir_pdf": True,
-    }
+    # 3) Determinar tabla de firmantes
+    firmantes_table = None
+    # Intento estándar: public.firmantes
+    if _table_exists("public", "firmantes"):
+        firmantes_table = "firmantes"
+    # Alternativa común: public.solicitudes_firmantes
+    elif _table_exists("public", "solicitudes_firmantes"):
+        firmantes_table = "solicitudes_firmantes"
 
-    def _pdf(slug):
-        html = render_doc_by_slug(slug, **ctx)
-        return HTML(string=html, base_url=base_url).write_pdf()
+    # 4) Si existe alguna tabla de firmantes, contamos por solicitud
+    counts = {}
+    if firmantes_table and ids:
+        counts = _firmantes_count_by_solicitud(firmantes_table, ids)
 
-    pdf_operativo = _pdf("finalizar")
+    # 5) Marcar bandera firmantes_completos (default True si no hay tabla → no bloquea exportación)
+    for s in solicitudes:
+        sid = int(s["id"])
+        if firmantes_table:
+            cnt = counts.get(sid, 0)
+            s["firmantes_completos"] = (cnt >= REQUIRED_FIRMANTES)
+            s["firmantes_count"] = cnt
+        else:
+            s["firmantes_completos"] = True
+            s["firmantes_count"] = None
 
-    pdf_usd = None
-    if firmantes.get("anexo_usd_14k") or session.get("anexo_usd_14k"):
-        pdf_usd = _pdf("anexo_usd14k")
-
-    pdf_trad = None
-    if f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "CPAE TRADICIONAL":
-        pdf_trad = _pdf("contrato_tradicional")
-
-    pdf_ele = None
-    if f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "SEF ELECTRÓNICO":
-        pdf_ele = _pdf("contrato_electronico")
-
-    pdf_rdc = None
-    if session.get("rdc_reporte"):
-        pdf_rdc = _pdf("reporte_rdc")
-
-    zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w") as zf:
-        zf.writestr("02_Anexo_Operativo.pdf", pdf_operativo)
-        if pdf_usd: zf.writestr("03_Anexo_USD14K.pdf", pdf_usd)
-        if pdf_trad: zf.writestr("01_Contrato_SEF_Tradicional.pdf", pdf_trad)
-        if pdf_ele: zf.writestr("01_Contrato_SEF_Electronico.pdf", pdf_ele)
-        if pdf_rdc: zf.writestr("04_RDC.pdf", pdf_rdc)
-
-    zip_buffer.seek(0)
-    filename_zip = f"documentos_{f1.get('numero_cliente','NA')}_{datetime.now().strftime('%Y-%m-%d')}.zip"
-    return send_file(zip_buffer, mimetype="application/zip", as_attachment=True, download_name=filename_zip)
+    return render_template("solicitudes/lista.html", solicitudes=solicitudes)
