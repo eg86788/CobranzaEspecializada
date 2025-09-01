@@ -7,20 +7,18 @@ try:
 except Exception:
     from app.db_legacy import fetchall, fetchone  # pragma: no cover
 
-# Nombre del blueprint que ya espera tu app/__init__.py
+# Este blueprint mantiene el nombre que esperas en app/__init__.py
 sol_portal = Blueprint("solicitudes_portal", __name__, url_prefix="/solicitudes")
 
-# Mínimo de firmantes requeridos para habilitar exportación (editable por ENV)
+# Mínimo de firmantes requeridos (ajustable por ENV)
 REQUIRED_FIRMANTES = int(os.getenv("FIRMANTES_MIN", "3"))
 
 
 def _login_url():
-    """URL de login según exista el endpoint o no."""
     return url_for("admin.login") if "admin.login" in current_app.view_functions else "/admin/login"
 
 
 def _resolve_user_id_from_username(username: str):
-    """Busca el ID del usuario por username o email. Retorna int o None."""
     if not username:
         return None
     sql = """
@@ -38,7 +36,6 @@ def _resolve_user_id_from_username(username: str):
 
 
 def _table_exists(schema: str, table: str) -> bool:
-    """Verifica existencia de tabla en information_schema."""
     sql = """
         SELECT 1
         FROM information_schema.tables
@@ -50,14 +47,8 @@ def _table_exists(schema: str, table: str) -> bool:
 
 
 def _firmantes_count_by_solicitud(table_name: str, solicitud_ids):
-    """
-    Devuelve dict { solicitud_id: count } leyendo de `table_name`.
-    Construye placeholders dinámicos para IN (...).
-    """
     if not solicitud_ids:
         return {}
-
-    # Placeholders (%s, %s, ...)
     placeholders = ", ".join(["%s"] * len(solicitud_ids))
     sql = f"""
         SELECT solicitud_id, COUNT(*) AS cnt
@@ -71,20 +62,12 @@ def _firmantes_count_by_solicitud(table_name: str, solicitud_ids):
 
 @sol_portal.route("/lista", methods=["GET"])
 def lista():
-    """
-    Lista de solicitudes del usuario autenticado.
-    - solicitudes.created_by es INTEGER (usamos user_id int).
-    - Usamos updated_at para fecha de referencia.
-    - Calculamos firmantes_completos si existe la tabla de firmantes.
-    """
     user_id = session.get("user_id")
     username = session.get("username") or session.get("user_name") or session.get("login")
 
-    # Si no hay user_id ni username, no hay sesión válida
     if not user_id and not username:
         return redirect(_login_url())
 
-    # Resolver user_id cuando solo tenemos username
     if not user_id and username:
         resolved = _resolve_user_id_from_username(username)
         if resolved is None:
@@ -94,7 +77,6 @@ def lista():
         session["user_id"] = resolved
         user_id = resolved
 
-    # Asegurar entero
     try:
         user_id = int(user_id)
     except Exception:
@@ -102,7 +84,7 @@ def lista():
         session.pop("user_id", None)
         return redirect(_login_url())
 
-    # 1) Traer solicitudes (sin campos inexistentes)
+    # Solicitudes del usuario (solo columnas que existen)
     sql = """
         SELECT
             s.id,
@@ -116,25 +98,19 @@ def lista():
         ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
     """
     solicitudes = fetchall(sql, (user_id,)) or []
-
-    # 2) Preparar mapa por id
     ids = [int(s["id"]) for s in solicitudes if s.get("id") is not None]
 
-    # 3) Determinar tabla de firmantes
+    # Tabla de firmantes (opcional)
     firmantes_table = None
-    # Intento estándar: public.firmantes
     if _table_exists("public", "firmantes"):
         firmantes_table = "firmantes"
-    # Alternativa común: public.solicitudes_firmantes
     elif _table_exists("public", "solicitudes_firmantes"):
         firmantes_table = "solicitudes_firmantes"
 
-    # 4) Si existe alguna tabla de firmantes, contamos por solicitud
     counts = {}
     if firmantes_table and ids:
         counts = _firmantes_count_by_solicitud(firmantes_table, ids)
 
-    # 5) Marcar bandera firmantes_completos (default True si no hay tabla → no bloquea exportación)
     for s in solicitudes:
         sid = int(s["id"])
         if firmantes_table:
@@ -145,4 +121,10 @@ def lista():
             s["firmantes_completos"] = True
             s["firmantes_count"] = None
 
-    return render_template("solicitudes/lista.html", solicitudes=solicitudes)
+    # 🔑 Fallback de templates:
+    #  - primero intenta templates/solicitudes/lista.html
+    #  - luego templates/lista.html
+    return render_template(
+        ["solicitudes/lista.html", "lista.html"],
+        solicitudes=solicitudes
+    )

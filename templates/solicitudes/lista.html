@@ -65,7 +65,8 @@
           {% set _firmantes_ok = (s.firmantes_completos if s.firmantes_completos is defined else True) %}
 
           {% set ver_url = url_for('frames.finalizar', solicitud_id=_id) %}
-          {% set export_url = url_for('exportar.exportar_zip', solicitud_id=_id) %}
+          {# Corrección: usar exportar.exportar_pdf en lugar de exportar.exportar_zip #}
+          {% set export_url = url_for('exportar.exportar_pdf', solicitud_id=_id) %}
 
           <tr>
             <td class="text-muted">{{ _id }}</td>
@@ -98,11 +99,11 @@
                 </a>
                 {% if _firmantes_ok %}
                   <a class="btn btn-outline-success" href="{{ export_url }}">
-                    <i class="bi bi-file-zip me-1"></i>Exportar
+                    <i class="bi bi-file-earmark-pdf me-1"></i>Exportar
                   </a>
                 {% else %}
                   <button class="btn btn-outline-success" type="button" disabled title="Completa firmantes para habilitar la exportación">
-                    <i class="bi bi-file-zip me-1"></i>Exportar
+                    <i class="bi bi-file-earmark-pdf me-1"></i>Exportar
                   </button>
                 {% endif %}
               </div>
