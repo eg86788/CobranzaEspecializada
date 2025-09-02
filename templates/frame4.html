@@ -1,10 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}Frame 4 - Usuarios SEF{% endblock %}
+{% block title %}Usuarios SEF — Rediseño{% endblock %}
 
 {% block content %}
-<h2>Resumen de la solicitud</h2>
 
+<!-- ===== RESUMEN DE LA SOLICITUD ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Resumen de la solicitud</strong>
+    </div>
+    <form method="post" class="mb-0">
+      <button class="btn btn-outline-light btn-sm" name="regresar_frame1">✎ Editar</button>
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0 align-middle">
+        <tbody>
+          <tr>
+            <th class="text-muted fw-semibold" style="width:18%">Cliente</th>
+            <td style="width:32%">{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th class="text-muted fw-semibold" style="width:18%">Segmento</th>
+            <td style="width:32%">{{ frame1.segmento or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Contrato</th>
+            <td>{{ frame1.numero_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Tipo Trámite</th>
+            <td>{{ frame1.tipo_tramite or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Tipo Contrato</th>
+            <td>{{ frame1.tipo_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Servicio</th>
+            <td>{{ frame1.tipo_servicio or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Tipo Cobro Comisión</th>
+            <td>{{ frame1.tipo_cobro or '-' }}</td>
+            <th class="text-muted fw-semibold">Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif or '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ALERTAS ===== -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
@@ -16,236 +60,430 @@
   {% endif %}
 {% endwith %}
 
-<!-- Datos Generales del Cliente -->
-<div class="card mb-3">
-    <div class="card-header">Datos Generales del Cliente</div>
-    <div class="card-body p-0">
-      <table class="table table-sm mb-0">
-        <tbody>
-          <tr>
-            <th>Cliente</th>
-            <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
-            <th>Segmento</th>
-            <td>{{ frame1.segmento or '-' }}</td>
-          </tr>
-          <tr>
-            <th>Contrato</th>
-            <td>{{ frame1.numero_contrato }}</td>
-            <th>Tipo Trámite</th>
-            <td>{{ frame1.tipo_tramite }}</td>
-          </tr>
-          <tr>
-            <th>Tipo Contrato</th>
-            <td>{{ frame1.tipo_contrato }}</td>
-            <th>Servicio</th>
-            <td>{{ frame1.tipo_servicio }}</td>
-          </tr>
-          <tr>
-            <th>Tipo Cobro Comisión</th>
-            <td>{{ frame1.tipo_cobro }}</td>
-            <th>Importe Máximo de Diferencias</th>
-            <td>{{ frame1.importe_maximo_dif }}</td>
-          </tr>
-        </tbody>
-      </table>
+<!-- ===== UNIDADES DE NEGOCIO (resumen compacto) ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Unidades de Negocio</strong>
     </div>
-    <div class="card-footer text-end">
-      <form method="post" class="d-inline">
-        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame1">✎ Editar</button>
-      </form>
+    <a href="{{ url_for('frames.frame2') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
+  <div class="card-body p-0">
+    {% if unidades %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>CPAE</th>
+              <th>Servicio</th>
+              <th>ETV</th>
+              <th>Terminal SEF</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in unidades %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ u.nombre_unidad }}</td>
+              <td>{{ u.cpae_nombre }}</td>
+              <td>{{ u.tipo_servicio_unidad }}</td>
+              <td>{{ u.etv_nombre }}</td>
+              <td>{{ u.numero_terminal_sef or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay unidades capturadas.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== CUENTAS CAPTURADAS (estilo frame3) ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Cuentas Bancarias</strong>
     </div>
+    <a href="{{ url_for('frames.frame3') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
+  <div class="card-body p-0">
+    {% if cuentas %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Servicio</th>
+              <th>No. Sucursal</th>
+              <th>No. Cuenta</th>
+              <th>Moneda</th>
+              <th>Terminal SEF Aplica</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in cuentas %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ c.servicio }}</td>
+              <td>{{ c.sucursal }}</td>
+              <td>{{ c.cuenta }}</td>
+              <td>{{ c.moneda }}</td>
+              <td>{{ c.terminal_aplica or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay cuentas capturadas.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== FORMULARIO: USUARIOS SEF ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center gap-2" style="background:#F7FBFD; color:#003746;">
+    <h2 class="h5 mb-0 d-flex align-items-center gap-2">
+      <i class="bi bi-people"></i><span>Captura de Usuarios SEF</span>
+    </h2>
   </div>
 
-<!-- Unidades de Negocio -->
-<div class="card mb-3">
-  <div class="card-header">Unidades de Negocio</div>
-  <div class="card-body p-0">
-    <table class="table table-bordered table-sm align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>#</th>
-          <th>Nombre de Unidad</th>
-          <th>CPAE</th>
-          <th>Tipo Servicio</th>
-          <th>Empresa TV</th>
-          <th>Terminal SEF</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for unidad in unidades %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ unidad.nombre_unidad }}</td>
-          <td>{{ unidad.cpae_nombre }}</td>
-          <td>{{ unidad.tipo_servicio_unidad }}</td>
-          <td>{{ unidad.etv_nombre }}</td>
-          <td>{{ unidad.numero_terminal_sef or '-' }}</td>
-        </tr>
-        <tr class="table-light small">
-          <td colspan="7">
-            <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.municipio_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.<br>
-            <strong>Terminal Integradora:</strong> {{ unidad.terminal_integradora or '-' }} |
-            <strong>Dotación Centralizada:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
-            <strong>Certificado Centralizado:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  <div class="card-footer text-end">
-    <form method="post" class="d-inline">
-      <button class="btn btn-outline-secondary btn-sm" name="regresar_frame2">✎ Editar</button>
+  <div class="card-body">
+    <!-- Contenedor de aviso nivel formulario -->
+    <div id="alertaUsuarios" class="alert alert-warning d-none" role="alert"></div>
+
+    <form method="POST" class="needs-validation" novalidate autocomplete="off" id="formUsuarios">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">
+            Nombre completo *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Nombre de la persona usuaria que operará SEF."></i>
+          </label>
+          <input type="text" class="form-control uc" name="nombre_usuario" id="nombre_usuario" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">
+            Clave de Usuario *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Exactamente 8 caracteres alfanuméricos (A–Z, 0–9)."></i>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            name="clave_usuario"
+            id="clave_usuario"
+            inputmode="latin"
+            pattern="^[A-Za-z0-9]{8}$"
+            minlength="8" maxlength="8"
+            placeholder="Ej. AB12CD34"
+            required>
+          <div class="invalid-feedback">La clave debe ser exactamente 8 caracteres alfanuméricos.</div>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
+          <label class="form-label">
+            Perfil *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Selecciona un perfil del catálogo; se mostrará su descripción."></i>
+          </label>
+          <select class="form-select" name="perfil" id="perfil" required>
+            <option value="">Selecciona…</option>
+            {% for p in catalogo_perfiles %}
+              <option value="{{ p.perfil }}" data-desc="{{ p.descripcion|default('', true) }}">{{ p.perfil }}</option>
+            {% endfor %}
+          </select>
+          <div id="perfil_desc" class="form-text text-muted"></div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">
+            Maker/Checker *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Rol de operación del usuario en SEF."></i>
+          </label>
+          <select class="form-select" name="maker_checker" id="maker_checker" required>
+            <option value="">Selecciona…</option>
+            <option value="MAKER">MAKER</option>
+            <option value="CHECKER">CHECKER</option>
+            <option value="NO APLICA">NO APLICA</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">
+            Correo electrónico *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Correo institucional para notificaciones."></i>
+          </label>
+          <input type="email" class="form-control" name="correo" id="correo" required>
+        </div>
+      </div>
+                  <!-- Teléfono -->
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <label class="form-label">
+            Teléfono *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+              title="Solo dígitos; incluye lada."></i>
+          </label>
+          <input type="tel" class="form-control input-digit" name="telefono" id="telefono" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">
+            Terminal SEF a donde aplica *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Elige una de las unidades capturadas."></i>
+          </label>
+          <select class="form-select" name="terminal_aplica" id="terminal_aplica" required>
+            <option value="">Selecciona…</option>
+            {% for u in unidades %}
+              <option value="#{{ loop.index }} – {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}">
+                #{{ loop.index }} – {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4 gap-2">
+        <button type="reset" class="btn btn-outline-secondary" id="btnLimpiar">Limpiar</button>
+        <button type="submit" class="btn btn-success" id="btnAgregarUsuario">
+          <i class="bi bi-plus-circle"></i> Agregar Usuario
+        </button>
+      </div>
     </form>
   </div>
 </div>
-  
-<!-- Cuentas Capturadas -->
-<div class="card mb-3">
-    <div class="card-header">Cuentas</div>
-    <div class="card-body p-0">
-      <table class="table table-sm table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Servicio</th>
-            <th>No. Sucursal</th>
-            <th>No. Cuenta</th>
-            <th>Moneda</th>
-            <th>Terminal SEF Aplica</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for cuenta in cuentas %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ cuenta.servicio }}</td>
-            <td>{{ cuenta.sucursal }}</td>
-            <td>{{ cuenta.cuenta }}</td>
-            <td>{{ cuenta.moneda }}</td>
-            <td>{{ cuenta.terminal_aplica or '-' }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <div class="card-footer text-end">
-      <form method="POST" class="d-inline">
-        <button name="regresar_frame3" class="btn btn-outline-secondary btn-sm">✎ Editar</button>
+
+<!-- ===== USUARIOS CAPTURADOS ===== -->
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <h3 class="h6 mb-0">Usuarios Capturados</h3>
+    {% if usuarios %}
+      <form action="{{ url_for('frames.frame5') }}" method="get" class="mb-0">
+        <button type="submit" class="btn btn-primary btn-sm">Siguiente – Contactos</button>
       </form>
-    </div>
+    {% endif %}
   </div>
-  
-  
-  <h2 class="mb-4">Usuarios de SEF</h2>
-
-<!-- Formulario de Usuarios SEF -->
-<form method="POST">
-    <div class="row mb-3">
-
-        <div class="col-md-6">
-            <label class="form-label">Nombre Completo</label>
-            <input type="text" class="form-control" name="nombre_usuario" required>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Clave de Usuario</label>
-            <input type="text" class="form-control" id="clave_usuario" name="clave_usuario" required>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <label class="form-label">Perfil</label>
-        <select class="form-select" name="perfil" id="perfil">
-            <option value="">Selecciona...</option>
-            <option>USUARIO</option>
-            <option>TESORERO</option>
-        </select>
-    </div>
-            
-          
-        <div class="col-md-4">
-            <label class="form-label">Maker/Checker</label>
-            <select class="form-select" name="maker_checker">
-                <option value="">Selecciona...</option>
-                <option>MAKER</option>
-                <option>CHECKER</option>
-                <option>NO APLICA</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Correo Electrónico</label>
-            <input type="email" class="form-control" name="correo">
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Teléfono</label>
-            <input type="tel" class="form-control" name="telefono">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Terminal SEF a donde aplica *</label>
-          <select class="form-select" name="terminal_aplica" required>
-              <option value="">Selecciona...</option>
-              {% for unidad in unidades %}
-              <option value="#{{loop.index }} – {{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}">#{{loop.index }} – {{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}</option>
-              {% endfor %}
-          </select>
-      </div>      
-    </div>
-    </div>
-    <button type="submit" class="btn btn-success">Agregar Usuario</button>
-</form>
-
-<hr>
-<h4>Usuarios Capturados:</h4>
-{% if usuarios %}
-  <div class="table-responsive">
-    <table class="table table-bordered table-sm align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>#</th>
-          <th>Nombre</th>
-          <th>Clave Usuario</th>
-          <th>Perfil</th>
-          <th>Maker/Checker</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Terminal SEF Aplica</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for usuario in usuarios %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ usuario.nombre_usuario }}</td>
-          <td>{{ usuario.clave_usuario }}</td>
-          <td>{{ usuario.perfil }}</td>
-          <td>{{ usuario.maker_checker }}</td>
-          <td>{{ usuario.correo }}</td>
-          <td>{{ usuario.telefono }}</td>
-          <td>{{ usuario.terminal_aplica }}</td>
-          <td class="text-center">
-            <form method="POST" class="m-0">
-              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
-              <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar usuario">
-                <i class="bi bi-trash"></i>
-              </button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="card-body">
+    {% if usuarios %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>Clave Usuario</th>
+              <th>Perfil</th>
+              <th>Maker/Checker</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Terminal SEF Aplica</th>
+              <th class="text-center" style="width:96px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in usuarios %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ u.nombre_usuario }}</td>
+              <td>{{ u.clave_usuario }}</td>
+              <td>{{ u.perfil }}</td>
+              <td>{{ u.maker_checker }}</td>
+              <td>{{ u.correo }}</td>
+              <td>{{ u.telefono }}</td>
+              <td>{{ u.terminal_aplica }}</td>
+              <td class="text-center">
+                <form method="POST" class="m-0">
+                  <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar usuario">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Aún no se han capturado usuarios.</p>
+    {% endif %}
   </div>
-{% else %}
-  <p class="text-muted">Aún no se han capturado usuarios.</p>
-{% endif %}
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Tooltips
+  const els = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  els.map(el => new bootstrap.Tooltip(el));
+
+  // Mayúsculas para .uc (sin afectar emails)
+  document.querySelectorAll('input.uc, textarea.uc').forEach(inp=>{
+    inp.addEventListener('input', function(){
+      const pos = this.selectionStart;
+      this.value = this.value.toUpperCase();
+      try { this.setSelectionRange(pos,pos); } catch(e){}
+    });
+  });
+
+// Teléfono: dígitos (lógica original)
+const tel = document.getElementById('telefono');
+if (tel){
+  tel.setAttribute('inputmode','numeric');
+  tel.addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,15);
+  }, {passive:true});
+}
 
 
-<form action="{{ url_for('frames.frame5') }}" method="get">
-    <button type="submit" class="btn btn-primary mt-4">Siguiente - Contactos</button>
-</form>
+
+  // Clave de usuario: exactamente 8 alfanuméricos
+  const clave = document.getElementById('clave_usuario');
+  if (clave){
+    clave.addEventListener('input', function(){
+      this.value = this.value.replace(/[^A-Za-z0-9]/g,'').slice(0,8);
+    }, {passive:true});
+    clave.addEventListener('blur', function(){
+      if (!/^[A-Za-z0-9]{8}$/.test(this.value || '')) {
+        this.setCustomValidity('La clave debe ser exactamente 8 caracteres alfanuméricos.');
+      } else {
+        this.setCustomValidity('');
+      }
+    });
+  }
+
+  // Perfil: mostrar descripción
+  const perfil = document.getElementById('perfil');
+  const lblDesc = document.getElementById('perfil_desc');
+  function pintaDesc(){
+    const opt = perfil?.selectedOptions?.[0];
+    if (!opt || !lblDesc) return;
+    const d = opt.getAttribute('data-desc') || '';
+    lblDesc.textContent = d ? ('Descripción: ' + d) : '';
+  }
+  perfil && perfil.addEventListener('change', pintaDesc);
+  pintaDesc();
+
+  // ====== Reglas especiales (ALTA/SUSTITUCIÓN) + SEF ELECTRÓNICO ======
+  const form = document.getElementById('formUsuarios');
+  const alerta = document.getElementById('alertaUsuarios');
+
+  const tipoTramite = ({{ (frame1.tipo_tramite or '')|tojson }});
+  const tipoContrato = ({{ (frame1.tipo_contrato or '')|tojson }});
+
+  function normaliza(s){ return (s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase(); }
+  const esAlta = normaliza(tipoTramite) === 'ALTA';
+  const esSust = normaliza(tipoTramite) === 'SUSTITUCION' || normaliza(tipoTramite) === 'SUSTITUCIÓN';
+  const esSEF  = normaliza(tipoContrato) === 'SEF ELECTRONICO' || normaliza(tipoContrato) === 'SEF ELECTRÓNICO';
+
+  // Campos del formulario
+  const campos = {
+    nombre: document.getElementById('nombre_usuario'),
+    clave: document.getElementById('clave_usuario'),
+    perfil: document.getElementById('perfil'),
+    mc:     document.getElementById('maker_checker'),
+    correo: document.getElementById('correo'),
+    tel:    document.getElementById('telefono'),
+    term:   document.getElementById('terminal_aplica'),
+  };
+
+  function setReqAll(req){
+    Object.values(campos).forEach(el=>{
+      if (!el) return;
+      if (req) el.setAttribute('required','required');
+      else el.removeAttribute('required');
+    });
+  }
+
+  function allEmpty(){
+    return !campos.nombre.value && !campos.clave.value && !campos.perfil.value &&
+           !campos.mc.value && !campos.correo.value && !campos.tel.value && !campos.term.value;
+  }
+
+  function anyFilled(){
+    return !!(campos.nombre.value || campos.clave.value || campos.perfil.value ||
+              campos.mc.value || campos.correo.value || campos.tel.value || campos.term.value);
+  }
+
+  function showAlert(msg, type='warning'){
+    if (!alerta) return;
+    alerta.classList.remove('d-none','alert-warning','alert-danger','alert-info','alert-success');
+    alerta.classList.add('alert-' + type);
+    alerta.textContent = msg;
+  }
+  function hideAlert(){
+    if (!alerta) return;
+    alerta.classList.add('d-none');
+    alerta.textContent = '';
+  }
+
+  // Regla A: ALTA + SEF -> todo obligatorio SIEMPRE
+  if (esAlta && esSEF){
+    setReqAll(true);
+    showAlert('Para ALTA con contrato SEF ELECTRÓNICO es obligatorio capturar al menos un Usuario SEF completo antes de continuar.');
+  }
+
+  // Regla B: SUSTITUCIÓN + SEF -> opcional solo si TODOS vacíos; si alguno tiene dato, todos obligatorios
+  function aplicaSustitucion(){
+    if (esSust && esSEF){
+      if (anyFilled()){
+        setReqAll(true);
+        showAlert('Estás modificando un usuario: completa todos los campos para guardar.', 'info');
+      } else {
+        setReqAll(false);
+        hideAlert();
+      }
+    }
+  }
+
+  // Observa cambios para la regla B
+  if (esSust && esSEF){
+    Object.values(campos).forEach(el=>{
+      el && el.addEventListener('input', aplicaSustitucion, {passive:true});
+      el && el.addEventListener('change', aplicaSustitucion);
+    });
+    aplicaSustitucion();
+  }
+
+  // Validación de envío
+  form && form.addEventListener('submit', function(e){
+    hideAlert();
+
+    // SUSTITUCIÓN + SEF: no permitir guardar registro en blanco
+    if (esSust && esSEF && allEmpty()){
+      e.preventDefault();
+      showAlert('En SUSTITUCIÓN con contrato SEF, no se guardan registros en blanco. Captura todos los campos o deja el formulario vacío.', 'danger');
+      return;
+    }
+
+    // Validación estándar HTML5
+    if (!form.checkValidity()){
+      e.preventDefault();
+      e.stopPropagation();
+      showAlert('Revisa los campos obligatorios del usuario antes de guardar.', 'danger');
+    }
+    form.classList.add('was-validated');
+  });
+
+  // Botón limpiar → borra alertas y re-aplica reglas
+  const btnLimpiar = document.getElementById('btnLimpiar');
+  btnLimpiar && btnLimpiar.addEventListener('click', function(){
+    hideAlert();
+    form.classList.remove('was-validated');
+    if (esSust && esSEF) aplicaSustitucion();
+  });
+
+});
+</script>
+
 {% endblock %}

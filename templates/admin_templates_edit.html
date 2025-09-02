@@ -2,7 +2,14 @@
 {% block title %}{{ tpl and 'Editar' or 'Nueva' }} plantilla{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">{{ tpl and 'Editar' or 'Nueva' }} plantilla</h2>
+<h2 class="mb-4 d-flex justify-content-between align-items-center">
+  <span>{{ tpl and 'Editar' or 'Nueva' }} plantilla</span>
+  <a id="btn-back-to-list"
+     href="{{ url_for('templates_admin.list_templates', token=request.args.get('token')) }}"
+     class="btn btn-outline-secondary btn-sm">
+    ← Volver a la lista
+  </a>
+</h2>
 
 <form id="tpl-form" method="post">
   {% if not tpl %}
@@ -17,11 +24,15 @@
   {% endif %}
 
   <div class="mb-3">
-    <label class="form-label">Contenido (HTML + Jinja)</label>
+    <label class="form-label">Contenido (HTML completo: puede incluir &lt;style&gt; y Jinja)</label>
     <textarea id="content_html" name="content_html">{{ tpl.content_html if tpl else '' }}</textarea>
+    <div class="form-text">
+      Aquí pega el HTML completo tal como está en <code>contrato_tradicional.html</code> o <code>contrato_electronico.html</code>.
+      Puedes incluir <code>&lt;style&gt;...&lt;/style&gt;</code> dentro del propio HTML. No se separará ni sanitizará.
+    </div>
   </div>
 
-  <div class="mb-3">
+  <div class="mb-3" style="display:none;">
     <label class="form-label">CSS (opcional)</label>
     <textarea id="css" name="css">{{ tpl.css if tpl else '' }}</textarea>
   </div>
@@ -34,8 +45,8 @@
 
 <hr>
 <h5>Vista previa</h5>
-<div id="preview-frame" class="border p-3 bg-white shadow-sm" style="min-height: 500px;">
-  <div class="text-muted">Haz clic en <strong>Vista previa</strong> para ver la plantilla renderizada.</div>
+<div class="border p-2 bg-white shadow-sm">
+  <iframe id="preview-frame" class="w-100" style="min-height: 600px; border:0;"></iframe>
 </div>
 
 <!-- Codemirror -->
@@ -43,6 +54,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/theme/eclipse.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/javascript/javascript.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/css/css.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/addon/edit/closetag.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/addon/edit/closebrackets.js"></script>
@@ -52,12 +65,13 @@
     border: 1px solid #ced4da;
     border-radius: .375rem;
     font-size: 14px;
-    min-height: 400px;
+    min-height: 420px;
   }
 </style>
 
 <script>
   let editorHtml, editorCss;
+  let formDirty = false;
 
   document.addEventListener("DOMContentLoaded", function () {
     editorHtml = CodeMirror.fromTextArea(document.getElementById("content_html"), {
@@ -70,37 +84,68 @@
       viewportMargin: Infinity
     });
 
-    editorCss = CodeMirror.fromTextArea(document.getElementById("css"), {
-      mode: "css",
-      theme: "eclipse",
-      lineNumbers: true,
-      lineWrapping: true,
-      autoCloseBrackets: true,
-      viewportMargin: Infinity
+    const cssArea = document.getElementById("css");
+    if (cssArea) {
+      editorCss = CodeMirror.fromTextArea(cssArea, {
+        mode: "css",
+        theme: "eclipse",
+        lineNumbers: true,
+        lineWrapping: true,
+        autoCloseBrackets: true,
+        viewportMargin: Infinity
+      });
+      editorCss.getWrapperElement().style.display = "none";
+    }
+
+    // Marcar como "dirty" al modificar algo
+    const markDirty = () => { formDirty = true; };
+    editorHtml.on("change", markDirty);
+    if (editorCss) editorCss.on("change", markDirty);
+
+    document.querySelectorAll('#tpl-form input[name="slug"], #tpl-form input[name="name"]').forEach(inp => {
+      inp.addEventListener('input', markDirty);
     });
 
-    // Para prevenir mayúsculas automáticas globales
-    editorHtml.getInputField().classList.add("no-uppercase");
-    editorCss.getInputField().classList.add("no-uppercase");
+    document.getElementById('tpl-form').addEventListener('submit', () => {
+      formDirty = false;
+    });
+
+    // Confirmación al hacer clic en Volver si hay cambios
+    const backBtn = document.getElementById("btn-back-to-list");
+    if (backBtn) {
+      backBtn.addEventListener("click", function (e) {
+        if (formDirty) {
+          const ok = confirm("Tienes cambios sin guardar. ¿Deseas salir sin guardar?");
+          if (!ok) {
+            e.preventDefault();
+          }
+        }
+      });
+    }
+
+    // Confirmación al cerrar pestaña
+    window.addEventListener('beforeunload', function (e) {
+      if (!formDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    });
   });
 
   function previewLive() {
-    editorHtml.save();
-    editorCss.save();
+    if (editorHtml) editorHtml.save();
+    if (editorCss) editorCss.save();
 
     fetch("{{ url_for('templates_admin.preview_live') }}?token={{ request.args.get('token') }}", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         content_html: document.getElementById("content_html").value,
-        css: document.getElementById("css").value
+        css: document.getElementById("css") ? document.getElementById("css").value : ""
       })
     })
     .then(r => r.text())
     .then(html => {
-      document.getElementById("preview-frame").innerHTML = html;
+      document.getElementById("preview-frame").srcdoc = html;
     })
     .catch(err => {
       alert("Error al generar vista previa");

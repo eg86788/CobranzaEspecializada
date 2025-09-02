@@ -217,6 +217,25 @@
     });
   </script>
 
+<script>
+  // Habilita tooltips Bootstrap globalmente
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.bootstrap) {
+      const els = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      els.map(el => new bootstrap.Tooltip(el));
+    }
+  });
+
+  // Botón "Volver" reutilizable en todos los frames
+  window.confirmExitTo = function (url) {
+    const msg = "Volverás al panel. Los cambios no guardados de esta solicitud no se guardarán.\n\n¿Deseas continuar?";
+    if (confirm(msg)) {
+      window.location.href = url;
+    }
+  };
+</script>
+
+
   {% block scripts %}{% endblock %}
 </body>
 </html>

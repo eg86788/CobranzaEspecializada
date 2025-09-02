@@ -1,4 +1,5 @@
 # app/__init__.py
+import logging
 import os
 from pathlib import Path
 from flask import Flask, session
@@ -126,5 +127,6 @@ def create_app():
     app.add_url_rule("/", "root_index", _root_index)
     
     register_error_handlers(app)
+    
 
     return app

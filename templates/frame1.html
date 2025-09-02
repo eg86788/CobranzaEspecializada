@@ -1,260 +1,371 @@
 {% extends "base.html" %}
-
-{% block title %}Datos Generales{% endblock %}
-
 {% block content %}
-<h2>Nueva solicitud</h2>
+<div class="form-compact">
+  <h2 class="mb-2">Nueva solicitud</h2>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-<form method="POST">
-  <fieldset class="border p-3 mb-4">
-    <legend class="float-none w-auto px-2">Datos del Cliente</legend>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Tipo de Trámite *</label>
-        <select class="form-select" name="tipo_tramite" id="tipo_tramite" required>
-          <option value="">Selecciona...</option>
-          <option value="ALTA" {% if frame1 and frame1.tipo_tramite == 'ALTA' %}selected{% endif %}>ALTA</option>
-          <option value="SUSTITUCIÓN" {% if frame1 and frame1.tipo_tramite == 'SUSTITUCIÓN' %}selected{% endif %}>SUSTITUCIÓN</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Segmento *</label>
-        <select class="form-select" name="segmento" required>
-          <option value="">Selecciona…</option>
-          <option value="EMPRESARIAL" {% if frame1 and frame1.segmento == 'EMPRESARIAL' %}selected{% endif %}>EMPRESARIAL</option>
-          <option value="COMERCIAL" {% if frame1 and frame1.segmento == 'COMERCIAL' %}selected{% endif %}>COMERCIAL</option>
-          <option value="OTRO" {% if frame1 and frame1.segmento == 'OTRO' %}selected{% endif %}>OTRO</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Nombre del Ejecutivo *</label>
-        <input type="text" class="form-control" name="nombre_ejecutivo" required value="{{ frame1.nombre_ejecutivo if frame1 else '' }}">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Tipo Persona Cliente*</label>
-        <select class="form-select" name="tipo_persona" id="tipo_persona">
-          <option value="">Selecciona…</option>
-          <option value="PERSONA MORAL" {% if frame1 and frame1.tipo_persona == 'PERSONA MORAL' %}selected{% endif %}>PERSONA MORAL</option>
-          <option value="PERSONA FISICA CON ACTIVIDAD EMPRESARIAL" {% if frame1 and frame1.tipo_persona == 'PERSONA FISICA CON ACTIVIDAD EMPRESARIAL' %}selected{% endif %}>PERSONA FISICA CON ACTIVIDAD EMPRESARIAL</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Número Cliente *</label>
-        <input type="number" class="form-control" name="numero_cliente" id="numero_cliente" value="{{ frame1.numero_cliente if frame1 else '' }}">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Nombre o Razón Social *</label>
-        <input type="text" class="form-control" name="razon_social" required value="{{ frame1.razon_social if frame1 else '' }}">
-      </div>
-      <div class="col-md-6" id="grupo_contrato">
-        <label class="form-label">Número de Contrato</label>
-        <input type="text" class="form-control" name="numero_contrato" id="numero_contrato" value="{{ frame1.numero_contrato if frame1 else '' }}">
-      </div>
-      <div class="col-md-6">
-        <label for="apoderado_legal" class="form-label">Apoderado Legal (Cliente) *</label>
-        <input type="text" name="apoderado_legal" id="apoderado_legal" class="form-control" value="{{ frame1.apoderado_legal if frame1 else '' }}">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Correo electrónico Apoderado Legal *</label>
-        <input type="email" class="form-control" name="correo_apoderado_legal" required value="{{ frame1.correo_apoderado_legal if frame1 else '' }}">
-      </div>      
-      <div class="col-md-12">
-        <label for="domicilio_cliente" class="form-label">Domicilio principal del Cliente *</label>
-        <input type="text" name="domicilio_cliente" id="domicilio_cliente" class="form-control" value="{{ frame1.domicilio_cliente if frame1 else '' }}">
-      </div>
-      <div class="col-md-6">
-        <label for="telefono_cliente" class="form-label">Teléfono del Cliente *</label>
-        <input type="tel" name="telefono_cliente" id="telefono_cliente" class="form-control" value="{{ frame1.telefono_cliente if frame1 else '' }}">
-      </div>
-    </div>
-  </fieldset>
+  <form method="POST" autocomplete="off">
+    {# >>> FIX: bandera para la regla (1) RDC en exportar <<< #}
+    <input type="hidden" name="incluir_rdc" id="incluir_rdc" value="NO">
+    <input type="hidden" id="unidades_count"  value="{{ unidades|length if unidades is defined and unidades else 0 }}">
+    <input type="hidden" id="cuentas_count"   value="{{ cuentas|length  if cuentas  is defined and cuentas  else 0 }}">
+    <input type="hidden" id="usuarios_count"  value="{{ usuarios|length if usuarios is defined and usuarios else 0 }}">
+    <input type="hidden" id="contactos_count" value="{{ contactos|length if contactos is defined and contactos else 0 }}">
+    <input type="hidden" name="config_changed" id="config_changed" value="NO">
 
-  <fieldset class="border p-3 mb-4">
-    <legend class="float-none w-auto px-2">Servicio</legend>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Tipo Contrato *</label>
-        <select class="form-select" name="tipo_contrato" id="tipo_contrato" required>
-          <option value="">Selecciona…</option>
-          <option value="CPAE TRADICIONAL" {% if frame1 and frame1.tipo_contrato == 'CPAE TRADICIONAL' %}selected{% endif %}>CPAE TRADICIONAL</option>
-          <option value="SEF ELECTRÓNICO" {% if frame1 and frame1.tipo_contrato == 'SEF ELECTRÓNICO' %}selected{% endif %}>SEF ELECTRÓNICO</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Servicio *</label>
-        <select class="form-select" name="tipo_servicio" id="tipo_servicio" required>
-          <option value="">Selecciona...</option>
-          <option value="DEPÓSITO TRADICIONAL" {% if frame1 and frame1.tipo_servicio == 'DEPÓSITO TRADICIONAL' %}selected{% endif %}>DEPÓSITO TRADICIONAL</option>
-          <option value="DEPÓSITO ELECTRÓNICO" {% if frame1 and frame1.tipo_servicio == 'DEPÓSITO ELECTRÓNICO' %}selected{% endif %}>DEPÓSITO ELECTRÓNICO</option>
-          <option value="DOTACIÓN ELECTRÓNICA" {% if frame1 and frame1.tipo_servicio == 'DOTACIÓN ELECTRÓNICA' %}selected{% endif %}>DOTACIÓN ELECTRÓNICA</option>
-          <option value="DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA" {% if frame1 and frame1.tipo_servicio == 'DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA' %}selected{% endif %}>DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Tipo de Cobro *</label>
-        <select class="form-select" name="tipo_cobro" required>
-          <option value="">Selecciona…</option>
-          <option {% if frame1 and frame1.tipo_cobro == 'LOCAL' %}selected{% endif %}>LOCAL</option>
-          <option {% if frame1 and frame1.tipo_cobro == 'CENTRALIZADO' %}selected{% endif %}>CENTRALIZADO</option>
-        </select>
-      </div>
-      <div class="col-md-6" id="importe_dif_grupo" style="display: none;">
-        <label class="form-label">Importe Máximo de Diferencias *</label>
-        <div class="input-group">
-          <span class="input-group-text">$</span>
-          <input type="text" class="form-control" name="importe_maximo_dif" id="importe_maximo_dif" value="{{ '{:,.2f}'.format(frame1.importe_maximo_dif|float) if frame1 and frame1.importe_maximo_dif else '200.01' }}">
+
+    <fieldset class="border p-3 mb-3 compact">
+      <legend class="float-none w-auto px-2">Datos del Cliente</legend>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Tipo de Trámite *</label>
+          <select class="form-select uc" name="tipo_tramite" id="tipo_tramite" required>
+            <option value="">Selecciona...</option>
+            <option value="ALTA" {% if frame1 and frame1.tipo_tramite == 'ALTA' %}selected{% endif %}>ALTA</option>
+            <option value="SUSTITUCIÓN" {% if frame1 and frame1.tipo_tramite == 'SUSTITUCIÓN' %}selected{% endif %}>SUSTITUCIÓN</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Segmento *</label>
+          <select class="form-select uc" name="segmento" required>
+            <option value="">Selecciona…</option>
+            <option value="EMPRESARIAL" {% if frame1 and frame1.segmento == 'EMPRESARIAL' %}selected{% endif %}>EMPRESARIAL</option>
+            <option value="COMERCIAL" {% if frame1 and frame1.segmento == 'COMERCIAL' %}selected{% endif %}>COMERCIAL</option>
+            <option value="OTRO" {% if frame1 and frame1.segmento == 'OTRO' %}selected{% endif %}>OTRO</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre del Ejecutivo *</label>
+          <input type="text" class="form-control uc" name="nombre_ejecutivo" required value="{{ frame1.nombre_ejecutivo if frame1 else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Tipo Persona Cliente*</label>
+          <select class="form-select uc" name="tipo_persona" id="tipo_persona">
+            <option value="">Selecciona…</option>
+            <option value="PERSONA MORAL" {% if frame1 and frame1.tipo_persona == 'PERSONA MORAL' %}selected{% endif %}>PERSONA MORAL</option>
+            <option value="PERSONA FISICA CON ACTIVIDAD EMPRESARIAL" {% if frame1 and frame1.tipo_persona == 'PERSONA FISICA CON ACTIVIDAD EMPRESARIAL' %}selected{% endif %}>PERSONA FISICA CON ACTIVIDAD EMPRESARIAL</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Número Cliente *</label>
+          <input type="text" class="form-control input-digit" name="numero_cliente" id="numero_cliente"
+                 maxlength="11" value="{{ frame1.numero_cliente if frame1 else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre o Razón Social *</label>
+          <input type="text" class="form-control uc" name="razon_social" required value="{{ frame1.razon_social if frame1 else '' }}">
+        </div>
+        <div class="col-md-6" id="grupo_contrato">
+          <label class="form-label">Número de Contrato</label>
+          <input type="text" class="form-control input-digit" name="numero_contrato" id="numero_contrato"
+                 maxlength="12" value="{{ frame1.numero_contrato if frame1 else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label for="apoderado_legal" class="form-label">Apoderado Legal (Cliente) *</label>
+          <input type="text" name="apoderado_legal" id="apoderado_legal" class="form-control uc"
+                 value="{{ frame1.apoderado_legal if frame1 else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Correo electrónico Apoderado Legal *</label>
+          <input type="email" class="form-control" name="correo_apoderado_legal" required
+                 value="{{ frame1.correo_apoderado_legal if frame1 else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label for="telefono_cliente" class="form-label">Teléfono del Cliente *</label>
+          <input type="tel" name="telefono_cliente" id="telefono_cliente" class="form-control input-digit"
+                 value="{{ frame1.telefono_cliente if frame1 else '' }}">
+        </div>
+        <div class="col-md-12">
+          <label for="domicilio_cliente" class="form-label">Domicilio principal del Cliente *</label>
+          <input type="text" name="domicilio_cliente" id="domicilio_cliente" class="form-control uc"
+                 value="{{ frame1.domicilio_cliente if frame1 else '' }}">
         </div>
       </div>
+    </fieldset>
+
+    <fieldset class="border p-3 mb-3 compact">
+      <legend class="float-none w-auto px-2">Servicio</legend>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Tipo Contrato *</label>
+          <select class="form-select uc" name="tipo_contrato" id="tipo_contrato" required>
+            <option value="">Selecciona…</option>
+            <option value="CPAE TRADICIONAL" {% if frame1 and frame1.tipo_contrato == 'CPAE TRADICIONAL' %}selected{% endif %}>CPAE TRADICIONAL</option>
+            <option value="SEF ELECTRÓNICO" {% if frame1 and frame1.tipo_contrato == 'SEF ELECTRÓNICO' %}selected{% endif %}>SEF ELECTRÓNICO</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Servicio *</label>
+          <select class="form-select uc" name="tipo_servicio" id="tipo_servicio" required>
+            <option value="">Selecciona...</option>
+            <option value="DEPÓSITO TRADICIONAL" {% if frame1 and frame1.tipo_servicio == 'DEPÓSITO TRADICIONAL' %}selected{% endif %}>DEPÓSITO TRADICIONAL</option>
+            <option value="DEPÓSITO ELECTRÓNICO" {% if frame1 and frame1.tipo_servicio == 'DEPÓSITO ELECTRÓNICO' %}selected{% endif %}>DEPÓSITO ELECTRÓNICO</option>
+            <option value="DOTACIÓN ELECTRÓNICA" {% if frame1 and frame1.tipo_servicio == 'DOTACIÓN ELECTRÓNICA' %}selected{% endif %}>DOTACIÓN ELECTRÓNICA</option>
+            <option value="DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA" {% if frame1 and frame1.tipo_servicio == 'DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA' %}selected{% endif %}>DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Tipo de Cobro *</label>
+          {# >>> FIX: id=\"tipo_cobro\" para la regla (1) y compatibilidad con scripts previos <<< #}
+          <select class="form-select uc" name="tipo_cobro" id="tipo_cobro" required>
+            <option value="">Selecciona…</option>
+            <option {% if frame1 and frame1.tipo_cobro == 'LOCAL' %}selected{% endif %}>LOCAL</option>
+            <option {% if frame1 and frame1.tipo_cobro == 'CENTRALIZADO' %}selected{% endif %}>CENTRALIZADO</option>
+          </select>
+        </div>
+        <div class="col-md-6" id="importe_dif_grupo" style="display: none;">
+          <label class="form-label">Importe Máximo de Diferencias *</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="text" class="form-control input-digit" name="importe_maximo_dif" id="importe_maximo_dif"
+                   value="{{ '{:,.2f}'.format(frame1.importe_maximo_dif|float) if frame1 and frame1.importe_maximo_dif else '200.01' }}">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">Guardar y Continuar</button>
+
+    <!-- Modal: cambio de configuración -->
+<div class="modal fade" id="modalConfigChange" tabindex="-1" aria-labelledby="modalConfigChangeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalConfigChangeLabel">Cambiar configuración del servicio</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        Has modificado la configuración (<strong>Tipo de trámite / Tipo de contrato / Tipo de servicio</strong>).
+        <br>Los registros previamente capturados de <strong>Unidades, Cuentas, Usuarios y Contactos</strong>
+        serán <strong>eliminados</strong> al guardar esta solicitud.
+        <br><br>¿Deseas continuar?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="btnConfigCancelar" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfigContinuar" data-bs-dismiss="modal">Sí, continuar</button>
+      </div>
     </div>
-  </fieldset>
+  </div>
+</div>
 
-  <button type="submit" class="btn btn-primary">Guardar y Continuar</button>
-</form>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const tipoTramite = document.getElementById('tipo_tramite');
-    const grupoContrato = document.getElementById('grupo_contrato');
-    const inputContrato = document.getElementById('numero_contrato');
-    const tipoContrato = document.getElementById('tipo_contrato');
-    const servicio = document.getElementById('tipo_servicio');
-    const importeDifGrupo = document.getElementById('importe_dif_grupo');
-    const importeDifInput = document.getElementById('importe_maximo_dif');
-
-    function actualizarContratoVisible() {
-      if (tipoTramite && grupoContrato && inputContrato) {
-        if (tipoTramite.value === 'ALTA') {
-          grupoContrato.style.display = 'none';
-          inputContrato.value = '-';
-          inputContrato.removeAttribute('required');
-        } else {
-          grupoContrato.style.display = 'block';
-          if (inputContrato.value === '-') inputContrato.value = '';
-          inputContrato.setAttribute('required', true);
-        }
-      }
-    }
-
-    function actualizarOpcionesServicio() {
-      if (!tipoContrato || !servicio) return;
-      Array.from(servicio.options).forEach(opt => {
-        opt.hidden = false;
-        opt.disabled = false;
-      });
-      if (tipoContrato.value === 'CPAE TRADICIONAL') {
-        servicio.value = 'DEPÓSITO TRADICIONAL';
-        Array.from(servicio.options).forEach(opt => {
-          if (opt.value !== 'DEPÓSITO TRADICIONAL' && opt.value !== '') {
-            opt.hidden = true;
-            opt.disabled = true;
-          }
-        });
-        servicio.setAttribute('readonly', true);
-      } else if (tipoContrato.value === 'SEF ELECTRÓNICO') {
-        Array.from(servicio.options).forEach(opt => {
-          if (opt.value === 'DEPÓSITO TRADICIONAL') {
-            opt.hidden = true;
-            opt.disabled = true;
-          }
-        });
-        servicio.removeAttribute('readonly');
-        if (servicio.value === 'DEPÓSITO TRADICIONAL') servicio.value = '';
-      } else {
-        servicio.value = '';
-        Array.from(servicio.options).forEach(opt => {
-          opt.hidden = false;
-          opt.disabled = false;
-        });
-        servicio.removeAttribute('readonly');
-      }
-    }
-
-    function actualizarImporteDiferencias() {
-      if (!servicio || !importeDifGrupo || !importeDifInput) return;
-      const valor = servicio.value;
-      const habilitados = [
-        'DEPÓSITO TRADICIONAL',
-        'DEPÓSITO ELECTRÓNICO',
-        'DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA'
-      ];
-      if (habilitados.includes(valor)) {
-        importeDifGrupo.style.display = 'block';
-        importeDifInput.setAttribute('required', true);
-      } else {
-        importeDifGrupo.style.display = 'none';
-        importeDifInput.removeAttribute('required');
-        importeDifInput.value = '200.01';
-      }
-    }
-
-    if (importeDifInput) {
-      importeDifInput.addEventListener('blur', () => {
-        let valor = parseFloat(importeDifInput.value.replace(/[^0-9.]/g, ''));
-        if (!isNaN(valor)) {
-          importeDifInput.value = valor.toFixed(2);
-        } else {
-          importeDifInput.value = '200.01';
-        }
-      });
-    }
-
-    if (tipoContrato) {
-      tipoContrato.addEventListener('change', () => {
-        actualizarOpcionesServicio();
-        actualizarImporteDiferencias();
-      });
-    }
-
-    if (servicio) {
-      servicio.addEventListener('change', actualizarImporteDiferencias);
-    }
-
-    if (tipoTramite) {
-      tipoTramite.addEventListener('change', actualizarContratoVisible);
-    }
-
-    actualizarOpcionesServicio();
-    actualizarImporteDiferencias();
-    actualizarContratoVisible();
-  });
-</script>
+  </form>
+</div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const tipoTramite = document.getElementById('tipo_tramite');
-    const tipoContrato = document.getElementById('tipo_contrato');
-    const tipoServicio = document.getElementById('tipo_servicio');
-    const hayDatosDependientes = {{ hay_datos_dependientes | tojson }};
-    let originalTramite = tipoTramite ? tipoTramite.value : '';
-    let originalContrato = tipoContrato ? tipoContrato.value : '';
-    let originalServicio = tipoServicio ? tipoServicio.value : '';
-
-    function confirmarCambio(campo, original) {
-      if (!hayDatosDependientes) return;
-      const confirmar = confirm("⚠️ Cambiar este campo eliminará todas las unidades, cuentas, usuarios y contactos guardados. ¿Deseas continuar?");
-      if (!confirmar) {
-        campo.value = original;
-      } else {
-        if (campo === tipoTramite) originalTramite = campo.value;
-        if (campo === tipoContrato) originalContrato = campo.value;
-        if (campo === tipoServicio) originalServicio = campo.value;
+    const $ = (sel) => document.querySelector(sel);
+    // Normaliza robusto: sin acentos, mayúsculas
+    const normaliza = (s) => (s || '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
+  
+    const tipoTramite   = $('#tipo_tramite');
+    const tipoContrato  = $('#tipo_contrato');
+    const tipoServicio  = $('#tipo_servicio');
+    const grupoContrato = $('#grupo_contrato');
+    const numContrato   = $('#numero_contrato');
+    const numCliente    = $('#numero_cliente');
+    const tipoCobro     = $('#tipo_cobro');
+    const impDifGrupo   = $('#importe_dif_grupo');
+    const impDifInput   = $('#importe_maximo_dif');
+    const incluirRdc    = $('#incluir_rdc');
+  
+    // Contadores (si existen datos ya capturados)
+    const unidadesCount  = parseInt($('#unidades_count')?.value || '0', 10);
+    const cuentasCount   = parseInt($('#cuentas_count')?.value  || '0', 10);
+    const usuariosCount  = parseInt($('#usuarios_count')?.value || '0', 10);
+    const contactosCount = parseInt($('#contactos_count')?.value|| '0', 10);
+    const hayDatosPrevios = (unidadesCount + cuentasCount + usuariosCount + contactosCount) > 0;
+  
+    // Valores originales para revertir si el usuario cancela en el modal
+    let origTipoTramite  = tipoTramite?.value || '';
+    let origTipoContrato = tipoContrato?.value || '';
+    let origTipoServicio = tipoServicio?.value || '';
+  
+    // ===== Regla (8): mayúsculas en textos (excepto emails) =====
+    document.querySelectorAll('input[type="text"], textarea').forEach(function(inp){
+      if (inp.type === 'email' || (inp.name && inp.name.includes('correo'))) return;
+      inp.addEventListener('input', function(){
+        const pos = inp.selectionStart;
+        inp.value = inp.value.toUpperCase();
+        try { inp.setSelectionRange(pos, pos); } catch(e){}
+      });
+    });
+  
+    // ===== Reglas (5) y (6): numéricos con longitudes =====
+    numCliente && numCliente.addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,11);
+    }, {passive:true});
+  
+    numContrato && numContrato.addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,12);
+    }, {passive:true});
+  
+    // ===== Regla (2): trámite controla contrato =====
+    function reglaTramite(){
+      const v = tipoTramite?.value || '';
+      if (v === 'ALTA') {
+        if (grupoContrato) grupoContrato.style.display = 'none';
+        if (numContrato) { numContrato.removeAttribute('required'); numContrato.value = ''; }
+      } else if (v === 'SUSTITUCIÓN') {
+        if (grupoContrato) grupoContrato.style.display = '';
+        if (numContrato) numContrato.setAttribute('required','required');
       }
     }
-
-    if (tipoTramite) tipoTramite.addEventListener('change', () => confirmarCambio(tipoTramite, originalTramite));
-    if (tipoContrato) tipoContrato.addEventListener('change', () => confirmarCambio(tipoContrato, originalContrato));
-    if (tipoServicio) tipoServicio.addEventListener('change', () => confirmarCambio(tipoServicio, originalServicio));
+  
+    // ===== Regla (3): contrato restringe servicio =====
+    function reglaContrato(){
+      const v = normaliza(tipoContrato?.value);
+      const permitidoCPAE = ['DEPÓSITO TRADICIONAL'];
+      const permitidoSEF  = ['DEPÓSITO ELECTRÓNICO','DOTACIÓN ELECTRÓNICA','DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA'];
+  
+      const opcionesValidas = (v === 'CPAE TRADICIONAL')
+        ? permitidoCPAE
+        : (v === 'SEF ELECTRONICO' || v === 'SEF ELECTRÓNICO')
+          ? permitidoSEF
+          : [];
+  
+      if (tipoServicio) {
+        Array.from(tipoServicio.options).forEach(opt => {
+          if (opt.value === '') return; // placeholder
+          const esValida = opcionesValidas.includes(opt.value);
+          opt.disabled = !esValida;
+          opt.style.display = esValida ? 'block' : 'none';
+        });
+        // si la selección actual quedó inválida, vaciar
+        if (tipoServicio.value && !opcionesValidas.includes(tipoServicio.value)) {
+          tipoServicio.value = '';
+        }
+      }
+      // Cascada hacia la regla (4)
+      reglaServicio();
+    }
+  
+    // ===== Regla (4): mostrar/ocultar Importe Máximo de Diferencias =====
+    const serviciosQueMuestranImporte = new Set([
+      'DEPOSITO TRADICIONAL',
+      'DEPOSITO ELECTRONICO',
+      'DEPOSITO ELECTRONICO Y DOTACION ELECTRONICA'
+    ]);
+  
+    function reglaServicio(){
+      const vNorm = normaliza(tipoServicio?.value);
+      const debe  = serviciosQueMuestranImporte.has(vNorm);
+  
+      if (impDifGrupo) impDifGrupo.style.display = debe ? '' : 'none';
+  
+      if (impDifInput) {
+        if (debe) {
+          impDifInput.setAttribute('required','required');
+          // (1) valor por defecto 200.01 si viene vacío (editable por el usuario)
+          if (!impDifInput.value || impDifInput.value.trim() === '') {
+            impDifInput.value = '200.01';
+          }
+        } else {
+          impDifInput.removeAttribute('required');
+          // opcional: no vaciamos para no perder entrada del usuario si oculta temporalmente
+          // impDifInput.value = '';
+        }
+      }
+    }
+  
+    // ===== Regla (1): cobro centralizado -> bandera RDC =====
+    function reglaCobro(){
+      const v = normaliza(tipoCobro?.value);
+      if (incluirRdc) incluirRdc.value = (v === 'CENTRALIZADO') ? 'SI' : 'NO';
+    }
+  
+    // ===== Modal de advertencia por cambio de configuración (punto 2) =====
+    const modalEl   = document.getElementById('modalConfigChange');
+    const modalInst = modalEl ? new bootstrap.Modal(modalEl) : null;
+    const btnOk     = document.getElementById('btnConfigContinuar');
+    const btnCancel = document.getElementById('btnConfigCancelar');
+    const cfgChanged= document.getElementById('config_changed');
+  
+    // util: muestra modal sólo si hay datos previos
+    function confirmarCambioConfig(onConfirm, onCancel){
+      if (!hayDatosPrevios || !modalInst) { onConfirm(); return; }
+      // limpiar listeners previos (por seguridad)
+      if (btnOk)     btnOk.onclick = null;
+      if (btnCancel) btnCancel.onclick = null;
+  
+      modalInst.show();
+      btnOk && (btnOk.onclick = function(){
+        if (cfgChanged) cfgChanged.value = 'SI';
+        modalInst.hide();
+        onConfirm && onConfirm();
+      });
+      btnCancel && (btnCancel.onclick = function(){
+        modalInst.hide();
+        onCancel && onCancel();
+      });
+    }
+  
+    // Listeners con confirmación
+    tipoTramite && tipoTramite.addEventListener('change', function (e) {
+      const nuevo = tipoTramite.value;
+      confirmarCambioConfig(
+        () => { // confirmar
+          origTipoTramite = nuevo;
+          reglaTramite();
+        },
+        () => { // cancelar -> revertir
+          tipoTramite.value = origTipoTramite;
+          reglaTramite();
+        }
+      );
+    });
+  
+    tipoContrato && tipoContrato.addEventListener('change', function (e) {
+      const nuevo = tipoContrato.value;
+      confirmarCambioConfig(
+        () => { // confirmar
+          origTipoContrato = nuevo;
+          reglaContrato();
+        },
+        () => { // cancelar -> revertir
+          tipoContrato.value = origTipoContrato;
+          reglaContrato();
+        }
+      );
+    });
+  
+    tipoServicio && tipoServicio.addEventListener('change', function (e) {
+      const nuevo = tipoServicio.value;
+      confirmarCambioConfig(
+        () => { // confirmar
+          origTipoServicio = nuevo;
+          reglaServicio();
+        },
+        () => { // cancelar -> revertir
+          tipoServicio.value = origTipoServicio;
+          reglaServicio();
+        }
+      );
+    });
+  
+    // Bind “normales”
+    tipoCobro  && tipoCobro.addEventListener('change',  reglaCobro);
+  
+    // Estado inicial (si hay valores precargados)
+    reglaTramite();
+    reglaContrato();
+    reglaServicio();
+    reglaCobro();
   });
-</script>
+  </script>
+  
+  
 {% endblock %}

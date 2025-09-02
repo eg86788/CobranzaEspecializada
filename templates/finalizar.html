@@ -69,20 +69,16 @@
 {% endif %}
 
 {% if imprimir_pdf %}
-<!-- Contenedor general del encabezado -->
+<!-- Encabezado PDF -->
 <div style="display: flex; align-items: center;">
-  <!-- Logo con fondo blanco -->
   <div style="background-color: white; padding: 5px;">
     <img src="file:/Users/edgargarcia/Documents/CobranzaSEF/static/banamex_neg.png" alt="Logo Banamex" style="height: 60px;">
   </div>
-
-  <!-- Fondo azul ocupa todo el ancho restante -->
   <div style="background-color: #003746; color: white; padding: 10px 20px; flex: 1;">
     <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">Servicios de Efectivo | Anexo Operativo</h1>
     <p style="margin: 0; font-size: 12px; color: white;">Cascarón 204</p>
   </div>
 </div>
-
 {% else %}
 <h2 class="mt-4">Resumen de la Solicitud</h2>
 {% endif %}
@@ -98,192 +94,242 @@
   {% endif %}
 {% endwith %}
 
-<!-- Datos Generales del Cliente - Diseño Moderno Compacto -->
-<div class="card shadow-sm rounded-4 mb-4 border-0">
-  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
-    Datos Generales del Cliente
+<!-- ===== RESUMEN DE LA SOLICITUD ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Resumen de la solicitud</strong>
+    </div>
+    {% if not imprimir_pdf %}
+    <a href="{{ url_for('frames.frame1') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+    {% endif %}
   </div>
   <div class="card-body p-0">
-    <table class="table table-sm mb-0">
-      <tbody>
-        <tr>
-          <th>Cliente</th>
-          <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
-          <th>Segmento</th>
-          <td>{{ frame1.segmento or '-' }}</td>
-        </tr>
-        <tr>
-          <th>Contrato</th>
-          <td>{{ frame1.numero_contrato }}</td>
-          <th>Tipo Trámite</th>
-          <td>{{ frame1.tipo_tramite }}</td>
-        </tr>
-        <tr>
-          <th>Tipo Contrato</th>
-          <td>{{ frame1.tipo_contrato }}</td>
-          <th>Servicio</th>
-          <td>{{ frame1.tipo_servicio }}</td>
-        </tr>
-        <tr>
-          <th>Tipo Cobro Comisión</th>
-          <td>{{ frame1.tipo_cobro }}</td>
-          <th>Importe Máximo de Diferencias</th>
-          <td>{{ frame1.importe_maximo_dif }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0 align-middle">
+        <tbody>
+          <tr>
+            <th class="text-muted fw-semibold" style="width:18%">Cliente</th>
+            <td style="width:32%">{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th class="text-muted fw-semibold" style="width:18%">Segmento</th>
+            <td style="width:32%">{{ frame1.segmento or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Contrato</th>
+            <td>{{ frame1.numero_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Tipo Trámite</th>
+            <td id="tipo_tramite_val">{{ frame1.tipo_tramite or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Tipo Contrato</th>
+            <td id="tipo_contrato_val">{{ frame1.tipo_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Servicio</th>
+            <td id="servicio_general">{{ frame1.tipo_servicio or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Tipo Cobro Comisión</th>
+            <td id="tipo_cobro_val">{{ frame1.tipo_cobro or '-' }}</td>
+            <th class="text-muted fw-semibold">Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif or '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-
-<!-- Unidades de Negocio - Diseño Moderno Compacto -->
-<div class="card shadow-sm rounded-4 mb-4 border-0">
-  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff;">
-    Unidades de Negocio
+<!-- ===== UNIDADES ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Unidades de Negocio</strong>
+    </div>
+    {% if not imprimir_pdf %}
+    <a href="{{ url_for('frames.frame2') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+    {% endif %}
   </div>
   <div class="card-body p-0">
-    <table class="table table-sm table-bordered align-middle mb-0">
-      <thead class="table-light">
-        <tr>
-          <th style="width: 3%;">#</th>
-          <th style="width: 22%;">Nombre Unidad</th>
-          <th style="width: 18%;">CPAE</th>
-          <th style="width: 17%;">Tipo Unidad</th>
-          <th style="width: 20%;">Empresa Traslado</th>
-          <th style="width: 20%;">Terminal SEF</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for unidad in unidades %}
-        <tr>
-          <td class="fw-semibold">{{ loop.index }}</td>
-          <td>{{ unidad.nombre_unidad }}</td>
-          <td>{{ unidad.cpae_nombre }}</td>
-          <td>{{ unidad.tipo_servicio_unidad }}</td>
-          <td>{{ unidad.etv_nombre }}</td>
-          <td>{{ unidad.numero_terminal_sef or '-' }}</td>
-        </tr>
-        <tr>
-          <td colspan="6" class="bg-light text-muted small py-2 px-3">
-            <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.municipio_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.<br>
-            <strong>Term. Int.:</strong> {{ unidad.terminal_integradora or '-' }} |
-            <strong>Dot. Central.:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
-            <strong>Cert. Central.:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if unidades %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>CPAE</th>
+              <th>Servicio</th>
+              <th>ETV</th>
+              <th>Terminal SEF</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in unidades %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ u.nombre_unidad }}</td>
+              <td>{{ u.cpae_nombre }}</td>
+              <td>{{ u.tipo_servicio_unidad }}</td>
+              <td>{{ u.etv_nombre }}</td>
+              <td>{{ u.numero_terminal_sef or '-' }}</td>
+            </tr>
+            <tr class="table-light small">
+              <td colspan="6">
+                <strong>Dirección:</strong> {{ u.calle_numero }}, {{ u.colonia }}, {{ u.municipio_nombre }}, {{ u.estado_nombre }}, CP {{ u.codigo_postal }}.
+                &nbsp;|&nbsp; <strong>Integradora:</strong> {{ u.terminal_integradora or '-' }}
+                &nbsp;|&nbsp; <strong>Dotación Centralizada:</strong> {{ u.terminal_dotacion_centralizada or '-' }}
+                &nbsp;|&nbsp; <strong>Certificado Centralizada:</strong> {{ u.terminal_certificado_centralizada or '-' }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay unidades capturadas.</div>
+    {% endif %}
   </div>
 </div>
 
-<!-- Cuentas – Diseño Moderno Compacto -->
-<div class="card shadow-sm rounded-4 mb-4 border-0">
-  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
-    Cuentas
+<!-- ===== CUENTAS ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Cuentas Bancarias</strong>
+    </div>
+    {% if not imprimir_pdf %}
+    <a href="{{ url_for('frames.frame3') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+    {% endif %}
   </div>
-
   <div class="card-body p-0">
-    <table class="table table-sm table-hover table-borderless align-middle mb-0">
-      <thead class="table-light small">
-        <tr class="border-bottom">
-          <th style="width:5%;">#</th>
-          <th style="width:25%;">Servicio</th>
-          <th style="width:15%;">No. Sucursal</th>
-          <th style="width:30%;">No. Cuenta</th>
-          <th style="width:10%;">Moneda</th>
-          <th style="width:15%;">Terminal SEF Aplica</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for cuenta in cuentas %}
-        <tr class="border-bottom">
-          <td class="text-muted">{{ loop.index }}</td>
-          <td class="fw-semibold text-dark">{{ cuenta.servicio }}</td>
-          <td>{{ cuenta.sucursal }}</td>
-          <td>{{ cuenta.cuenta }}</td>
-          <td>{{ cuenta.moneda }}</td>
-          <td class="text-muted">{{ cuenta.terminal_aplica or '-' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if cuentas %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Servicio</th>
+              <th>No. Sucursal</th>
+              <th>No. Cuenta</th>
+              <th>Moneda</th>
+              <th>Terminal SEF Aplica</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in cuentas %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ c.servicio }}</td>
+              <td>{{ c.sucursal }}</td>
+              <td>{{ c.cuenta }}</td>
+              <td>{{ c.moneda }}</td>
+              <td>{{ c.terminal_aplica or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay cuentas capturadas.</div>
+    {% endif %}
   </div>
 </div>
 
-<!-- Usuarios SEF – Diseño Moderno Compacto -->
-<div class="card shadow-sm rounded-4 mb-4 border-0">
-  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
-    Usuarios SEF
+<!-- ===== USUARIOS (si SEF ELECTRÓNICO) ===== -->
+{% if frame1.tipo_contrato == 'SEF ELECTRÓNICO' %}
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Usuarios SEF</strong>
+    </div>
+    {% if not imprimir_pdf %}
+    <a href="{{ url_for('frames.frame4') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+    {% endif %}
   </div>
-
   <div class="card-body p-0">
-    <table class="table table-sm table-hover table-bordered align-middle mb-0">
-      <thead class="table-light small">
-        <tr>
-          <th style="width:3%;">#</th>
-          <th style="width:14%;">Nombre</th>
-          <th style="width:10%;">Clave</th>
-          <th style="width:12%;">Perfil</th>
-          <th style="width:12%;">Maker/Checker</th>
-          <th style="width:14%;">Correo</th>
-          <th style="width:10%;">Teléfono</th>
-          <th style="width:12%;">Terminal SEF</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for u in usuarios %}
-        <tr>
-          <td class="text-muted">{{ loop.index }}</td>
-          <td class="fw-semibold text-dark">{{ u.nombre_usuario }}</td>
-          <td>{{ u.clave_usuario }}</td>
-          <td>{{ u.perfil }}</td>
-          <td>{{ u.maker_checker }}</td>
-          <td>{{ u.correo }}</td>
-          <td>{{ u.telefono }}</td>
-          <td>{{ u.terminal_aplica }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if usuarios %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>Clave Usuario</th>
+              <th>Perfil</th>
+              <th>Maker/Checker</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Terminal SEF Aplica</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ usuario.nombre_usuario }}</td>
+              <td>{{ usuario.clave_usuario }}</td>
+              <td>{{ usuario.perfil }}</td>
+              <td>{{ usuario.maker_checker }}</td>
+              <td>{{ usuario.correo }}</td>
+              <td>{{ usuario.telefono }}</td>
+              <td>{{ usuario.terminal_aplica }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay usuarios capturados.</div>
+    {% endif %}
   </div>
 </div>
+{% endif %}
 
-<!-- Contactos – Diseño Moderno Compacto -->
-<div class="card mb-3">
-  <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">
-    Contactos
+<!-- ===== CONTACTOS ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Contactos</strong>
+    </div>
+    {% if not imprimir_pdf %}
+    <a href="{{ url_for('frames.frame5') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+    {% endif %}
   </div>
-
   <div class="card-body p-0">
-    <table class="table table-sm table-hover table-bordered align-middle mb-0">
-      <thead class="table-light small">
-        <tr>
-          <th style="width:22%;">Nombre</th>
-          <th style="width:25%;">Correo</th>
-          <th style="width:18%;">Teléfono</th>
-          <th style="width:15%;">Terminal</th>
-          <th style="width:20%;">Tipo de Contacto</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in contactos %}
-        <tr>
-          <td class="fw-semibold text-dark">{{ c.nombre_contacto }}</td>
-          <td>{{ c.correo }}</td>
-          <td>{{ c.telefono }}</td>
-          <td>{{ c.numero_terminal_sef or 'Todas' }}</td>
-          <td>{{ c.tipos_contacto | join(', ') }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if cuentas %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>Correo electrónico</th>
+              <th>Telefono</th>
+              <th>Tipo Contacto</th>
+              <th>Terminal SEF Aplica</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in contactos %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ c.nombre_contacto or c.contacto_nombre }}</td>
+              <td>{{ c.correo or c.contacto_correo }}</td>
+              <td>{{ c.telefono or c.contacto_telefono or '-' }}</td>
+              <td>{{ c.tipos_contacto or '-' }}</td>
+              <td>{{ c.numero_terminal_sef or c.contacto_terminales_aplica or 'TODAS' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay cuentas capturadas.</div>
+    {% endif %}
   </div>
 </div>
-
 
 {% if imprimir_pdf %}
+<!-- Sección de firmas para PDF -->
 <div class="card mb-3">
   <div class="card-header text-white fw-semibold py-2 px-3 rounded-top-4" style="background-color: #003746; color:#ffffff">Firmas</div>
   <div class="card-body p-0">
@@ -322,61 +368,82 @@
   </div>
 </div>
 {% else %}
-<form method="POST" class="card card-body mb-3">
-
+<!-- Formulario visual de Firmantes (sin botones para no mover diseño) -->
+<form method="POST" class="card card-body mb-3" id="formFirmantes">
   <div class="row mb-3">
     <div class="col-md-6">
-      <label for="apoderado_legal" class="form-label">Apoderado Legal (Cliente) <span class="text-danger">*</span></label>
-      <input type="text" name="apoderado_legal" id="apoderado_legal" class="form-control" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ 0-9]+" value="{{ frame1.apoderado_legal if frame1 else '' }}">
+      <label for="apoderado_legal" class="form-label">
+        Apoderado Legal (Cliente) <span class="text-danger">*</span>
+        <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+           title="Nombre completo del representante legal del cliente que firmará."></i>
+      </label>
+      <input type="text" name="apoderado_legal" id="apoderado_legal" class="form-control"
+             required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ 0-9]+"
+             value="{{ session.get('apoderado_legal') or frame1.apoderado_legal or '' }}">
     </div>
     <div class="col-md-6">
-      <label for="fecha_firma" class="form-label">Fecha de Firma Contrato <span class="text-danger">*</span></label>
-      <input type="text" 
-             name="fecha_firma" 
-             id="fecha_firma" 
-             class="form-control" 
-             required 
-             placeholder="dd/mm/aaaa" 
-             maxlength="10" 
-             value="{{ fecha_firma or '' }}">
+      <label for="fecha_firma" class="form-label">
+        Fecha de Firma Contrato <span class="text-danger">*</span>
+        <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+           title="Fecha en formato DD/MM/AAAA en que se firmará el contrato."></i>
+      </label>      
+      <input type="text" name="fecha_firma" id="fecha_firma" class="form-control" required
+             placeholder="dd/mm/aaaa" maxlength="10"
+             value="{{ session.get('fecha_firma') or '' }}">
       <div id="error_fecha" class="text-danger small mt-1" style="display: none;">Formato de fecha inválido</div>
     </div>
-    
   </div>
   <div class="row mb-3">
     <div class="col-md-6">
-      <label for="nombre_autorizador" class="form-label">Nombre del Autorizador 1 (Banamex)<span class="text-danger">*</span></label>
-      <input type="text" name="nombre_autorizador" id="nombre_autorizador" class="form-control" required value="{{ nombre_autorizador or '' }}">
+      <label for="nombre_autorizador" class="form-label">
+        Nombre del Autorizador 1 (Banamex) <span class="text-danger">*</span>
+        <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+           title="Nombre del primer autorizador del banco que firmará."></i>
+      </label>      
+      <input type="text" name="nombre_autorizador" id="nombre_autorizador" class="form-control" required
+             value="{{ session.get('nombre_autorizador') or '' }}">
     </div>
     <div class="col-md-6">
-      <label for="puesto_autorizador" class="form-label">Puesto<span class="text-danger">*</span></label>
-      <input type="text" name="puesto_autorizador" id="puesto_autorizador" class="form-control" required value="{{ puesto_autorizador or '' }}">
+      <label for="puesto_autorizador" class="form-label">
+        Puesto <span class="text-danger">*</span>
+        <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+           title="Cargo o puesto del primer autorizador."></i>
+      </label>
+            <input type="text" name="puesto_autorizador" id="puesto_autorizador" class="form-control" required
+             value="{{ session.get('puesto_autorizador') or '' }}">
     </div>
   </div>
-
   <div class="row mb-3">
     <div class="col-md-6">
-      <label for="nombre_director_divisional" class="form-label">Nombre del Autorizador 2 (Banamex)<span class="text-danger">*</span></label>
-      <input type="text" name="nombre_director_divisional" id="nombre_director_divisional" class="form-control" required value="{{ nombre_director_divisional or '' }}">
+      <label for="nombre_director_divisional" class="form-label">
+        Nombre del Autorizador 2 (Banamex) <span class="text-danger">*</span>
+        <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+           title="Nombre del segundo autorizador del banco (Director Divisional)."></i>
+      </label>
+            <input type="text" name="nombre_director_divisional" id="nombre_director_divisional" class="form-control" required
+             value="{{ session.get('nombre_director_divisional') or '' }}">
     </div>
     <div class="col-md-6">
-      <label for="puesto_director_divisional" class="form-label">Puesto<span class="text-danger">*</span></label>
-      <input type="text" name="puesto_director_divisional" id="puesto_director_divisional" class="form-control" required value="{{ puesto_director_divisional or '' }}">
+      <label for="puesto_director_divisional" class="form-label">
+        Puesto <span class="text-danger">*</span>
+        <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+           title="Cargo o puesto del segundo autorizador."></i>
+      </label>      
+      <input type="text" name="puesto_director_divisional" id="puesto_director_divisional" class="form-control" required
+             value="{{ session.get('puesto_director_divisional') or '' }}">
     </div>
   </div>
-
 </form>
-
 {% endif %}
-{% if not imprimir_pdf %}
-<form method="POST" class="mt-4">
 
+{% if not imprimir_pdf %}
+<!-- ===== ACCIONES ===== -->
+<form method="POST" class="mt-4" id="formAcciones">
   <div class="border rounded p-3 mb-3" style="background-color: #f9f9f9;">
     <h5 class="mb-2">Opciones de impresión</h5>
-
     <div class="form-check form-switch">
       <input class="form-check-input" type="checkbox" id="checkAnexoUSD" name="anexo_usd_14k" value="1"
-        {% if session.get('anexo_usd_14k') %}checked{% endif %}>
+             {% if session.get('anexo_usd_14k') %}checked{% endif %}>
       <label class="form-check-label" for="checkAnexoUSD">
         Incluir Anexo USD 14K en el PDF final
       </label>
@@ -387,135 +454,187 @@
   <div class="alert alert-info my-3">
     Este cliente solicitó cobro CENTRALIZADO. Se incluirá el reporte Reporte Centralizado de Difencias (RDC) para el trámite.
   </div>
-{% endif %}
+  {% endif %}
 
   <div class="d-flex flex-wrap gap-2 mb-3">
-    <a href="{{ url_for('frames.frame5') }}" class="btn btn-outline-secondary">
-      ← Modificar solicitud
-    </a>
-    <button type="button" onclick="validarFirmantes()" class="btn btn-outline-primary">
-      📄 Exportar PDF
+    <button type="button" class="btn btn-outline-secondary"
+    onclick="confirmExitTo('{{ url_for('solicitudes_portal.lista') }}')">
+    ← Volver al panel
     </button>
-    <button type="submit" name="confirmar" value="1" class="btn btn-success">
-      ✅ Confirmar y Guardar
+
+    <!-- NUEVO: Confirmar firmantes con JS -->
+    <button type="button" id="btnConfirmarFirmantes" class="btn btn-success">
+      ✅ Validar
+    </button>
+
+    <!-- Exportar PDF -->
+    <button type="button" onclick="validarFirmantes()" class="btn btn-outline-primary">
+      📄 Exportar ZIP
+    </button>
+
+    <!-- Guardar en BD (habilita sólo si firmantes_confirmados en sesión) -->
+    {% set listo = session.get('firmantes_confirmados') %}
+    <button type="submit" name="guardar_todo" value="1"
+            class="btn btn-primary"
+            {% if not listo %}disabled title="Confirma firmantes para habilitar el guardado"{% endif %}>
+      💾 Guardar
     </button>
   </div>
 
-
-  
   <div class="alert alert-info" role="alert">
     Al seleccionar <strong>Exportar PDF</strong>, se descargará un archivo <code>.zip</code> que contendrá todos los documentos aplicables al trámite.
   </div>
 
+  <!-- Espacios ocultos para enviar firmantes con cualquier submit de este form -->
+  <input type="hidden" name="apoderado_legal">
+  <input type="hidden" name="fecha_firma">
+  <input type="hidden" name="nombre_autorizador">
+  <input type="hidden" name="puesto_autorizador">
+  <input type="hidden" name="nombre_director_divisional">
+  <input type="hidden" name="puesto_director_divisional">
 </form>
 {% endif %}
 
-<script>
- function validarFirmantes() {
-  const apoderado    = document.getElementById('apoderado_legal').value.trim();
-  const fechaFirma   = document.getElementById('fecha_firma').value.trim();               // ← NUEVO
-  const autorizador  = document.getElementById('nombre_autorizador').value.trim();
-  const puestoAut    = document.getElementById('puesto_autorizador').value.trim();        // ← NUEVO
-  const director     = document.getElementById('nombre_director_divisional').value.trim();
-  const puestoDir    = document.getElementById('puesto_director_divisional').value.trim();// ← NUEVO
-  const anexoUSD     = document.getElementById('checkAnexoUSD').checked ? "1" : "";
+{% if imprimir_pdf %}
+<!-- Nada extra aquí -->
+{% endif %}
 
-  if (!apoderado || !fechaFirma || !autorizador || !puestoAut || !director || !puestoDir) {
-    alert('Completa todos los campos de firmantes antes de exportar el PDF.');
-    return;
+<!-- ===== JS ===== -->
+<script>
+  // Copia los campos visibles al form de acciones (inputs hidden)
+  function syncFirmantesToHidden() {
+    const formAcciones = document.getElementById('formAcciones');
+    if (!formAcciones) return;
+    const get = id => (document.getElementById(id)?.value || '').trim();
+    formAcciones.querySelector('input[name="apoderado_legal"]').value = get('apoderado_legal');
+    formAcciones.querySelector('input[name="fecha_firma"]').value = get('fecha_firma');
+    formAcciones.querySelector('input[name="nombre_autorizador"]').value = get('nombre_autorizador');
+    formAcciones.querySelector('input[name="puesto_autorizador"]').value = get('puesto_autorizador');
+    formAcciones.querySelector('input[name="nombre_director_divisional"]').value = get('nombre_director_divisional');
+    formAcciones.querySelector('input[name="puesto_director_divisional"]').value = get('puesto_director_divisional');
   }
 
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = "{{ url_for('exportar.exportar_pdf') }}";
+  // Acción del botón Confirmar firmantes:
+  // valida, copia a hidden, inyecta name=confirmar_firmantes y envía el formAcciones
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('btnConfirmarFirmantes');
+    const formAcciones = document.getElementById('formAcciones');
+    if (!btn || !formAcciones) return;
 
-  [
-    ['apoderado_legal', apoderado],
-    ['fecha_firma', fechaFirma],                                // ← NUEVO
-    ['nombre_autorizador', autorizador],
-    ['puesto_autorizador', puestoAut],                          // ← NUEVO
-    ['nombre_director_divisional', director],
-    ['puesto_director_divisional', puestoDir],                  // ← NUEVO
-    ['anexo_usd_14k', anexoUSD]
-  ].forEach(([name, value]) => {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
+    btn.addEventListener('click', function () {
+      const get = id => (document.getElementById(id)?.value || '').trim();
+      const apoderado  = get('apoderado_legal');
+      const fechaFirma = get('fecha_firma');
+      const aut1       = get('nombre_autorizador');
+      const pto1       = get('puesto_autorizador');
+      const aut2       = get('nombre_director_divisional');
+      const pto2       = get('puesto_director_divisional');
+
+      if (!apoderado || !fechaFirma || !aut1 || !pto1 || !aut2 || !pto2) {
+        alert('Completa todos los campos de firmantes antes de confirmar.');
+        return;
+      }
+
+      // Copia a hidden
+      syncFirmantesToHidden();
+
+      // Inyecta el flag "confirmar_firmantes=1" antes de enviar
+      let flag = formAcciones.querySelector('input[name="confirmar_firmantes"]');
+      if (!flag) {
+        flag = document.createElement('input');
+        flag.type = 'hidden';
+        flag.name = 'confirmar_firmantes';
+        flag.value = '1';
+        formAcciones.appendChild(flag);
+      } else {
+        flag.value = '1';
+      }
+
+      formAcciones.submit();
+    });
+
+    // Si el usuario hace submit por otros medios, sincroniza hidden
+    formAcciones.addEventListener('submit', syncFirmantesToHidden);
   });
-
-  document.body.appendChild(form);
-  form.submit();
-}
 </script>
 
-}
+<script>
+  // Exportar PDF: exige que los 6 campos tengan datos
+  function validarFirmantes() {
+    const apoderado  = (document.getElementById('apoderado_legal')?.value || '').trim();
+    const fechaFirma = (document.getElementById('fecha_firma')?.value || '').trim();
+    const aut1       = (document.getElementById('nombre_autorizador')?.value || '').trim();
+    const pto1       = (document.getElementById('puesto_autorizador')?.value || '').trim();
+    const aut2       = (document.getElementById('nombre_director_divisional')?.value || '').trim();
+    const pto2       = (document.getElementById('puesto_director_divisional')?.value || '').trim();
+    const anexoUSD   = document.getElementById('checkAnexoUSD')?.checked ? "1" : "";
+
+    if (!apoderado || !fechaFirma || !aut1 || !pto1 || !aut2 || !pto2) {
+      alert('Completa todos los campos de firmantes antes de exportar el PDF.');
+      return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ url_for('exportar.exportar_pdf') }}";
+    [['apoderado_legal', apoderado],
+     ['fecha_firma', fechaFirma],
+     ['nombre_autorizador', aut1],
+     ['puesto_autorizador', pto1],
+     ['nombre_director_divisional', aut2],
+     ['puesto_director_divisional', pto2],
+     ['anexo_usd_14k', anexoUSD]
+    ].forEach(([name, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  }
 </script>
+
+<!-- Flatpickr + Inputmask para Fecha -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const fechaInput = document.getElementById('fecha_firma');
   const errorDiv = document.getElementById('error_fecha');
 
-  // 🎯 1. Aplicar Flatpickr
-  flatpickr(fechaInput, {
-    dateFormat: "d/m/Y",  // DD/MM/YYYY
-    allowInput: true,
-    locale: {
-      firstDayOfWeek: 1,
-      weekdays: {
-        shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
-        longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
-      },
-      months: {
-        shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-        longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
-                   'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  if (window.flatpickr) {
+    flatpickr(fechaInput, {
+      dateFormat: "d/m/Y",
+      allowInput: true,
+      locale: {
+        firstDayOfWeek: 1,
+        weekdays: { shorthand: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'], longhand: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'] },
+        months:   { shorthand: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+                    longhand:  ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'] }
       }
-    }
-  });
+    });
+  }
 
-  // 🎯 2. Aplicar máscara de entrada
-  Inputmask("99/99/9999", {
-    placeholder: "dd/mm/aaaa",
-    showMaskOnHover: false,
-    clearIncomplete: true
-  }).mask(fechaInput);
+  Inputmask("99/99/9999", { placeholder: "dd/mm/aaaa", showMaskOnHover: false, clearIncomplete: true }).mask(fechaInput);
 
-  // 🎯 3. Validación
   fechaInput.addEventListener('blur', function () {
-    const valor = this.value;
-
-    if (valor.length === 10) {
-      const [dia, mes, anio] = valor.split('/').map(Number);
-      const fechaObj = new Date(anio, mes - 1, dia);
-
-      if (
-        fechaObj.getFullYear() !== anio ||
-        fechaObj.getMonth() + 1 !== mes ||
-        fechaObj.getDate() !== dia
-      ) {
-        errorDiv.style.display = "block";
-        this.classList.add("is-invalid");
-      } else {
-        errorDiv.style.display = "none";
-        this.classList.remove("is-invalid");
-        this.classList.add("is-valid");
-      }
-    } else {
-      errorDiv.style.display = "block";
-      this.classList.add("is-invalid");
-    }
+    const v = this.value;
+    if (v.length !== 10) { errorDiv.style.display='block'; this.classList.add('is-invalid'); return; }
+    const [d,m,y] = v.split('/').map(Number);
+    const dt = new Date(y, m-1, d);
+    const ok = dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
+    errorDiv.style.display = ok ? 'none' : 'block';
+    this.classList.toggle('is-invalid', !ok);
+    this.classList.toggle('is-valid', ok);
   });
 
-  // 🎯 4. Limpiar estado si vuelve a editar
   fechaInput.addEventListener('input', function () {
     errorDiv.style.display = "none";
-    this.classList.remove("is-invalid", "is-valid");
+    this.classList.remove("is-invalid","is-valid");
   });
 });
 </script>
-
 
 {% endblock %}

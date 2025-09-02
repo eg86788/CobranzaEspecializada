@@ -195,5 +195,40 @@ td {
 
 strong, b { font-weight: 700 !important; }
 
+/* ====== Utilitarios de formularios compactos y formato ====== */
+
+/* Densidad compacta reutilizable */
+.form-compact .form-control,
+.form-compact .form-select,
+.form-compact .input-group-text {
+  padding: .375rem .5rem;
+  font-size: .875rem;
+}
+
+/* Mayúsculas visuales en inputs/select/textarea (no afecta emails) */
+.uc:not([type="email"]) {
+  text-transform: uppercase;
+}
+
+/* Alineación a la derecha para numéricos */
+.input-digit {
+  text-align: right;
+}
+
+/* Separadores más ligeros */
+fieldset.compact {
+  border-color: #e9ecef;
+}
+fieldset.compact legend {
+  font-size: .95rem;
+  margin-bottom: .25rem;
+}
+/* C.P. 5 dígitos: estilo de apoyo (la lógica de relleno está en JS) */
+.cp-5 {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .05em;
+}
+
+
 
   

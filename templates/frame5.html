@@ -1,294 +1,713 @@
 {% extends "base.html" %}
 
-{% block title %}Frame 5 - Contactos{% endblock %}
+{% block title %}Contactos — Captura{% endblock %}
 
 {% block content %}
-<h2>Resumen de la solicitud</h2>
 
-<!-- Datos Generales del Cliente -->
-<div class="card mb-3">
-    <div class="card-header">Datos Generales del Cliente</div>
-    <div class="card-body p-0">
-      <table class="table table-sm mb-0">
+<!-- ===== RESUMEN DE LA SOLICITUD ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Resumen de la solicitud</strong>
+    </div>
+    <a href="{{ url_for('frames.frame1') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0 align-middle">
         <tbody>
           <tr>
-            <th>Cliente</th>
-            <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
-            <th>Segmento</th>
-            <td>{{ frame1.segmento or '-' }}</td>
+            <th class="text-muted fw-semibold" style="width:18%">Cliente</th>
+            <td style="width:32%">{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th class="text-muted fw-semibold" style="width:18%">Segmento</th>
+            <td style="width:32%">{{ frame1.segmento or '-' }}</td>
           </tr>
           <tr>
-            <th>Contrato</th>
-            <td>{{ frame1.numero_contrato }}</td>
-            <th>Tipo Trámite</th>
-            <td>{{ frame1.tipo_tramite }}</td>
+            <th class="text-muted fw-semibold">Contrato</th>
+            <td>{{ frame1.numero_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Tipo Trámite</th>
+            <td id="tipo_tramite_val">{{ frame1.tipo_tramite or '-' }}</td>
           </tr>
           <tr>
-            <th>Tipo Contrato</th>
-            <td>{{ frame1.tipo_contrato }}</td>
-            <th>Servicio</th>
-            <td>{{ frame1.tipo_servicio }}</td>
+            <th class="text-muted fw-semibold">Tipo Contrato</th>
+            <td id="tipo_contrato_val">{{ frame1.tipo_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Servicio</th>
+            <td id="servicio_general">{{ frame1.tipo_servicio or '-' }}</td>
           </tr>
           <tr>
-            <th>Tipo Cobro Comisión</th>
-            <td>{{ frame1.tipo_cobro }}</td>
-            <th>Importe Máximo de Diferencias</th>
-            <td>{{ frame1.importe_maximo_dif }}</td>
+            <th class="text-muted fw-semibold">Tipo Cobro Comisión</th>
+            <td id="tipo_cobro_val">{{ frame1.tipo_cobro or '-' }}</td>
+            <th class="text-muted fw-semibold">Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif or '-' }}</td>
           </tr>
         </tbody>
       </table>
-    </div>
-    <div class="card-footer text-end">
-      <form method="post" class="d-inline">
-        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame1">✎ Editar</button>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Unidades de Negocio -->
-  <div class="card mb-3">
-    <div class="card-header">Unidades de Negocio</div>
-    <div class="card-body p-0">
-      <table class="table table-sm table-bordered align-middle mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Nombre Unidad</th>
-            <th>CPAE</th>
-            <th>Tipo Unidad</th>
-            <th>Servicio</th>
-            <th>Tipo Servicio</th>
-            <th>Empresa Traslado</th>
-            <th>Terminal SEF</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for unidad in unidades %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ unidad.nombre_unidad }}</td>
-            <td>{{ unidad.cpae }}</td>
-            <td>{{ unidad.tipo_unidad }}</td>
-            <td>{{ unidad.servicio }}</td>
-            <td>{{ unidad.tipo_servicio }}</td>
-            <td>{{ unidad.empresa_traslado }}</td>
-            <td>{{ unidad.numero_terminal_sef or '-' }}</td>
-          </tr>
-          <tr>
-            <td colspan="8" class="bg-light small">
-              <strong>Dirección:</strong> {{ unidad.calle_numero }}, {{ unidad.colonia }}, {{ unidad.ciudad_nombre }}, {{ unidad.estado_nombre }}, CP {{ unidad.codigo_postal }}.
-              <strong>Term. Int.:</strong> {{ unidad.terminal_integradora or '-' }} |
-              <strong>Dot. Central.:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }} |
-              <strong>Cert. Central.:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <div class="card-footer text-end">
-      <form method="post" class="d-inline">
-        <button class="btn btn-outline-secondary btn-sm" name="regresar_frame2">✎ Editar</button>
-      </form>
-    </div>
-  </div>
-
-<!-- Cuentas Capturadas -->
-<div class="card mb-3">
-    <div class="card-header">Cuentas Capturadas</div>
-    <div class="card-body p-0">
-      <table class="table table-sm table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Servicio</th>
-            <th>No. Sucursal</th>
-            <th>No. Cuenta</th>
-            <th>Moneda</th>
-            <th>Terminal SEF Aplica</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for cuenta in cuentas %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ cuenta.servicio }}</td>
-            <td>{{ cuenta.sucursal }}</td>
-            <td>{{ cuenta.cuenta }}</td>
-            <td>{{ cuenta.moneda }}</td>
-            <td>{{ cuenta.terminal_aplica or '-' }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <div class="card-footer text-end">
-      <form method="POST" class="d-inline">
-        <button name="regresar_frame3" class="btn btn-outline-secondary btn-sm">✎ Editar</button>
-      </form>
-    </div>
-  </div>
-  
-  
-<!-- Resumen Usuarios SEF -->
-<div class="card mb-3">
-    <div class="card-header">Usuarios SEF (Frame 4)</div>
-    <div class="card-body p-0">
-      <table class="table table-sm table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Clave</th>
-            <th>Perfil</th>
-            <th>Maker/Checker</th>
-            <th>Correo</th>
-            <th>Teléfono</th>
-            <th>Terminal SEF</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for u in usuarios %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ u.nombre_usuario }}</td>
-            <td>{{ u.clave_usuario }}</td>
-            <td>{{ u.perfil }}</td>
-            <td>{{ u.maker_checker }}</td>
-            <td>{{ u.correo }}</td>
-            <td>{{ u.telefono }}</td>
-            <td>{{ u.terminal_aplica }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <div class="card-footer text-end">
-      <form method="POST">
-        <button name="regresar_frame4" class="btn btn-outline-secondary btn-sm">✎ Editar</button>
-      </form>
-    </div>
-  </div>
-  <h2 class="mb-4">Contactos</h2>
-
-<!-- Formulario Contactos -->
-<form method="POST">
-    <div class="mb-3">
-        <label>Terminal SEF</label>
-        <select class="form-select" name="terminal_aplica" required>
-          <option value="">Selecciona...</option>
-          <option value="TODAS">APLICA PARA TODAS LAS UNIDADES REGISTRADAS</option>
-          {% for unidad in unidades %}
-              <option value="{{ unidad.nombre_unidad }}">{{ unidad.nombre_unidad }} - {{ unidad.numero_terminal_sef }}</option>
-          {% endfor %}
-      </select>
-    </div>
-
-    <div class="mb-3">
-        <label>Nombre completo</label>
-        <input type="text" name="nombre_contacto" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Teléfono</label>
-        <input type="tel" name="telefono" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Correo electrónico</label>
-        <input type="email" name="correo" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Tipo de Contacto</label><br>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Diferencias Locales">
-            <label class="form-check-label">Diferencias Locales</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Diferencias Centralizadas">
-            <label class="form-check-label">Diferencias Centralizadas</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Contingencia">
-            <label class="form-check-label">Contingencia</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="tipos_contacto" value="Capacitacion Dotación o Depósito">
-            <label class="form-check-label">Capacitación Dotación o Depósito</label>
-        </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Agregar Contacto</button>
-</form>
-
-<hr>
-<h4>Contactos Capturados:</h4>
-{% if contactos %}
-  <div class="table-responsive">
-    <table class="table table-bordered table-sm align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>#</th>
-          <th>Nombre</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Terminal SEF</th>
-          <th>Tipo(s) de Contacto</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for contacto in contactos %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ contacto.nombre_contacto }}</td>
-          <td>{{ contacto.correo }}</td>
-          <td>{{ contacto.telefono }}</td>
-          <td>{{ contacto.numero_terminal_sef or '-' }}</td>
-          <td>
-            {% if contacto.tipos_contacto %}
-              {{ contacto.tipos_contacto | join(', ') }}
-            {% else %}
-              -
-            {% endif %}
-          </td>
-          <td class="text-center">
-            <form method="POST" class="m-0">
-              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
-              <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar contacto">
-                <i class="bi bi-trash"></i>
-              </button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-{% else %}
-  <p class="text-muted">Aún no se han capturado contactos.</p>
-{% endif %}
-
-<div class="modal fade" id="modalConfirmacionUSD" tabindex="-1" aria-labelledby="modalConfirmacionUSDLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalConfirmacionUSDLabel">Confirmar servicio en dólares</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        Esta ingresando una cuenta en dólares. ¿El cliente tiene contratado el servicio en dólares (hasta $14,000 USD mensuales)?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" id="btnUsdSi" data-bs-dismiss="modal">Sí</button>
-        <button type="button" class="btn btn-danger" id="btnUsdNo" data-bs-dismiss="modal">No</button>
-      </div>
     </div>
   </div>
 </div>
-<form method="GET" action="{{ url_for('frames.finalizar') }}" class="mt-4">
-    <button type="submit" class="btn btn-success">Finalizar Captura</button>
-</form>
+
+<!-- ===== UNIDADES DE NEGOCIO (resumen compacto) ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Unidades de Negocio</strong>
+    </div>
+    <a href="{{ url_for('frames.frame2') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
+  <div class="card-body p-0">
+    {% if unidades %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>CPAE</th>
+              <th>Servicio</th>
+              <th>ETV</th>
+              <th>Terminal SEF</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in unidades %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ u.nombre_unidad }}</td>
+              <td>{{ u.cpae_nombre }}</td>
+              <td>{{ u.tipo_servicio_unidad }}</td>
+              <td>{{ u.etv_nombre }}</td>
+              <td>{{ u.numero_terminal_sef or '-' }}</td>
+            </tr>
+            <tr class="table-light small">
+              <td colspan="6">
+                <strong>Dirección:</strong> {{ u.calle_numero }}, {{ u.colonia }}, {{ u.municipio_nombre }}, {{ u.estado_nombre }}, CP {{ u.codigo_postal }}.
+                &nbsp;|&nbsp; <strong>Integradora:</strong> {{ u.terminal_integradora or '-' }}
+                &nbsp;|&nbsp; <strong>Dotación Centralizada:</strong> {{ u.terminal_dotacion_centralizada or '-' }}
+                &nbsp;|&nbsp; <strong>Certificado Centralizada:</strong> {{ u.terminal_certificado_centralizada or '-' }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay unidades capturadas.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== CUENTAS CAPTURADAS ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Cuentas Bancarias</strong>
+    </div>
+    <a href="{{ url_for('frames.frame3') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
+  <div class="card-body p-0">
+    {% if cuentas %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Servicio</th>
+              <th>No. Sucursal</th>
+              <th>No. Cuenta</th>
+              <th>Moneda</th>
+              <th>Terminal SEF Aplica</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in cuentas %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ c.servicio }}</td>
+              <td>{{ c.sucursal }}</td>
+              <td>{{ c.cuenta }}</td>
+              <td>{{ c.moneda }}</td>
+              <td>{{ c.terminal_aplica or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay cuentas capturadas.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== USUARIOS SEF CAPTURADOS (solo si SEF ELECTRÓNICO) ===== -->
+{% if frame1.tipo_contrato == 'SEF ELECTRÓNICO' %}
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Usuarios SEF</strong>
+    </div>
+    <a href="{{ url_for('frames.frame4') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
+  <div class="card-body p-0">
+    {% if usuarios %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>Clave Usuario</th>
+              <th>Perfil</th>
+              <th>Maker/Checker</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Terminal SEF Aplica</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ usuario.nombre_usuario }}</td>
+              <td>{{ usuario.clave_usuario }}</td>
+              <td>{{ usuario.perfil }}</td>
+              <td>{{ usuario.maker_checker }}</td>
+              <td>{{ usuario.correo }}</td>
+              <td>{{ usuario.telefono }}</td>
+              <td>{{ usuario.terminal_aplica }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-3 text-muted">Aún no hay usuarios capturados.</div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ===== ALERTAS ===== -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- ===== FORMULARIO: CONTACTOS ===== -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header d-flex align-items-center gap-2" style="background:#F7FBFD; color:#003746;">
+    <h2 class="h5 mb-0 d-flex align-items-center gap-2">
+      <i class="bi bi-people"></i><span>Captura de Contactos</span>
+    </h2>
+  </div>
+
+  <div class="card-body">
+    <form method="POST" class="needs-validation" novalidate autocomplete="off" id="formContactos">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">
+            Nombre del Contacto *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Nombre completo del contacto del Cliente."></i>
+          </label>
+          <input type="text" class="form-control uc" name="nombre_contacto" id="nombre_contacto">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">
+            Correo electrónico *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Se usa para notificaciones."></i>
+          </label>
+          <input type="email" class="form-control" name="correo" id="correo">
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <label class="form-label">
+            Teléfono *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Incluye lada. Solo números."></i>
+          </label>
+          <input type="tel" class="form-control input-digit" name="telefono" id="telefono">
+        </div>
+
+        <!-- Terminales donde aplica (MULTI) -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Terminales donde aplica *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Puedes elegir varias terminales o TODAS."></i>
+          </label>
+          <select class="form-select" id="contacto_terminales_aplica" multiple>
+            <option value="TODAS">TODAS LAS UNIDADES</option>
+            {% for u in unidades %}
+              <option value="#{{loop.index }} – {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}">
+                #{{loop.index }} – {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}
+              </option>
+            {% endfor %}
+          </select>
+          <!-- lo que espera el backend -->
+          <input type="hidden" name="numero_terminal_sef" id="numero_terminal_sef_hidden">
+          <div class="form-text">Selecciona una o varias terminales.</div>
+        </div>
+      </div>
+
+      <!-- Tipos de contacto (MULTI con Choices) -->
+      <div class="row g-3 mt-1">
+        <div class="col-md-8">
+          <label class="form-label d-block">
+            Tipo(s) de Contacto *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip"
+               title="Puedes seleccionar más de uno según aplique."></i>
+          </label>
+
+          <select class="form-select" id="tipos_contacto_ui" multiple>
+            {% if frame1.tipo_cobro == 'LOCAL' %}
+              <option value="CONTACTO DIFERENCIAS LOCALES">Contacto de Diferencias Locales</option>
+            {% endif %}
+            {% if frame1.tipo_cobro == 'CENTRALIZADO' %}
+              <option value="CONTACTO DIFERENCIAS CENTRALES">Contacto de Diferencias Centrales</option>
+            {% endif %}
+            <option value="CONTACTO DE CONTINGENCIA">Contacto de Contingencia</option>
+            {% if frame1.tipo_contrato == 'SEF ELECTRÓNICO' %}
+              <option value="CONTACTO DE CAPACITACIÓN">Contacto de Capacitación</option>
+            {% endif %}
+          </select>
+          <!-- lo que espera el backend -->
+          <input type="hidden" name="tipos_contacto" id="tipos_contacto_hidden">
+        </div>
+
+        {% if frame1.tipo_cobro == 'CENTRALIZADO' %}
+        <div class="col-md-4" id="grupo_prioridad_centrales" style="display:none;">
+          <label class="form-label mb-1">Orden de prioridad (Dif. Centrales)</label>
+          <select class="form-select" id="prioridad_centrales">
+            <option value="">Selecciona…</option>
+            <option value="1">1ero</option>
+            <option value="2">2do</option>
+            <option value="3">3ro</option>
+          </select>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="d-flex justify-content-end mt-4 gap-2">
+        <button type="reset" class="btn btn-outline-secondary" id="btnLimpiar">Limpiar</button>
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-plus-circle"></i> Agregar Contacto
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== CONTACTOS CAPTURADOS ===== -->
+
+{# --- Regla ALTA/Tipo Cobro requeridos --- #}
+{% set req_local   = frame1.tipo_tramite == 'ALTA' and frame1.tipo_cobro == 'LOCAL' %}
+{% set req_central = frame1.tipo_tramite == 'ALTA' and frame1.tipo_cobro == 'CENTRALIZADO' %}
+
+{# Detectar si ya hay al menos uno del tipo requerido (cálculo del servidor) #}
+{% set has_local = false %}
+{% set has_central = false %}
+{% for c in contactos %}
+  {% set tipos_txt = (c.tipos_contacto or '') | upper %}
+  {% if 'DIFERENCIAS LOCALES' in tipos_txt or 'LOCALES' in tipos_txt %}
+    {% set has_local = true %}
+  {% endif %}
+  {% if 'DIFERENCIAS CENTRALES' in tipos_txt or 'CENTRALES' in tipos_txt %}
+    {% set has_central = true %}
+  {% endif %}
+{% endfor %}
+
+{# Condición para permitir avanzar (servidor) #}
+{% set puede_avanzar = (not req_local or has_local) and (not req_central or has_central) %}
+
+<div class="card shadow-sm border-0" id="cardContactos">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <h3 class="h6 mb-0">Contactos Capturados</h3>
+
+    {% if contactos %}
+      <form method="GET" action="{{ url_for('frames.finalizar') }}" class="mb-0" id="formSiguienteFinalizar" style="{{ 'display:none;' if not puede_avanzar else '' }}">
+        <button type="submit" class="btn btn-primary btn-sm">Siguiente – Finalizar</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="card-body">
+    {# Avisos (con IDs para que JS los oculte cuando aplique) #}
+    {% if req_local %}
+      <div class="alert alert-warning mb-3" id="alertReqLocal" style="{{ '' if not has_local else 'display:none;' }}">
+        Debes capturar al menos un <strong>Contacto de Diferencias Locales</strong> antes de continuar.
+      </div>
+    {% endif %}
+    {% if req_central %}
+      <div class="alert alert-warning mb-3" id="alertReqCentral" style="{{ '' if not has_central else 'display:none;' }}">
+        Debes capturar al menos un <strong>Contacto de Diferencias Centrales</strong> antes de continuar.
+      </div>
+    {% endif %}
+
+    {% if contactos %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle" id="tablaContactos">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Terminales</th>
+              <th>Tipos</th>
+              <th class="text-center" style="width:96px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in contactos %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ c.nombre_contacto or c.contacto_nombre }}</td>
+              <td>{{ c.correo or c.contacto_correo }}</td>
+              <td>{{ c.telefono or c.contacto_telefono or '-' }}</td>
+              <td>{{ c.numero_terminal_sef or c.contacto_terminales_aplica or 'TODAS' }}</td>
+              <td class="tipos-contacto">{{ c.tipos_contacto or '-' }}</td>
+              <td class="text-center">
+                <form method="POST" class="m-0">
+                  <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar contacto">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Aún no se ha agregado ningún contacto.</p>
+    {% endif %}
+  </div>
+</div>
+
+
+
+<!-- ===== SCRIPTS ===== -->
+
+<!-- Tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const els = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  els.map(el => new bootstrap.Tooltip(el));
+});
+</script>
+
+<!-- Choices.js para multiselección -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const selTerm = document.getElementById('contacto_terminales_aplica');
+  if (selTerm) {
+    new Choices(selTerm, {
+      removeItemButton: true,
+      searchEnabled: true,
+      itemSelectText: '',
+      placeholderValue: 'Selecciona terminales…',
+      searchPlaceholderValue: 'Buscar…'
+    });
+  }
+
+  const selTipos = document.getElementById('tipos_contacto_ui');
+  if (selTipos) {
+    new Choices(selTipos, {
+      removeItemButton: true,
+      searchEnabled: false,
+      itemSelectText: '',
+      placeholderValue: 'Selecciona tipo(s)…'
+    });
+  }
+});
+</script>
+
+<!-- Reglas ALTA/SUSTITUCIÓN + serialización + prioridad -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tipoTramite = (document.getElementById('tipo_tramite_val')?.textContent || '').trim();
+  const form = document.getElementById('formContactos');
+
+  // Campos (alineados a backend)
+  const nombre   = document.getElementById('nombre_contacto');
+  const correo   = document.getElementById('correo');
+  const telefono = document.getElementById('telefono');
+
+  // Terminales (UI) + hidden backend
+  const terminalsUI  = document.getElementById('contacto_terminales_aplica');
+  const terminalsHid = document.getElementById('numero_terminal_sef_hidden');
+
+  // Tipos (UI) + hidden backend
+  const tiposUI  = document.getElementById('tipos_contacto_ui');
+  const tiposHid = document.getElementById('tipos_contacto_hidden');
+
+  // Prioridad (Dif. Centrales)
+  const grupoPrio  = document.getElementById('grupo_prioridad_centrales');
+  const prioSel    = document.getElementById('prioridad_centrales');
+
+  function req(el, on){ if(!el) return; if(on){ el.setAttribute('required','required'); } else { el.removeAttribute('required'); } }
+
+  // Mostrar/ocultar prioridad si en tipos se incluye "CONTACTO DIFERENCIAS CENTRALES"
+  function togglePrioridadPorTipos(){
+    if (!tiposUI || !grupoPrio) return;
+    const vals = Array.from(tiposUI.selectedOptions || []).map(o => o.value);
+    const activo = vals.includes('CONTACTO DIFERENCIAS CENTRALES');
+    grupoPrio.style.display = activo ? '' : 'none';
+    if (prioSel) {
+      if (activo) prioSel.setAttribute('required','required');
+      else { prioSel.removeAttribute('required'); prioSel.value = ''; }
+    }
+  }
+  tiposUI && tiposUI.addEventListener('change', togglePrioridadPorTipos);
+  togglePrioridadPorTipos();
+
+  // Mayúsculas (excepto email)
+  document.querySelectorAll('input.uc, textarea.uc').forEach(inp=>{
+    inp.addEventListener('input', function(){
+      const pos = this.selectionStart;
+      this.value = this.value.toUpperCase();
+      try { this.setSelectionRange(pos,pos); } catch(e){}
+    });
+  });
+
+  // Teléfono: solo dígitos (no tocar validación original)
+  if (telefono){
+    telefono.setAttribute('inputmode','numeric');
+    telefono.addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,15);
+    }, {passive:true});
+  }
+
+  // Helpers de estado
+  function multiselectHasSelection(sel){
+    return sel && sel.selectedOptions && sel.selectedOptions.length > 0;
+  }
+  function isAnyFilled(){
+    const base = [nombre?.value?.trim(), correo?.value?.trim(), telefono?.value?.trim()].some(Boolean);
+    return base || multiselectHasSelection(terminalsUI) || multiselectHasSelection(tiposUI);
+  }
+  function setAllRequired(on){
+    [nombre, correo, telefono].forEach(el => req(el, on));
+    // Para multiselects validamos en submit, pero añadimos 'required' visual si quieres
+  }
+
+  // Estado por trámite
+  if (tipoTramite === 'ALTA') {
+    setAllRequired(true);
+  } else if (tipoTramite === 'SUSTITUCIÓN') {
+    setAllRequired(false);
+    // Dinámico: si toca algo -> todo requerido (incluye prioridad según tipos)
+    const watch = [nombre, correo, telefono, terminalsUI, tiposUI].filter(Boolean);
+    watch.forEach(el => {
+      const evt = (el.tagName === 'SELECT') ? 'change' : 'input';
+      el.addEventListener(evt, () => {
+        const any = isAnyFilled();
+        setAllRequired(any);
+        if (any) togglePrioridadPorTipos();
+      });
+    });
+  }
+
+  // Serialización antes de enviar
+  function serializeToBackend(){
+    // Terminales -> numero_terminal_sef (lo que espera tu vista)
+    if (terminalsUI && terminalsHid){
+      const vals = Array.from(terminalsUI.selectedOptions || []).map(o => o.value);
+      terminalsHid.value = vals.join(' | ');
+    }
+    // Tipos -> tipos_contacto (comma-separated)
+    if (tiposUI && tiposHid){
+      const vals = Array.from(tiposUI.selectedOptions || []).map(o => o.value);
+      // Agregar prioridad si aplica
+      const hasCentral = vals.includes('CONTACTO DIFERENCIAS CENTRALES');
+      if (hasCentral && prioSel && prioSel.value) {
+        const idx = vals.indexOf('CONTACTO DIFERENCIAS CENTRALES');
+        vals[idx] = `CONTACTO DIFERENCIAS CENTRALES (PRIO ${prioSel.value})`;
+      }
+      tiposHid.value = vals.join(',');
+    }
+  }
+
+  // Validación final
+  form.addEventListener('submit', function(e){
+    // Normaliza teléfono
+    if (telefono) telefono.value = (telefono.value || '').replace(/\D/g,'').slice(0,15);
+
+    // ALTA: todo requerido + al menos 1 tipo + al menos 1 terminal
+    if (tipoTramite === 'ALTA') {
+      const faltan = [];
+      if (!nombre.value.trim()) faltan.push('Nombre');
+      if (!correo.value.trim()) faltan.push('Correo');
+      if (!telefono.value.trim()) faltan.push('Teléfono');
+      if (!multiselectHasSelection(terminalsUI)) faltan.push('Terminales donde aplica');
+      if (!multiselectHasSelection(tiposUI)) faltan.push('Tipo(s) de contacto');
+
+      // Si incluyen Dif. Centrales y no hay prioridad, falta
+      if (multiselectHasSelection(tiposUI)) {
+        const vals = Array.from(tiposUI.selectedOptions || []).map(o => o.value);
+        if (vals.includes('CONTACTO DIFERENCIAS CENTRALES') && !(prioSel && prioSel.value)) {
+          faltan.push('Prioridad de Diferencias Centrales');
+        }
+      }
+      if (faltan.length > 0) {
+        e.preventDefault();
+        alert('Completa los campos obligatorios: ' + faltan.join(', '));
+        return;
+      }
+    }
+
+    // SUSTITUCIÓN: o todo vacío (bloquea guardar) o todo completo
+    if (tipoTramite === 'SUSTITUCIÓN') {
+      const any = isAnyFilled();
+      if (!any) {
+        e.preventDefault();
+        alert('No se guardó porque el formulario está vacío. Completa todos los campos o deja todo en blanco.');
+        return;
+      } else {
+        // exigir completitud similar a ALTA
+        const faltan = [];
+        if (!nombre.value.trim()) faltan.push('Nombre');
+        if (!correo.value.trim()) faltan.push('Correo');
+        if (!telefono.value.trim()) faltan.push('Teléfono');
+        if (!multiselectHasSelection(terminalsUI)) faltan.push('Terminales donde aplica');
+        if (!multiselectHasSelection(tiposUI)) faltan.push('Tipo(s) de contacto');
+        const vals = Array.from(tiposUI.selectedOptions || []).map(o => o.value);
+        if (vals.includes('CONTACTO DIFERENCIAS CENTRALES') && !(prioSel && prioSel.value)) {
+          faltan.push('Prioridad de Diferencias Centrales');
+        }
+        if (faltan.length > 0) {
+          e.preventDefault();
+          alert('Para guardar en sustitución, completa todos los campos: ' + faltan.join(', '));
+          return;
+        }
+      }
+    }
+
+    // Serializa para el backend
+    serializeToBackend();
+  });
+
+  // Botón limpiar
+  const btnLimpiar = document.getElementById('btnLimpiar');
+  btnLimpiar && btnLimpiar.addEventListener('click', function(){
+    form.reset();
+    togglePrioridadPorTipos();
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tipoTramite = (document.getElementById('tipo_tramite_val')?.textContent || '').trim().toUpperCase();
+  const tipoCobro   = (document.getElementById('tipo_cobro_val')?.textContent   || '').trim().toUpperCase();
+
+  // Si existe el formulario de "Siguiente – Finalizar", validamos al enviar:
+  const formNext = document.getElementById('formSiguienteFinalizar');
+  if (!formNext) return;
+
+  formNext.addEventListener('submit', function (e) {
+    if (tipoTramite !== 'ALTA') return; // Solo aplica a ALTA
+
+    // Leer la tabla para detectar tipos cargados
+    const filas = document.querySelectorAll('table tbody tr');
+    let hayLocal = false, hayCentral = false;
+
+    filas.forEach(tr => {
+      const celdas = tr.querySelectorAll('td');
+      if (!celdas.length) return;
+      const tipos = (celdas[5]?.textContent || '').toUpperCase(); // Columna "Tipos"
+      if (tipos.includes('LOCALES'))    hayLocal = true;
+      if (tipos.includes('CENTRALES'))  hayCentral = true;
+    });
+
+    if (tipoCobro === 'LOCAL' && !hayLocal) {
+      e.preventDefault();
+      alert('Debes capturar al menos un Contacto de Diferencias Locales para continuar.');
+      return;
+    }
+    if (tipoCobro === 'CENTRALIZADO' && !hayCentral) {
+      e.preventDefault();
+      alert('Debes capturar al menos un Contacto de Diferencias Centrales para continuar.');
+      return;
+    }
+  });
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tipoTramite = (document.getElementById('tipo_tramite_val')?.textContent || '').trim().toUpperCase();
+    const tipoCobro   = (document.getElementById('tipo_cobro_val')?.textContent   || '').trim().toUpperCase();
+  
+    const table       = document.getElementById('tablaContactos');
+    const btnNextForm = document.getElementById('formSiguienteFinalizar');
+    const alertLocal  = document.getElementById('alertReqLocal');
+    const alertCentral= document.getElementById('alertReqCentral');
+  
+    function scanTipos() {
+      let hayLocal = false, hayCentral = false;
+      if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(tr => {
+          const tipos = (tr.querySelector('.tipos-contacto')?.textContent || '').toUpperCase();
+          if (tipos.includes('DIFERENCIAS LOCALES') || tipos.includes('LOCALES'))    hayLocal = true;
+          if (tipos.includes('DIFERENCIAS CENTRALES') || tipos.includes('CENTRALES')) hayCentral = true;
+        });
+      }
+      return { hayLocal, hayCentral };
+    }
+  
+    function aplicarReglasUI() {
+      if (tipoTramite !== 'ALTA') {
+        // Para sustitución no bloqueamos por este requisito
+        if (btnNextForm) btnNextForm.style.display = '';
+        if (alertLocal)  alertLocal.style.display = 'none';
+        if (alertCentral)alertCentral.style.display = 'none';
+        return;
+      }
+  
+      const { hayLocal, hayCentral } = scanTipos();
+  
+      let puedeAvanzar = true;
+      if (tipoCobro === 'LOCAL') {
+        puedeAvanzar = hayLocal;
+        if (alertLocal)   alertLocal.style.display = hayLocal ? 'none' : '';
+        if (alertCentral) alertCentral.style.display = 'none';
+      } else if (tipoCobro === 'CENTRALIZADO') {
+        puedeAvanzar = hayCentral;
+        if (alertCentral) alertCentral.style.display = hayCentral ? 'none' : '';
+        if (alertLocal)   alertLocal.style.display = 'none';
+      } else {
+        // Otros tipos: sin bloqueo
+        if (alertLocal)  alertLocal.style.display = 'none';
+        if (alertCentral)alertCentral.style.display = 'none';
+      }
+  
+      if (btnNextForm) {
+        btnNextForm.style.display = puedeAvanzar ? '' : 'none';
+      }
+    }
+  
+    // Ejecuta ahora (tras render) y también cuando cambie la tabla por navegación
+    aplicarReglasUI();
+  
+    // Si en tu flujo hay actualizaciones dinámicas sin recargar, podrías observar:
+    // new MutationObserver(aplicarReglasUI).observe(document.getElementById('cardContactos'), { childList:true, subtree:true });
+  });
+  </script>
+  
+
 
 {% endblock %}

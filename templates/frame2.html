@@ -3,466 +3,615 @@
 {% block title %}Unidades de Negocio{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Resumen de la solicitud</h2>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
-<!-- ============================
-     FRAME 1 – DATOS GENERALES
-     ============================ -->
-<div class="card mb-3">
-  <div class="card-header">Datos Generales del Cliente</div>
+<!-- ===== RESUMEN DE SOLICITUD ===== -->
+<div class="card shadow-sm mb-4 border-0">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Resumen de la solicitud</strong>
+    </div>
+    <a href="{{ url_for('frames.frame1') }}" class="btn btn-outline-light btn-sm">✎ Editar</a>
+  </div>
   <div class="card-body p-0">
-    <table class="table table-sm mb-0">
-      <tbody>
-        <tr>
-          <th>Cliente</th>
-          <td>{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
-          <th>Segmento</th>
-          <td>{{ frame1.segmento or '-' }}</td>
-        </tr>
-        <tr>
-          <th>Contrato</th>
-          <td>{{ frame1.numero_contrato }}</td>
-          <th>Tipo Trámite</th>
-          <td>{{ frame1.tipo_tramite }}</td>
-        </tr>
-        <tr>
-          <th>Tipo Contrato</th>
-          <td>{{ frame1.tipo_contrato or '-' }}</td>
-          <th>Servicio</th>
-          <td id="servicio_general">{{ frame1.tipo_servicio }}</td>
-        </tr>
-        <tr>
-          <th>Tipo Cobro Comisión</th>
-          <td>{{ frame1.tipo_cobro }}</td>
-          <th>Importe Máximo de Diferencias</th>
-          <td>{{ frame1.importe_maximo_dif }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="card-footer text-end">
-    <a href="{{ url_for('frames.frame1') }}" class="btn btn-outline-secondary btn-sm">✎ Editar</a>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0 align-middle">
+        <tbody>
+          <tr>
+            <th class="text-muted fw-semibold" style="width:18%">Cliente</th>
+            <td style="width:32%">{{ frame1.numero_cliente }} - {{ frame1.razon_social }}</td>
+            <th class="text-muted fw-semibold" style="width:18%">Segmento</th>
+            <td style="width:32%">{{ frame1.segmento or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Contrato</th>
+            <td>{{ frame1.numero_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Tipo Trámite</th>
+            <td>{{ frame1.tipo_tramite or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Tipo Contrato</th>
+            <td>{{ frame1.tipo_contrato or '-' }}</td>
+            <th class="text-muted fw-semibold">Servicio</th>
+            <td id="servicio_general">{{ frame1.tipo_servicio or '-' }}</td>
+          </tr>
+          <tr>
+            <th class="text-muted fw-semibold">Tipo Cobro Comisión</th>
+            <td>{{ frame1.tipo_cobro or '-' }}</td>
+            <th class="text-muted fw-semibold">Importe Máximo de Diferencias</th>
+            <td>{{ frame1.importe_maximo_dif or '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<h2 class="mb-4">Unidades de Negocio</h2>
-
-<form method="POST">
-  <!-- Campo oculto para usar valor en JS -->
-  <input type="hidden" id="servicio_tipo_oculto" value="{{ frame1.tipo_servicio }}">
-
-  {% if frame1.tipo_tramite == "SUSTITUCIÓN" %}
-
-  
-<div class="mb-3">
-  <label class="form-label">¿Qué tipo de Sustitución desea hacer?</label>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_sustituir" value="sustituir" checked>
-    <label class="form-check-label" for="radio_sustituir">
-      Actualizar algun dato de una unidad existente
-    </label>
-  </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_agregar" value="agregar">
-    <label class="form-check-label" for="radio_agregar">
-      Incorporar una nueva Unidad del mismo Contrato
-    </label>
-  </div>
-</div>
-{% endif %}
-
-
-<input type="hidden" name="origen_unidad" id="origen_unidad" value="">
-
-
-  <div class="row mb-3" id="grupo_terminal">
-    <div class="col-md-6">
-      <label class="form-label">
-        Número de Terminal SEF
-        <i id="icono-ayuda" class="bi bi-info-circle-fill text-primary ms-2" style="cursor:pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="Número de Terminal SEF asignada por el sistema. Se solicita solo si el trámite es SUSTITUCIÓN."></i>
-      </label>
-      <input type="text" class="form-control" id="numero_terminal_sef" name="numero_terminal_sef">
-    </div>
+<!-- ===== FORMULARIO: UNIDADES ===== -->
+<div class="card shadow-sm border-0 mb-4">
+  <!-- Regla 0: título visible siempre -->
+  <div class="card-header d-flex align-items-center gap-2" style="background:#F7FBFD; color:#003746;">
+    <h2 class="h5 mb-0 d-flex align-items-center gap-2">
+      <i class="bi bi-building"></i>
+      <span>Captura de Unidades</span>
+    </h2>
   </div>
 
-  <div class="mb-3" id="grupo_nombre_unidad">
-    <label class="form-label">
-        Nombre de la Unidad *
-        <i class="bi bi-info-circle-fill text-primary ms-2" style="cursor:pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="Nombre de la Unidad de Negocio SEF es asignada por el Cliente. Se solicita solo si el trámite es ALTA."></i>
-    </label>
-    <input type="text" class="form-control" name="nombre_unidad" id="nombre_unidad">
-  </div>
+  <div class="card-body">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-  <div class="mb-3">
-    <label class="form-label">CPAE *</label>
-    <select class="form-select" name="cpae" required id="cpaeSelect">
-      <option value="">Selecciona…</option>
-      {% for cpae in catalogo_cpae %}
-        <option value="{{ cpae.id }}">{{ cpae.descripcion }}</option>
-      {% endfor %}
+    <form method="POST" class="needs-validation" novalidate autocomplete="off">
+      <!-- Contexto/ocultos -->
+      <input type="hidden" id="servicio_tipo_oculto" value="{{ frame1.tipo_servicio }}">
+      <input type="hidden" name="origen_unidad" id="origen_unidad" value="">
 
-    </select>
-  </div>
+      {# === NUEVO: ocultos para enviar tambien los nombres de catálogo === #}
+      <input type="hidden" name="cpae_nombre" id="cpae_nombre" value="">
+      <input type="hidden" name="estado_nombre" id="estado_nombre" value="">
+      <input type="hidden" name="municipio_nombre" id="municipio_nombre" value="">
+      <input type="hidden" name="etv_nombre" id="etv_nombre" value="">
 
-  <div class="mb-3">
-    <label class="form-label">Servicio en la Unidad *</label>
-    <select class="form-select" name="tipo_servicio_unidad" id="tipo_servicio_unidad" required>
-      <option value="">Selecciona…</option>
-      <option value="DEPÓSITO TRADICIONAL">DEPÓSITO TRADICIONAL</option>
-      <option value="DEPÓSITO ELECTRÓNICO">DEPÓSITO ELECTRÓNICO</option>
-      <option value="DOTACIÓN ELECTRÓNICA">DOTACIÓN ELECTRÓNICA</option>
-      <option value="DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA">DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA</option>
-      <option value="CENTRALIZADA (SOLO DOTACIÓN)">CENTRALIZADA (SOLO DOTACIÓN)</option>
-      <option value="INTEGRADORA (SOLO DEPÓSITO)">INTEGRADORA (SOLO DEPÓSITO)</option>
-      <option value="DEPOSITO CLIENTE CERTIFICADO">DEPOSITO CLIENTE CERTIFICADO</option>
-      <option value="CENTRALIZADA CLIENTE CERTIFICADO">CENTRALIZADA CLIENTE CERTIFICADO</option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Empresa de Traslado de Valores *</label>
-    <select class="form-select" name="empresa_traslado" required>
-      <option value="">SELECCIONA...</option>
-      {% for etv in catalogo_etv %}
-        <option value="{{ etv.id }}">{{ etv.descripcion }}</option>
-      {% endfor %}
-    
-    </select>
-  </div>
-
-<!-- Dirección -->
-<div class="row mb-2">
-  <div class="col-md-4">
-    <label class="form-label">Calle y número *</label>
-    <input type="text" class="form-control" name="calle_numero" required>
-  </div>
-  <div class="col-md-4">
-    <label class="form-label">Colonia *</label>
-    <input type="text" class="form-control" name="colonia" required>
-  </div>
-  <div class="col-md-4">
-    <label class="form-label">Código Postal *</label>
-    <input type="text" class="form-control" name="codigo_postal" id="codigo_postal">
-  </div>
-</div>
-
-<div class="row mb-3">
-
-  <div class="col-md-6">
-    <label class="form-label">Estado *</label>
-    <select class="form-select" name="estado" id="estadoSelect" required>
-      <option value="">Selecciona…</option>
-      {% for estado in catalogo_estados %}
-        <option value="{{ estado.id }}">{{ estado.nombre }}</option>
-      {% endfor %}
-    
-    </select>
-  </div>
-
-  <div class="col-md-6">
-    <label class="form-label">Ciudad/Municipio *</label>
-    <select class="form-select" name="municipio_id" id="municipioSelect" required>
-      <option value="">Selecciona...</option>
-    </select>
-  </div>
-</div>
-
-  <div class="row mb-3">
-    <div class="col-md-4">
-      <label class="form-label">No. Terminal Integradora</label>
-      <input type="text" class="form-control" name="terminal_integradora" id="terminal_integradora">
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">No. Terminal Dotación Centralizada</label>
-      <input type="text" class="form-control" name="terminal_dotacion_centralizada" id="terminal_dotacion_centralizada">
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">No. Terminal Cliente Certificado Centralizada</label>
-      <input type="text" class="form-control" name="terminal_certificado_centralizada" id="terminal_certificado_centralizada">
-    </div>
-  </div>
-
-  <button type="submit" class="btn btn-success">Agregar Unidad</button>
-</form>
-
-<hr>
-<h4>Unidades Capturadas:</h4>
-{% if unidades %}
-  <div class="accordion" id="accordionUnidades">
-    {% for unidad in unidades %}
-      <div class="accordion-item mb-2 border rounded">
-        <h2 class="accordion-header" id="heading{{ loop.index }}">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
-                  aria-controls="collapse{{ loop.index }}" >
-            <strong>#{{loop.index }} - {{ unidad.origen_unidad or '-' }}</strong>&nbsp;–{{ unidad.tipo_servicio_unidad or '-' }} | {{ unidad.cpae_nombre or '-' }} | {{ unidad.numero_terminal_sef or '-' }} | {{ unidad.nombre_unidad or '-' }}
-          </button>
-        </h2>
-        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse"
-             aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionUnidades">
-          <div class="accordion-body small">
-            <div class="row">
-              <div class="col-md-6"><strong>ETV:</strong> {{ unidad.etv_nombre or '-' }}</div>
-              <div class="col-md-6"><strong>Ciudad:</strong> {{ unidad.municipio_nombre or '-' }}</div>
-              <div class="col-md-6"><strong>Estado:</strong> {{ unidad.estado_nombre or '-' }}</div>              
-              <div class="col-md-6"><strong>Código Postal:</strong> {{ unidad.codigo_postal or '-' }}</div>
-              <div class="col-md-6"><strong>Calle y Número:</strong> {{ unidad.calle_numero or '-' }}</div>
-              <div class="col-md-6"><strong>Colonia:</strong> {{ unidad.colonia or '-' }}</div>
-              <div class="col-md-6"><strong>Terminal Integradora:</strong> {{ unidad.terminal_integradora or '-' }}</div>
-              <div class="col-md-6"><strong>Dotación Centralizada:</strong> {{ unidad.terminal_dotacion_centralizada or '-' }}</div>
-              <div class="col-md-6"><strong>Terminal Certificado:</strong> {{ unidad.terminal_certificado_centralizada or '-' }}</div>
-              <div class="col-md-6"><strong>No. Terminal SEF:</strong> {{ unidad.numero_terminal_sef or '-' }}</div>
-            </div>
-            <form method="POST" class="mt-3 text-end">
-              <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
-              <button type="submit" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-trash"></i> Eliminar Unidad</button>
-            </form>
+      {% if frame1.tipo_tramite == "SUSTITUCIÓN" %}
+      <!-- Regla 5: Sustitución (a/b) -->
+      <div class="row g-3 mb-2">
+        <div class="col-12">
+          <label class="form-label">¿Qué desea hacer?</label>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check border rounded-3 p-3 h-100">
+            <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_sustituir" value="sustituir" checked>
+            <label class="form-check-label ms-1" for="radio_sustituir">
+              Modificar datos de una unidad existente
+            </label>
+            <div class="form-text">Obliga <strong>No. de Terminal SEF</strong>; el resto es opcional.</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check border rounded-3 p-3 h-100">
+            <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_agregar" value="agregar">
+            <label class="form-check-label ms-1" for="radio_agregar">
+              Agregar nueva Unidad al contrato
+            </label>
+            <div class="form-text">`numero_terminal_sef` por defecto <strong>0000000000</strong>; se pide nombre y demás obligatorios.</div>
           </div>
         </div>
       </div>
-    {% endfor %}
+      {% endif %}
+
+      <!-- No. Terminal SEF -->
+      <div class="row g-3" id="grupo_terminal">
+        <div class="col-md-6">
+          <label class="form-label">
+            Número de Terminal SEF
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Hasta 10 dígitos numéricos. En sustitución: obligatorio al modificar existente."></i>
+          </label>
+          <input type="text" class="form-control input-digit" id="numero_terminal_sef" name="numero_terminal_sef" maxlength="10" placeholder="Ej. 0001234567">
+        </div>
+      </div>
+
+      <!-- Nombre Unidad -->
+      <div class="row g-3 mt-0" id="grupo_nombre_unidad">
+        <div class="col-md-8">
+          <label class="form-label">
+            Nombre de la Unidad *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Nombre asignado por el Cliente para identificar la Unidad."></i>
+          </label>
+          <input type="text" class="form-control uc" name="nombre_unidad" id="nombre_unidad" placeholder="Ej. Sucursal Centro">
+        </div>
+      </div>
+
+      <hr class="text-muted"/>
+
+      <!-- Datos principales -->
+      <div class="row g-3">
+        <div class="col-lg-4">
+          <label class="form-label">
+            CPAE *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Selecciona el CPAE del catálogo. Busca por nombre."></i>
+          </label>
+          <select class="form-select" name="cpae" required id="cpaeSelect">
+            <option value="">Selecciona…</option>
+            {% for cpae in catalogo_cpae %}
+              <option value="{{ cpae.id }}">{{ cpae.descripcion }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label">
+            Servicio en la Unidad *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Se filtra en base al servicio general (Frame 1)."></i>
+          </label>
+          <select class="form-select" name="tipo_servicio_unidad" id="tipo_servicio_unidad" required>
+            <option value="">Selecciona…</option>
+            <option value="DEPÓSITO TRADICIONAL">DEPÓSITO TRADICIONAL</option>
+            <option value="DEPÓSITO ELECTRÓNICO">DEPÓSITO ELECTRÓNICO</option>
+            <option value="DOTACIÓN ELECTRÓNICA">DOTACIÓN ELECTRÓNICA</option>
+            <option value="DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA">DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA</option>
+            <option value="CENTRALIZADA (SOLO DOTACIÓN)">CENTRALIZADA (SOLO DOTACIÓN)</option>
+            <option value="INTEGRADORA (SOLO DEPÓSITO)">INTEGRADORA (SOLO DEPÓSITO)</option>
+            <option value="DEPOSITO CLIENTE CERTIFICADO">DEPOSITO CLIENTE CERTIFICADO</option>
+            <option value="CENTRALIZADA CLIENTE CERTIFICADO">CENTRALIZADA CLIENTE CERTIFICADO</option>
+          </select>
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label">
+            Empresa de Traslado de Valores *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Selecciona la ETV responsable de recolección."></i>
+          </label>
+          <select class="form-select" name="empresa_traslado" id="empresa_traslado" required>
+            <option value="">SELECCIONA...</option>
+            {% for etv in catalogo_etv %}
+              <option value="{{ etv.id }}">{{ etv.descripcion }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Dirección -->
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
+          <label class="form-label">Calle y número *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Domicilio de la Unidad."></i>
+          </label>
+          <input type="text" class="form-control uc" name="calle_numero" id="calle_numero" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Colonia *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Colonia o barrio."></i>
+          </label>
+          <input type="text" class="form-control uc" name="colonia" id="colonia" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Código Postal *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Se guardará con 5 dígitos (relleno con ceros a la izquierda si faltan)."></i>
+          </label>
+          <input type="text" class="form-control input-digit cp-5" name="codigo_postal" id="codigo_postal" maxlength="5" required>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <label class="form-label">Estado *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Selecciona el estado; luego el municipio."></i>
+          </label>
+          <select class="form-select" name="estado" id="estadoSelect" required>
+            <option value="">Selecciona…</option>
+            {% for estado in catalogo_estados %}
+              <option value="{{ estado.id }}">{{ estado.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Ciudad/Municipio *
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Se carga al seleccionar el estado."></i>
+          </label>
+          <select class="form-select" name="municipio_id" id="municipioSelect" required>
+            <option value="">Selecciona...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Terminales relacionadas -->
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
+          <label class="form-label">No. Terminal Integradora
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Solo aplica si su servicio lo permite."></i>
+          </label>
+          <input type="text" class="form-control uc" name="terminal_integradora" id="terminal_integradora">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">No. Terminal Dotación Centralizada
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Solo aplica si su servicio lo permite."></i>
+          </label>
+          <input type="text" class="form-control uc" name="terminal_dotacion_centralizada" id="terminal_dotacion_centralizada">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">No. Terminal Cliente Certificado Centralizada
+            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Obligatorio para 'DEPÓSITO CLIENTE CERTIFICADO'."></i>
+          </label>
+          <input type="text" class="form-control uc" name="terminal_certificado_centralizada" id="terminal_certificado_centralizada">
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4 gap-2">
+        <button type="button" class="btn btn-outline-secondary" id="btnLimpiar">Limpiar</button>
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-plus-circle"></i> Guardar Unidad
+        </button>
+      </div>
+    </form>
   </div>
+</div>
 
-  <form method="GET" action="{{ url_for('frames.frame3') }}">
-    <button type="submit" class="btn btn-primary mt-4">Siguiente – Cuentas</button>
-  </form>
-  
-{% else %}
-  <p class="text-muted">Aún no se ha agregado ninguna unidad.</p>
-{% endif %}
+<!-- ===== UNIDADES CAPTURADAS (SIN edición) ===== -->
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <h3 class="h6 mb-0">Unidades Capturadas</h3>
+    {% if unidades %}
+      <form method="GET" action="{{ url_for('frames.frame3') }}" class="mb-0">
+        <button type="submit" class="btn btn-primary btn-sm">Siguiente – Cuentas</button>
+      </form>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    {% if unidades %}
+      <div class="accordion" id="accordionUnidades">
+        {% for u in unidades %}
+          <div class="accordion-item mb-2 border rounded-3">
+            <h2 class="accordion-header" id="heading{{ loop.index }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
+                      aria-controls="collapse{{ loop.index }}">
+                <strong>#{{ loop.index }}</strong>
+                &nbsp;– {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | SEF: {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}
+              </button>
+            </h2>
+            <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionUnidades">
+              <div class="accordion-body small">
+                <div class="row g-2">
+                  <div class="col-md-6"><strong>Origen:</strong> {{ u.origen_unidad or '-' }}</div>
+                  <div class="col-md-6"><strong>ETV:</strong> {{ u.etv_nombre or '-' }}</div>
+                  <div class="col-md-6"><strong>Estado:</strong> {{ u.estado_nombre or '-' }}</div>
+                  <div class="col-md-6"><strong>Municipio:</strong> {{ u.municipio_nombre or '-' }}</div>
+                  <div class="col-md-6"><strong>C.P.:</strong> {{ u.codigo_postal or '-' }}</div>
+                  <div class="col-md-6"><strong>Calle y Número:</strong> {{ u.calle_numero or '-' }}</div>
+                  <div class="col-md-6"><strong>Colonia:</strong> {{ u.colonia or '-' }}</div>
+                  <div class="col-md-6"><strong>Integradora:</strong> {{ u.terminal_integradora or '-' }}</div>
+                  <div class="col-md-6"><strong>Dotación Centralizada:</strong> {{ u.terminal_dotacion_centralizada or '-' }}</div>
+                  <div class="col-md-6"><strong>Certificado Centralizada:</strong> {{ u.terminal_certificado_centralizada or '-' }}</div>
+                </div>
 
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                  <!-- SOLO eliminar (sin editar) -->
+                  <form method="POST" class="mb-0">
+                    <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                  </form>
+                </div>
 
-<!-- Script 1: Mostrar/Ocultar campos y manejar requisitos según el tipo de trámite y opción seleccionada -->
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Aún no se ha agregado ninguna unidad.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+
+<!-- (A) Tooltips -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Obtener el tipo de trámite enviado desde el backend
-    const tipoTramite = "{{ frame1.tipo_tramite }}";
+document.addEventListener('DOMContentLoaded', function () {
+  const els = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  els.map(el => new bootstrap.Tooltip(el));
+});
+</script>
 
-    // Obtener referencias a elementos del DOM
-    const grupoTerminal = document.getElementById("grupo_terminal");
-    const inputTerminal = document.getElementById("numero_terminal_sef");
-    const iconoAyuda = document.getElementById("icono-ayuda");
-    const grupoNombreUnidad = document.getElementById("grupo_nombre_unidad");
-    const inputNombreUnidad = document.getElementById("nombre_unidad");
-    const campoOrigen = document.getElementById("origen_unidad");
+<!-- (B) Filtrado de Servicio en la Unidad por Servicio General -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const servicioGeneral = (document.getElementById('servicio_tipo_oculto')?.value || '').trim();
+  const selectServicioUnidad = document.getElementById("tipo_servicio_unidad");
+  if (!selectServicioUnidad) return;
 
-    // Lista de campos que usualmente son obligatorios
-    const camposObligatorios = [
-      "cpaeSelect",
-      "tipo_servicio_unidad",
-      "empresa_traslado",
-      "calle_numero",
-      "colonia",
-      "codigo_postal",
-      "estadoSelect",
-      "municipioSelect"
-    ];
+  const reglas = {
+    "DEPÓSITO TRADICIONAL": ["DEPÓSITO TRADICIONAL"],
+    "DEPÓSITO ELECTRÓNICO": [
+      "DEPÓSITO ELECTRÓNICO",
+      "INTEGRADORA (SOLO DEPÓSITO)",
+      "DEPOSITO CLIENTE CERTIFICADO",
+      "CENTRALIZADA CLIENTE CERTIFICADO"
+    ],
+    "DOTACIÓN ELECTRÓNICA": [
+      "DOTACIÓN ELECTRÓNICA",
+      "CENTRALIZADA (SOLO DOTACIÓN)"
+    ],
+    "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA": [
+      "DEPÓSITO ELECTRÓNICO",
+      "DOTACIÓN ELECTRÓNICA",
+      "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA",
+      "CENTRALIZADA (SOLO DOTACIÓN)",
+      "INTEGRADORA (SOLO DEPÓSITO)",
+      "DEPOSITO CLIENTE CERTIFICADO",
+      "CENTRALIZADA CLIENTE CERTIFICADO"
+    ]
+  };
 
-    // Si el trámite es SUSTITUCIÓN, aplicar lógica condicional
-    if (tipoTramite === "SUSTITUCIÓN") {
-      const radioSustituir = document.getElementById("radio_sustituir");
-      const radioAgregar = document.getElementById("radio_agregar");
+  const visibles = reglas[servicioGeneral] || [];
+  const todas = Array.from(selectServicioUnidad.options);
+  selectServicioUnidad.innerHTML = "";
+  todas.forEach(opt => {
+    if (opt.value === "" || visibles.includes(opt.value)) selectServicioUnidad.appendChild(opt);
+  });
+});
+</script>
 
-      // Función que aplica reglas dinámicamente según la selección
-      function aplicarReglasSustitucion() {
-        if (radioSustituir.checked) {
-          // ✔ Usuario seleccionó sustituir una unidad existente
+<!-- (C) Reglas 1–4: inhabilitar/obligar terminales según “Tipo de Servicio Unidad” -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sel = document.getElementById('tipo_servicio_unidad');
+  const tInt  = document.getElementById('terminal_integradora');
+  const tDot  = document.getElementById('terminal_dotacion_centralizada');
+  const tCert = document.getElementById('terminal_certificado_centralizada');
 
-          // Mostrar campo de terminal y hacerlo obligatorio
-          grupoTerminal.style.display = "flex";
-          inputTerminal.setAttribute("required", "required");
-          iconoAyuda.style.display = "inline";
+  function setDisabled(el, disabled, clear=false) {
+    if (!el) return;
+    el.disabled = !!disabled;
+    if (disabled && clear) el.value = '';
+  }
+  function setRequired(el, required) {
+    if (!el) return;
+    if (required) el.setAttribute('required', 'required'); else el.removeAttribute('required');
+  }
 
-          // Ocultar nombre de unidad y quitar requerimiento
-          grupoNombreUnidad.style.display = "none";
-          inputNombreUnidad.removeAttribute("required");
+  function aplicaReglasServicioUnidad() {
+    const v = (sel?.value || '').toUpperCase();
 
-          // Hacer opcionales los campos generales
-          camposObligatorios.forEach(id => {
-            const campo = document.getElementById(id);
-            if (campo) campo.removeAttribute("required");
-          });
+    // Reset por defecto
+    setDisabled(tInt,  false);
+    setDisabled(tDot,  false);
+    setDisabled(tCert, false);
+    setRequired(tCert, false);
 
-          // Guardar valor de origen en campo oculto
-          if (campoOrigen) campoOrigen.value = "SUSTITUCIÓN";
+    // 1) CENTRALIZADA (SOLO DOTACIÓN)
+    if (v.includes('CENTRALIZADA') && v.includes('SOLO DOTACIÓN')) {
+      setDisabled(tDot,  true, true);
+      setDisabled(tCert, true, true);
+      setDisabled(tInt,  true, true);
+      return;
+    }
 
-        } else {
-          // ✔ Usuario seleccionó agregar nueva unidad
+    // 2) INTEGRADORA (SOLO DEPÓSITO)
+    if (v.includes('INTEGRADORA') && v.includes('SOLO DEPÓSITO')) {
+      setDisabled(tDot,  true, true);
+      setDisabled(tCert, true, true);
+      setDisabled(tInt,  true, true);
+      return;
+    }
 
-          // Ocultar campo terminal y quitar requerimiento
-          grupoTerminal.style.display = "none";
-          inputTerminal.removeAttribute("required");
-          iconoAyuda.style.display = "none";
+    // 3) CENTRALIZADA CLIENTE CERTIFICADO
+    if (v === 'CENTRALIZADA CLIENTE CERTIFICADO') {
+      setDisabled(tDot,  true, true);
+      setDisabled(tCert, true, true);
+      setDisabled(tInt,  true, true);
+      return;
+    }
 
-          // Mostrar nombre de unidad y hacerlo obligatorio
-          grupoNombreUnidad.style.display = "block";
-          inputNombreUnidad.setAttribute("required", "required");
+    // 4) DEPOSITO CLIENTE CERTIFICADO
+    if (v === 'DEPOSITO CLIENTE CERTIFICADO' || v === 'DEPÓSITO CLIENTE CERTIFICADO') {
+      setDisabled(tDot,  true, true);
+      setDisabled(tInt,  true, true);
+      setDisabled(tCert, false);
+      setRequired(tCert, true);
+      return;
+    }
+  }
 
-          // Hacer obligatorios los campos generales
-          camposObligatorios.forEach(id => {
-            const campo = document.getElementById(id);
-            if (campo) campo.setAttribute("required", "required");
-          });
+  sel && sel.addEventListener('change', aplicaReglasServicioUnidad);
+  aplicaReglasServicioUnidad();
+});
+</script>
 
-          // Guardar valor de origen en campo oculto
-          if (campoOrigen) campoOrigen.value = "NUEVA";
-        }
-      }
+<!-- (D) Sustitución (a/b) + UX “Limpiar” + (3) validación num_terminal 10 dígitos -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const esSustitucion = ("{{ frame1.tipo_tramite }}" === "SUSTITUCIÓN");
 
-      // Ejecutar reglas iniciales
-      aplicarReglasSustitucion();
+  const radioSustituir = document.getElementById("radio_sustituir");
+  const radioAgregar   = document.getElementById("radio_agregar");
 
-      // Reaplicar lógica al cambiar selección
-      radioSustituir.addEventListener("change", aplicarReglasSustitucion);
-      radioAgregar.addEventListener("change", aplicarReglasSustitucion);
+  const grupoTerminal  = document.getElementById("grupo_terminal");
+  const inputTerminal  = document.getElementById("numero_terminal_sef");
+  const grupoNombre    = document.getElementById("grupo_nombre_unidad");
+  const inputNombre    = document.getElementById("nombre_unidad");
+  const origen         = document.getElementById("origen_unidad");
 
-    } else {
-      // ✔ Trámite es ALTA o distinto de SUSTITUCIÓN
+  const obligatorios = [
+    "cpaeSelect","tipo_servicio_unidad","empresa_traslado",
+    "calle_numero","colonia","codigo_postal",
+    "estadoSelect","municipioSelect"
+  ];
 
-      // Ocultar campo de terminal y quitar requerimiento
+  function setRequired(id, req) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (req) el.setAttribute('required','required'); else el.removeAttribute('required');
+  }
+
+  // (3) numero_terminal_sef: solo dígitos y máx 10
+  if (inputTerminal) {
+    inputTerminal.addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,10);
+    }, {passive:true});
+  }
+
+  function aplicarSustitucionUI() {
+    if (!esSustitucion) {
+      // ALTA
       grupoTerminal.style.display = "none";
-      inputTerminal.removeAttribute("required");
-      iconoAyuda.style.display = "none";
-
-      // Mostrar nombre de unidad y hacerlo obligatorio
-      grupoNombreUnidad.style.display = "block";
-      inputNombreUnidad.setAttribute("required", "required");
-
-      // Hacer obligatorios los campos generales
-      camposObligatorios.forEach(id => {
-        const campo = document.getElementById(id);
-        if (campo) campo.setAttribute("required", "required");
-      });
-
-      // Establecer valor de origen por defecto
-      if (campoOrigen) campoOrigen.value = "NUEVA";
+      inputTerminal && inputTerminal.removeAttribute("required");
+      grupoNombre.style.display = "block";
+      inputNombre && inputNombre.setAttribute("required","required");
+      obligatorios.forEach(id => setRequired(id, true));
+      origen.value = "NUEVA";
+      inputTerminal.value = '0000000000';
+      return;
     }
-  });
-</script>
 
-
-
-<!-- Script 2: Filtrar dinámicamente las opciones de 'tipo_servicio_unidad' -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const servicioGeneral = document.getElementById('servicio_tipo_oculto')?.value?.trim();
-    const selectServicioUnidad = document.getElementById("tipo_servicio_unidad");
-
-    // Reglas de visibilidad según el tipo de servicio general
-    const reglas = {
-      "DEPÓSITO TRADICIONAL": ["DEPÓSITO TRADICIONAL"],
-      "DEPÓSITO ELECTRÓNICO": [
-        "DEPÓSITO ELECTRÓNICO",
-        "INTEGRADORA (SOLO DEPÓSITO)",
-        "DEPOSITO CLIENTE CERTIFICADO",
-        "CENTRALIZADA CLIENTE CERTIFICADO"
-      ],
-      "DOTACIÓN ELECTRÓNICA": [
-        "DOTACIÓN ELECTRÓNICA",
-        "CENTRALIZADA (SOLO DOTACIÓN)"
-      ],
-      "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA": [
-        "DEPÓSITO ELECTRÓNICO",
-        "DOTACIÓN ELECTRÓNICA",
-        "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA",
-        "CENTRALIZADA (SOLO DOTACIÓN)",
-        "INTEGRADORA (SOLO DEPÓSITO)",
-        "DEPOSITO CLIENTE CERTIFICADO",
-        "CENTRALIZADA CLIENTE CERTIFICADO"
-      ]
-    };
-
-    // Elimina todas las opciones y vuelve a mostrar solo las válidas
-    const visibles = reglas[servicioGeneral] || [];
-    const todasOpciones = Array.from(selectServicioUnidad.options);
-    selectServicioUnidad.innerHTML = "";
-
-    todasOpciones.forEach(opt => {
-      if (visibles.includes(opt.value) || opt.value === "") {
-        selectServicioUnidad.appendChild(opt);
+    if (radioSustituir && radioSustituir.checked) {
+      // 5a) Modificar existente:
+      grupoNombre.style.display = "none";
+      if (inputNombre) {
+        inputNombre.value = "-";
+        inputNombre.removeAttribute("required");
+        inputTerminal.disabled = false;
+        inputTerminal.value = '';
       }
-    });
-  });
-</script>
+      grupoTerminal.style.display = "flex";
+      inputTerminal && inputTerminal.setAttribute("required","required");
+      obligatorios.forEach(id => setRequired(id, false));
+      origen.value = "SUSTITUCIÓN";
+    } else {
+      // 5b) Agregar nueva:
+      grupoTerminal.style.display = "none";
+      inputTerminal && inputTerminal.removeAttribute("required");
+      inputTerminal.value = '0000000000';
+      inputTerminal.disabled = true;
 
-<!-- Script 3: Inicializar tooltips de Bootstrap -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Buscar todos los elementos con atributo data-bs-toggle="tooltip"
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-
-    // Inicializar cada uno como Tooltip de Bootstrap
-    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-  });
-</script>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const select = document.getElementById('cpaeSelect');
-    if (select) {
-      new Choices(select, {
-        searchEnabled: true,
-        itemSelectText: '',
-        placeholderValue: 'Escribe para buscar…',
-        searchPlaceholderValue: 'Buscar CPAE…'
-      });
+      grupoNombre.style.display = "block";
+      if (inputNombre) {
+        inputNombre.disabled = false;
+        inputNombre.setAttribute("required","required");
+        if (inputNombre.value === "-") inputNombre.value = "";
+      }
+      obligatorios.forEach(id => setRequired(id, true));
+      origen.value = "NUEVA";
     }
-  });
-  </script>
+  }
 
+  const btnLimpiar = document.getElementById('btnLimpiar');
+  btnLimpiar && btnLimpiar.addEventListener('click', function(){
+    document.querySelector('form.needs-validation').reset();
+    if (radioAgregar) radioAgregar.checked = true;
+    aplicarSustitucionUI();
+  });
+
+  if (radioSustituir) radioSustituir.addEventListener("change", aplicarSustitucionUI);
+  if (radioAgregar)   radioAgregar.addEventListener("change",   aplicarSustitucionUI);
+  aplicarSustitucionUI();
+});
+</script>
+
+<!-- (E) C.P. a 5 dígitos (rellena con ceros a la izquierda) -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const estadoSelect = document.getElementById('estadoSelect');
-    const municipioSelect = document.getElementById('municipioSelect');
-  
-    estadoSelect.addEventListener('change', function () {
-      const estadoId = this.value;
-  
-      municipioSelect.innerHTML = '<option value="">Cargando...</option>';
+document.addEventListener('DOMContentLoaded', function () {
+  const cp = document.getElementById('codigo_postal');
+  if (!cp) return;
+  cp.addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,5);
+  }, {passive:true});
+  cp.addEventListener('blur', function(){
+    const v = (this.value || '').replace(/\D/g,'');
+    this.value = v.padStart(5, '0');
+  });
+});
+</script>
+
+<!-- (F) Estados/Municipios + === NUEVO: alimentar ocultos de nombres === -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const estadoSelect = document.getElementById('estadoSelect');
+  const municipioSelect = document.getElementById('municipioSelect');
+  const cpaeSelect = document.getElementById('cpaeSelect');
+  const etvSelect = document.getElementById('empresa_traslado');
+
+  const inpCpaeNombre = document.getElementById('cpae_nombre');
+  const inpEstadoNombre = document.getElementById('estado_nombre');
+  const inpMunicipioNombre = document.getElementById('municipio_nombre');
+  const inpEtvNombre = document.getElementById('etv_nombre');
+
+  function setHiddenFromSelect(selectEl, hiddenEl) {
+    if (!selectEl || !hiddenEl) return;
+    const txt = selectEl.options[selectEl.selectedIndex]?.textContent?.trim() || '';
+    hiddenEl.value = txt;
+  }
+
+  cpaeSelect && cpaeSelect.addEventListener('change', () => setHiddenFromSelect(cpaeSelect, inpCpaeNombre));
+  etvSelect && etvSelect.addEventListener('change', () => setHiddenFromSelect(etvSelect, inpEtvNombre));
+  estadoSelect && estadoSelect.addEventListener('change', () => {
+    setHiddenFromSelect(estadoSelect, inpEstadoNombre);
+
+    const estadoId = estadoSelect.value;
+    municipioSelect.innerHTML = '<option value="">Cargando...</option>';
+    municipioSelect.disabled = true;
+
+    if (!estadoId) {
+      municipioSelect.innerHTML = '<option value="">Selecciona el estado primero</option>';
       municipioSelect.disabled = true;
-  
-      if (!estadoId) {
-        municipioSelect.innerHTML = '<option value="">Selecciona el estado primero</option>';
-        municipioSelect.disabled = true;
-        return;
-      }
-  
-      fetch(`/api/municipios/${estadoId}`)
-        .then(response => response.json())
-        .then(data => {
-          municipioSelect.innerHTML = '<option value="">Selecciona…</option>';
-          data.municipios.forEach(function (mun) {
-            const option = document.createElement('option');
-            option.value = mun.id;  // AHORA guarda el ID
-            option.textContent = mun.nombre;
-            municipioSelect.appendChild(option);
-          });
-          municipioSelect.disabled = false;
-        })
-        .catch(error => {
-          municipioSelect.innerHTML = '<option value="">Error al cargar</option>';
-          console.error('Error:', error);
+      return;
+    }
+
+    fetch(`/api/municipios/${estadoId}`)
+      .then(r => r.json())
+      .then(data => {
+        municipioSelect.innerHTML = '<option value="">Selecciona…</option>';
+        data.municipios.forEach(mun => {
+          const option = document.createElement('option');
+          option.value = mun.id;
+          option.textContent = mun.nombre;
+          municipioSelect.appendChild(option);
         });
-    });
+        municipioSelect.disabled = false;
+
+        // al cambiar el estado, reseteamos el nombre de municipio oculto
+        if (inpMunicipioNombre) inpMunicipioNombre.value = '';
+      })
+      .catch(() => {
+        municipioSelect.innerHTML = '<option value="">Error al cargar</option>';
+      });
   });
-  </script>
-  
 
+  municipioSelect && municipioSelect.addEventListener('change', () => setHiddenFromSelect(municipioSelect, inpMunicipioNombre));
 
+  // Inicialización por si ya vienen preseleccionados
+  setHiddenFromSelect(cpaeSelect, inpCpaeNombre);
+  setHiddenFromSelect(etvSelect, inpEtvNombre);
+  setHiddenFromSelect(estadoSelect, inpEstadoNombre);
+  setHiddenFromSelect(municipioSelect, inpMunicipioNombre);
+});
+</script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<!-- (G) Choices.js en CPAE -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const select = document.getElementById('cpaeSelect');
+  if (select) {
+    new Choices(select, {
+      searchEnabled: true,
+      itemSelectText: '',
+      placeholderValue: 'Escribe para buscar…',
+      searchPlaceholderValue: 'Buscar CPAE…'
+    });
+  }
+});
+</script>
+
 {% endblock %}

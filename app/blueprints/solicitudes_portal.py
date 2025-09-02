@@ -17,6 +17,15 @@ REQUIRED_FIRMANTES = int(os.getenv("FIRMANTES_MIN", "3"))
 def _login_url():
     return url_for("admin.login") if "admin.login" in current_app.view_functions else "/admin/login"
 
+# --- añade este helper arriba, cerca de tus helpers ---
+def _is_admin_current() -> bool:
+    # Ajusta a tu sesión real:
+    role = (session.get("role") or session.get("user_role") or "").lower()
+    return bool(
+        session.get("is_admin") is True
+        or role in ("admin", "superadmin", "administrator")
+        or session.get("admin") is True
+    )
 
 def _resolve_user_id_from_username(username: str):
     if not username:
@@ -84,20 +93,48 @@ def lista():
         session.pop("user_id", None)
         return redirect(_login_url())
 
-    # Solicitudes del usuario (solo columnas que existen)
-    sql = """
-        SELECT
-            s.id,
-            s.updated_at,
-            s.numero_cliente,
-            s.numero_contrato,
-            s.razon_social,
-            s.tipo_tramite
-        FROM solicitudes AS s
-        WHERE s.created_by = %s
-        ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
-    """
-    solicitudes = fetchall(sql, (user_id,)) or []
+    is_admin = _is_admin_current()
+
+    # ---------- SQL distinto según rol ----------
+    if is_admin:
+        # Todas las solicitudes + nombre del creador (si existe)
+        sql = """
+            SELECT
+                s.id,
+                s.updated_at,
+                s.numero_cliente,
+                s.numero_contrato,
+                s.razon_social,
+                s.tipo_tramite,
+                s.tipo_contrato,
+                s.tipo_servicio,
+                s.created_by,
+                au.username AS created_by_name
+            FROM solicitudes AS s
+            LEFT JOIN admin_users au ON au.id = s.created_by
+            ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
+        """
+        params = ()
+    else:
+        # Sólo las del usuario actual
+        sql = """
+            SELECT
+                s.id,
+                s.updated_at,
+                s.numero_cliente,
+                s.numero_contrato,
+                s.razon_social,
+                s.tipo_tramite,
+                s.tipo_contrato,
+                s.tipo_servicio,
+                s.created_by
+            FROM solicitudes AS s
+            WHERE s.created_by = %s
+            ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
+        """
+        params = (user_id,)
+
+    solicitudes = fetchall(sql, params) or []
     ids = [int(s["id"]) for s in solicitudes if s.get("id") is not None]
 
     # Tabla de firmantes (opcional)
@@ -121,10 +158,10 @@ def lista():
             s["firmantes_completos"] = True
             s["firmantes_count"] = None
 
-    # 🔑 Fallback de templates:
-    #  - primero intenta templates/solicitudes/lista.html
-    #  - luego templates/lista.html
+    # Render (pasamos is_admin para que el template ajuste columnas/título)
     return render_template(
         ["solicitudes/lista.html", "lista.html"],
-        solicitudes=solicitudes
+        solicitudes=solicitudes,
+        is_admin=is_admin
     )
+
