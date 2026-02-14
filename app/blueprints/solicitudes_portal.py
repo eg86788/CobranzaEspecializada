@@ -87,8 +87,9 @@ def crear_solicitud(producto):
     # Ajusta el endpoint frames.formulario_step según cómo lo vayas a implementar
     return redirect(
         url_for(
-            "frames.formulario_step",
-            solicitud_id=solicitud.id
+            "solicitudes_flow.step",
+            solicitud_id=solicitud.id,
+            step=1
         )
     )
 
@@ -126,9 +127,9 @@ def lista():
 
 from app.models import Producto, RoleProductAccess
 
+
 @sol_portal.route("/nueva", methods=["GET"])
 def nueva():
-    print(">>> ENTRANDO A NUEVA PRODUCTO <<<")
 
     username = session.get("username")
     if not username:

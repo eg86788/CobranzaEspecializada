@@ -19,7 +19,7 @@ try:
 except Exception:
     from app.db_legacy import fetchall, fetchone, conectar  # pragma: no cover
 
-frames_bp = Blueprint("frames", __name__)
+frames_bp = Blueprint("frames", __name__, url_prefix="/frames")
 log = logging.getLogger(__name__)
 
 # =============================================================================

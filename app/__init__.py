@@ -14,6 +14,8 @@ migrate = Migrate()
 def create_app():
     from pathlib import Path
 
+
+
     BASE_DIR = Path(__file__).resolve().parent
 
     app = Flask(
@@ -21,6 +23,8 @@ def create_app():
         template_folder=str(BASE_DIR / "templates"),
         static_folder=str(BASE_DIR / "static")
     )
+
+    print("TEMPLATE FOLDER:", app.template_folder)
 
   # ----- Config -----
     app.config.from_object(Config)
@@ -87,6 +91,10 @@ def create_app():
     from .blueprints.adhesiones_admin import adh_bp
     from .blueprints.solicitudes_portal import sol_portal
     from .blueprints.params_admin import params_bp  # módulo de parámetros
+    from .blueprints.solicitudes_flow import flow_bp
+    from .blueprints.productos_admin import productos_admin_bp
+
+
 
 
 
@@ -105,8 +113,8 @@ def create_app():
     app.register_blueprint(sol_portal)
     app.register_blueprint(params_bp)        # /admin/parametros
     app.register_blueprint(users_admin)
-
-
+    app.register_blueprint(flow_bp)
+    app.register_blueprint(productos_admin_bp)
 
     @app.route("/sol")
     def home():

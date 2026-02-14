@@ -42,7 +42,6 @@ class Solicitud(db.Model):
     __tablename__ = "solicitudes"
 
     id = db.Column(db.Integer, primary_key=True)
-
     producto = db.Column(db.String(50), nullable=False, index=True)
     estado_actual = db.Column(db.String(50), nullable=False)
     estatus = db.Column(db.String(20), nullable=False, default="BORRADOR", index=True)
@@ -58,6 +57,11 @@ class Solicitud(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow
     )
+    numero_cliente = db.Column(db.String(50))
+    numero_contrato = db.Column(db.String(20))
+    razon_social = db.Column(db.String(255))
+    observaciones = db.Column(db.Text)
+    rfc = db.Column(db.String(20))
 
 class Producto(db.Model):
     __tablename__ = "catalogo_productos"
