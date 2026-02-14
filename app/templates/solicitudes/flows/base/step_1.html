@@ -25,6 +25,14 @@
     </div>
 
     <div class="mb-3">
+        <label class="form-label">RFC</label>
+        <input type="text"
+               name="rfc"
+               class="form-control"
+               value="{{ solicitud.rfc or '' }}">
+      </div>
+
+    <div class="mb-3">
       <label class="form-label">Observaciones</label>
       <textarea name="observaciones"
                 class="form-control">{{ solicitud.observaciones or '' }}</textarea>
