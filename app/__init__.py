@@ -25,10 +25,12 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    # después de init_app y migrate.init_app
+    from app import models  # importa todos los modelos
+
     return app
 
-# después de init_app y migrate.init_app
-from app import models  # importa todos los modelos
+
 
 
 def create_app():
