@@ -8,7 +8,7 @@ except Exception:
     from app.db_legacy import fetchall, fetchone  # pragma: no cover
 
 # Este blueprint mantiene el nombre que esperas en app/__init__.py
-sol_portal = Blueprint("solicitudes_portal", __name__, url_prefix="/solicitudes")
+sol_portal = Blueprint("sol_portal", __name__, url_prefix="/solicitudes")
 
 # Mínimo de firmantes requeridos (ajustable por ENV)
 REQUIRED_FIRMANTES = int(os.getenv("FIRMANTES_MIN", "3"))
@@ -68,6 +68,29 @@ def _firmantes_count_by_solicitud(table_name: str, solicitud_ids):
     rows = fetchall(sql, tuple(solicitud_ids)) or []
     return {int(r["solicitud_id"]): int(r["cnt"]) for r in rows if r.get("solicitud_id") is not None}
 
+# 🧩 Nueva ruta para crear una solicitud persistida
+from app.services.solicitud_service import SolicitudService
+
+@sol_portal.route("/crear/<producto>", methods=["GET"])
+def crear_solicitud(producto):
+    # Determinar el usuario actual
+    # Ajusta según tus campos de sesión reales
+    usuario = session.get("username") or session.get("user_name") or session.get("login") or "desconocido"
+
+    # Crear solicitud en BD y obtenerla
+    solicitud = SolicitudService.crear_solicitud(
+        producto=producto,
+        usuario=usuario
+    )
+
+    # Redirigir al primer step de tu flujo
+    # Ajusta el endpoint frames.formulario_step según cómo lo vayas a implementar
+    return redirect(
+        url_for(
+            "frames.formulario_step",
+            solicitud_id=solicitud.id
+        )
+    )
 
 @sol_portal.route("/lista", methods=["GET"])
 def lista():

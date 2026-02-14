@@ -35,3 +35,26 @@ class RoleProductAccess(db.Model):
     habilitado = db.Column(db.Boolean, nullable=False, default=True)
     # Si tienes FK real a catalogo_productos.code en tu DB, puedes agregar:
     # db.ForeignKey("catalogo_productos.code")
+
+from sqlalchemy.dialects.postgresql import JSONB
+
+class Solicitud(db.Model):
+    __tablename__ = "solicitudes"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    producto = db.Column(db.String(50), nullable=False, index=True)
+    estado_actual = db.Column(db.String(50), nullable=False)
+    estatus = db.Column(db.String(20), nullable=False, default="BORRADOR", index=True)
+
+    usuario_creador = db.Column(db.String(50), nullable=False)
+
+    data_json = db.Column(JSONB, nullable=False, default=dict)
+
+    fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    fecha_actualizacion = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )

@@ -28,10 +28,10 @@ def create_app():
     # Registrar blueprints
     from .blueprints.frames import frames_bp
     from .blueprints.minutas import minutas_bp
-    from .blueprints.solicitudes_portal import solicitudes_portal_bp
+    from .blueprints.solicitudes_portal import sol_portal
 
     app.register_blueprint(frames_bp)
     app.register_blueprint(minutas_bp)
-    app.register_blueprint(solicitudes_portal_bp)
+    app.register_blueprint(sol_portal)
 
     return app
