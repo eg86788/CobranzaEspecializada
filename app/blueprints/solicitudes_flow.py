@@ -23,6 +23,7 @@ def step(solicitud_id, step):
             solicitud.razon_social = request.form.get("razon_social")
             solicitud.observaciones = request.form.get("observaciones")
             solicitud.rfc = request.form.get("rfc")
+            solicitud.tipo_tramite = request.form.get("tipo_tramite")
 
             db.session.commit()
 
@@ -42,3 +43,23 @@ def step(solicitud_id, step):
         return render_template(template_producto, solicitud=solicitud, step=step)
     except:
         return render_template(template_base, solicitud=solicitud, step=step)
+
+def config_cambio(solicitud, form):
+    return (
+        solicitud.tipo_tramite != form.get("tipo_tramite") or
+        solicitud.tipo_contrato != form.get("tipo_contrato") or
+        solicitud.tipo_servicio != form.get("tipo_servicio")
+    )
+
+def borrar_registros_dependientes(solicitud_id):
+    from app.models import (
+        SolicitudSEFUnidad,
+        SolicitudSEFCuenta,
+        SolicitudSEFUsuario,
+        SolicitudSEFContacto
+    )
+
+    SolicitudSEFUnidad.query.filter_by(solicitud_id=solicitud_id).delete()
+    SolicitudSEFCuenta.query.filter_by(solicitud_id=solicitud_id).delete()
+    SolicitudSEFUsuario.query.filter_by(solicitud_id=solicitud_id).delete()
+    SolicitudSEFContacto.query.filter_by(solicitud_id=solicitud_id).delete()

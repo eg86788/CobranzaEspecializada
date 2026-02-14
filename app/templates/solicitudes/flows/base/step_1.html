@@ -32,6 +32,14 @@
                value="{{ solicitud.rfc or '' }}">
       </div>
 
+      <div class="mb-3">
+        <label class="form-label">Tipo de Trámite</label>
+        <input type="text"
+               name="tipo_tramite"
+               class="form-control"
+               value="{{ solicitud.tipo_tramite or '' }}">
+      </div>
+
     <div class="mb-3">
       <label class="form-label">Observaciones</label>
       <textarea name="observaciones"

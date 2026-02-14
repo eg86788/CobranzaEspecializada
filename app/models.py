@@ -43,6 +43,7 @@ class Solicitud(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     producto = db.Column(db.String(50), nullable=False, index=True)
+    tipo_tramite = db.Column(db.String(50))
     estado_actual = db.Column(db.String(50), nullable=False)
     estatus = db.Column(db.String(20), nullable=False, default="BORRADOR", index=True)
 
