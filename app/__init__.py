@@ -2,6 +2,8 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+from flask_migrate import Migrate
+from app.extensions import db
 
 import psycopg2.extras
 from flask import Flask, session, redirect, url_for
@@ -14,7 +16,15 @@ from .blueprints.solicitudes_portal import sol_portal
 from .blueprints.params_admin import params_bp  # módulo de parámetros
 from app.blueprints.config_campos_admin import config_campos_admin_bp
 
+migrate = Migrate()
 
+def create_app():
+    app = Flask(__name__)
+
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    return app
 
 def create_app():
     project_root = Path(__file__).resolve().parent.parent
