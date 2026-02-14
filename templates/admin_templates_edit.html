@@ -21,15 +21,19 @@
     <label class="form-label">Nombre</label>
     <input class="form-control" name="name" required placeholder="Contrato SEF Tradicional">
   </div>
-  {% endif %}
 
+  <div class="mb-3">
+    <label class="form-label">Cascarón Ondemand</label>
+    <input class="form-control" name="cascaron" required placeholder="Número de cascaron en Ondemand">
+  </div>
+
+  {% endif %}
   <div class="mb-3">
     <label class="form-label">Contenido (HTML completo: puede incluir &lt;style&gt; y Jinja)</label>
     <textarea id="content_html" name="content_html">{{ tpl.content_html if tpl else '' }}</textarea>
     <div class="form-text">
-      Aquí pega el HTML completo tal como está en <code>contrato_tradicional.html</code> o <code>contrato_electronico.html</code>.
-      Puedes incluir <code>&lt;style&gt;...&lt;/style&gt;</code> dentro del propio HTML. No se separará ni sanitizará.
-    </div>
+      Aquí pega el HTML completo.
+      Puedes incluir <code>&lt;style&gt;...&lt;/style&gt;</code> dentro del propio HTML. 
   </div>
 
   <div class="mb-3" style="display:none;">

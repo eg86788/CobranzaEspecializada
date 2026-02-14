@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Configurar Campos{% endblock %}
+{% block content %}
+
+<div class="container py-3">
+  <div class="d-flex align-items-baseline justify-content-between mb-3">
+    <h1 class="mb-0" style="font-weight:800; color:#003746;">Configuración de Campos</h1>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('config_campos_admin.nuevo') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Nuevo
+      </a>
+      <a href="{{ url_for('config_campos_admin.listar') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-repeat me-1"></i> Refrescar
+      </a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form class="row g-2 mb-3" method="get">
+    <div class="col-md-4">
+      <input class="form-control" name="frame" placeholder="Filtrar por frame (p.ej. frame1)" value="{{ q_frame }}">
+    </div>
+    <div class="col-md-4">
+      <input class="form-control" name="field" placeholder="Filtrar por campo (p.ej. numero_cliente)" value="{{ q_field }}">
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-outline-primary"><i class="bi bi-search me-1"></i> Buscar</button>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width:120px;">Frame</th>
+          <th>Field</th>
+          <th style="width:110px;">Visible</th>
+          <th style="width:110px;">Requerido</th>
+          <th style="width:110px;">Bloqueado</th>
+          <th>Grupo</th>
+          <th style="width:90px;">Orden</th>
+          <th style="width:160px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td><code>{{ r.frame }}</code></td>
+            <td><strong>{{ r.field_name }}</strong></td>
+            <td>{{ 'Sí' if r.visible_default else 'No' }}</td>
+            <td>{{ 'Sí' if r.required_default else 'No' }}</td>
+            <td>{{ 'Sí' if r.disabled_default else 'No' }}</td>
+            <td>{{ r.grupo or '' }}</td>
+            <td>{{ r.orden or 0 }}</td>
+            <td class="text-end">
+              <a href="{{ url_for('config_campos_admin.editar', row_id=r.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+              <form class="d-inline" method="post" action="{{ url_for('config_campos_admin.eliminar', row_id=r.id) }}"
+                    onsubmit="return confirm('¿Eliminar este registro?');">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">
+              No hay registros que coincidan con el filtro.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

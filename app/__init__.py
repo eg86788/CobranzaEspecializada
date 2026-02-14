@@ -1,15 +1,18 @@
 # app/__init__.py
-import logging
 import os
 from pathlib import Path
-from flask import Flask, session
+from datetime import timedelta
+
+import psycopg2.extras
+from flask import Flask, session, redirect, url_for
+
 from app.extensions import db
 from .config import Config
-from .db_legacy import fetchall  # si lo usas en otros módulos, se queda
+from .db_legacy import conectar, fetchall  # si lo usas en otros módulos, se queda
 from .errors import register_error_handlers
-from flask import Flask, redirect, url_for, session
 from .blueprints.solicitudes_portal import sol_portal
-
+from .blueprints.params_admin import params_bp  # módulo de parámetros
+from app.blueprints.config_campos_admin import config_campos_admin_bp
 
 
 
@@ -26,12 +29,10 @@ def create_app():
 
     # ----- Config -----
     app.config.from_object(Config)
+    app.permanent_session_lifetime = timedelta(minutes=15)  # fallback por si no hay DB
 
-    # Usa la URI de Config si ya la tienes; si no, toma una por defecto.
-    # OJO: NUNCA dejes espacios en blanco en la URI.
     app.config.setdefault(
         "SQLALCHEMY_DATABASE_URI",
-        # Ejemplo correcto SIN espacios:
         os.getenv("DATABASE_URL", "postgresql+psycopg2://edgargarcia:@localhost:5432/postgres")
     )
     app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
@@ -50,7 +51,7 @@ def create_app():
     from .filters import register_filters
     register_filters(app)
 
-    # ----- Context processors (disponibles en todos los templates) -----
+    # ----- Context processors (user info) -----
     @app.context_processor
     def inject_user():
         return {
@@ -80,7 +81,6 @@ def create_app():
         from app.blueprints.users_admin import users_admin
         app.register_blueprint(users_admin)
     except Exception:
-        # Si aún no tienes el módulo, lo ignoramos sin romper la app.
         pass
 
     # Registro
@@ -96,37 +96,62 @@ def create_app():
     app.register_blueprint(minutas_bp)
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(sol_portal)
+    app.register_blueprint(params_bp)        # /admin/parametros
+    app.register_blueprint(config_campos_admin_bp)
 
+
+    # ---------------- TIMEOUT desde parámetros de BD ----------------
+    def _load_timeout_minutes() -> int:
+        """Lee el tiempo de inactividad (minutos) desde system_params."""
+        try:
+            with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT value FROM system_params WHERE key=%s LIMIT 1",
+                    ("session_timeout_minutes",),
+                )
+                row = cur.fetchone()
+                if row and row.get("value"):
+                    return int(row["value"])
+        except Exception:
+            pass
+        return 15  # fallback
+
+    @app.before_request
+    def _apply_session_timeout():
+        mins = _load_timeout_minutes()
+        app.permanent_session_lifetime = timedelta(minutes=mins)
+        # asegúrate de que la sesión activa sea permanente para que la cookie respete el lifetime
+        if "user_id" in session:
+            session.permanent = True
+
+    @app.context_processor
+    def inject_timeout():
+        # Expone a Jinja el valor para el JS de autologout
+        return {"inactivity_minutes": _load_timeout_minutes()}
 
     # ----- Crear tablas solo si lo activas por config o env var -----
     init_flag = app.config.get("INIT_DB") or os.getenv("INIT_DB") == "1"
     if init_flag:
         with app.app_context():
             try:
-                # importa tus modelos para que SQLAlchemy conozca las tablas
                 from app import models  # noqa: F401
                 db.create_all()
             except Exception:
-                # No detenemos el arranque si falla (p.ej. usando Postgres con tablas ya creadas)
                 pass
 
-    # === RUTA RAÍZ SIN NUEVO BLUEPRINT ===
+    # === RUTA RAÍZ ===
     def _root_index():
         user_id = session.get("user_id")
         role = session.get("role")  # "admin" o "user"
         if user_id:
             if role == "admin":
-                # ⬇️ Cambia el endpoint por el real de tu panel admin
                 return redirect(url_for("admin_portal.dashboard"))
             else:
-                # ⬇️ Cambia por el endpoint real de tu “inicio productos”
-                return redirect(url_for("inicio_productos.index"))
-        # ⬇️ Cambia por el endpoint real de tu login (hoy está en /admin/login)
-        return redirect(url_for("admin.login"))
+                return redirect(url_for("core.inicio_productos"))
+        # login correcto del blueprint auth_admin
+        return redirect(url_for("auth_admin.login"))
 
     app.add_url_rule("/", "root_index", _root_index)
-    
-    register_error_handlers(app)
-    
 
+    register_error_handlers(app)
     return app

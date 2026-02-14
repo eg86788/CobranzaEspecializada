@@ -7,9 +7,6 @@ import psycopg2.extras, zipfile
 from app.services.adhesion import numero_adhesion
 from ..db_legacy import conectar
 
-# NUEVO: importar el servicio de guardado
-from app.services.solicitudes_sef import guardar_solicitud_desde_session
-
 exportar_bp = Blueprint("exportar", __name__)
 
 def render_doc_by_slug(slug: str, **ctx) -> str:
@@ -20,7 +17,7 @@ def render_doc_by_slug(slug: str, **ctx) -> str:
     """
     with conectar() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute("""
-            SELECT content_html, css
+            SELECT content_html, css, cascaron
             FROM document_templates
             WHERE slug=%s AND is_active=TRUE
             ORDER BY version DESC LIMIT 1
@@ -36,12 +33,57 @@ def render_doc_by_slug(slug: str, **ctx) -> str:
     # Fallback a archivo físico si no existe en DB
     return render_template(f"{slug}.html", **ctx)
 
-
-# --- REEMPLAZAR SOLO ESTA FUNCIÓN ---
-
-@exportar_bp.route("/exportar_pdf", methods=["GET", "POST"])
+@exportar_bp.route("/exportar_pdf", methods=["POST"])
 @exportar_bp.route("/exportar_pdf/<int:solicitud_id>", methods=["GET"])
 def exportar_pdf(solicitud_id=None):
+    # --- Si viene por POST (finalizar.html), resolvemos solicitud_id desde form o session ---
+    if solicitud_id is None:
+        raw_id = (
+            request.form.get("solicitud_id")
+            or request.args.get("solicitud_id")
+            or session.get("solicitud_id")
+            or session.get("solicitud_db_id")
+            or session.get("solicitud_actual_id")
+        )
+        try:
+            solicitud_id = int(raw_id) if raw_id is not None and str(raw_id).strip() != "" else None
+        except Exception:
+            solicitud_id = None
+
+    # --- Si el POST trae firmantes, los guardamos en session para que el export use lo mismo que la app ---
+    # (Esto NO cambia tu flujo, solo sincroniza lo que ya estás mandando desde finalizar.html)
+    for key in [
+        "apoderado_legal",
+        "correo_apoderado_legal",
+        "fecha_firma",
+        "nombre_autorizador",
+        "puesto_autorizador",
+        "nombre_director_divisional",
+        "puesto_director_divisional",
+    ]:
+        if key in request.form and request.form.get(key) is not None:
+            session[key] = request.form.get(key)
+
+    # ---- helper local: normaliza fecha a YYYY-MM-DD con fallback hoy ----
+    def normaliza_fecha(value: str | None) -> str:
+        value = (value or "").strip()
+        if not value:
+            return datetime.now().strftime("%Y-%m-%d")
+        if "/" in value:
+            try:
+                return datetime.strptime(value, "%d/%m/%Y").strftime("%Y-%m-%d")
+            except Exception:
+                return datetime.now().strftime("%Y-%m-%d")
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").strftime("%Y-%m-%d")
+        except Exception:
+            return datetime.now().strftime("%Y-%m-%d")
+
+    # ✅ Si aún no hay solicitud_id, ya no intentamos exportar a ciegas
+    if solicitud_id is None:
+        flash("No se pudo determinar el ID de la solicitud para exportar. Abre la solicitud desde la lista y vuelve a intentar.", "warning")
+        return redirect(url_for("frames.finalizar"))
+    
     # ---- helper local: normaliza fecha a YYYY-MM-DD con fallback hoy ----
     def normaliza_fecha(value: str | None) -> str:
         value = (value or "").strip()
@@ -83,27 +125,6 @@ def exportar_pdf(solicitud_id=None):
         if forced:
             return forced.strip() or "finalizar"
         return _find_first_active_slug(["anexo_operativo", "finalizar"]) or "finalizar"
-
-    # ----------------- POST: guarda datos del form en sesión -----------------
-    if request.method == "POST":
-        fecha_norm = normaliza_fecha(request.form.get("fecha_firma"))
-        session["firmantes"] = {
-            "apoderado_legal": (request.form.get("apoderado_legal") or "").strip(),
-            "nombre_autorizador": (request.form.get("nombre_autorizador") or "").strip(),
-            "nombre_director_divisional": (request.form.get("nombre_director_divisional") or "").strip(),
-            "puesto_autorizador": (request.form.get("puesto_autorizador") or "").strip(),
-            "puesto_director_divisional": (request.form.get("puesto_director_divisional") or "").strip(),
-            "fecha_firma": fecha_norm,
-        }
-        session["anexo_usd_14k"] = bool(request.form.get("anexo_usd_14k"))
-
-        f1 = session.get("frame1", {}) or {}
-        session["contrato_tradicional"] = f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "CPAE TRADICIONAL"
-        session["contrato_electronico"] = f1.get("tipo_tramite") == "ALTA" and f1.get("tipo_contrato") == "SEF ELECTRÓNICO"
-        session.modified = True
-
-        # Si NO es confirmar, seguimos el flujo normal: GET genera los PDFs
-        return redirect(url_for("exportar.exportar_pdf"))
 
     # ----------------- GET: valida y construye contextos -----------------
     # Si viene solicitud_id por URL, reconstruimos TODO desde BD.
@@ -325,30 +346,3 @@ def exportar_pdf(solicitud_id=None):
     filename_zip = f"documentos_{f1.get('numero_cliente','NA')}_{datetime.now().strftime('%Y-%m-%d')}.zip"
     return send_file(zip_buffer, mimetype="application/zip", as_attachment=True, download_name=filename_zip)
 
-@exportar_bp.route("/fake_data")
-def fake_data():
-    session["frame1"] = {
-        "numero_cliente": "123456789",
-        "tipo_tramite": "ALTA",
-        "tipo_contrato": "CPAE TRADICIONAL",
-    }
-    session["firmantes"] = {
-        "apoderado_legal": "Lic. Juan Pérez",
-        "nombre_autorizador": "Ana López",
-        "nombre_director_divisional": "Carlos Ruiz",
-        "puesto_autorizador": "Gerente",
-        "puesto_director_divisional": "Director",
-        "fecha_firma": "20/08/2025",
-    }
-    session["usuarios"] = []
-    session["cuentas"] = []
-    session["unidades"] = []
-    session["contactos"] = []
-    session["anexo_usd_14k"] = True
-    session["contrato_tradicional"] = True
-    session["contrato_electronico"] = False
-    return "Datos de prueba cargados"
-
-@exportar_bp.route("/_debug_session")
-def _debug_session():
-    return {"firmantes": session.get("firmantes"), "frame1": session.get("frame1")}

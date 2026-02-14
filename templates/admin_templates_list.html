@@ -5,12 +5,13 @@
   Nueva plantilla
 </a>
 <table class="table table-sm mt-3">
-  <thead><tr><th>Slug</th><th>Nombre</th><th>Versión</th><th>Vigente</th><th>Acciones</th></tr></thead>
+  <thead><tr><th>Slug</th><th>Nombre</th><th>Cascaron</th><th>Versión</th><th>Vigente</th><th>Acciones</th></tr></thead>
   <tbody>
     {% for it in items %}
       <tr>
         <td>{{ it.slug }}</td>
         <td>{{ it.name }}</td>
+        <td>{{ it.cascaron }}</td>
         <td>{{ it.version }}</td>
         <td>{{ 'Sí' if it.is_active else 'No' }}</td>
         <td>

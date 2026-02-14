@@ -2,64 +2,230 @@
 {% block title %}Panel de Administración{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <h1 class="mb-4">Panel de Administración</h1>
 
-  <div class="row g-3">
-    <!-- Templates -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Plantillas de Documentos</h5>
-          <p class="card-text">Crea y versiona plantillas HTML/CSS para los formatos y reportes de productos.</p>
-          <a class="btn btn-primary" href="{{ url_for('templates_admin.list_templates') }}">Ir a Templates</a>
+<!-- Estilos SOLO para esta página -->
+<style>
+  .admin-grid{ row-gap: 1.25rem; }
+  .admin-card{
+    background:#fff;
+    border:1px solid #e6edf2;
+    border-radius:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+  }
+  .admin-card:hover{
+    transform: translateY(-2px);
+    box-shadow:0 14px 28px rgba(0,0,0,.10);
+    border-color:#d7e7ee;
+  }
+  .admin-body{ padding:.95rem 1rem; }
+  .admin-media{
+    display:grid;
+    grid-template-columns: 72px 1fr;
+    gap:14px;
+    align-items:center;
+  }
+  .admin-thumb{
+    width:72px; height:72px;
+    border-radius:12px;
+    background:linear-gradient(180deg,#f7fbfc,#eef4f6);
+    border:1px solid #e6edf2;
+    display:flex; align-items:center; justify-content:center;
+    font-size:32px; color:#0f6f85;
+  }
+  .admin-title{
+    margin:2px 0 4px;
+    font-weight:800; color:#003746;
+    font-size:1.05rem; line-height:1.15;
+  }
+  .admin-desc{
+    margin:0; color:#36515b; font-size:.95rem; line-height:1.35;
+  }
+  .admin-footer{
+    margin-top:auto;
+    border-top:1px solid #e6edf2;
+    background:#fbfdff;
+    padding:.7rem 1rem;
+    display:flex; gap:.5rem; align-items:center; justify-content:space-between;
+    border-bottom-left-radius:18px; border-bottom-right-radius:18px;
+  }
+  .btn-redondo{
+    background-color:#003746; color:#fff; border-radius:999px;
+    font-weight:700; padding:.5rem 1.05rem; font-size:.93rem; border:none;
+    transition: background-color .2s ease, transform .1s ease; white-space:nowrap;
+  }
+  .btn-redondo:hover{ background-color:#002b35; color:#fff; }
+  .btn-soft{
+    border-radius:999px; font-weight:600; padding:.45rem 1rem; font-size:.9rem;
+  }
+  @media (max-height: 800px){
+    .admin-media{ grid-template-columns:64px 1fr; gap:12px; }
+    .admin-thumb{ width:64px; height:64px; }
+    .admin-title{ font-size:1rem; }
+    .admin-desc{ font-size:.92rem; }
+  }
+</style>
+
+<div class="container py-2">
+  <div class="d-flex align-items-baseline justify-content-between mb-3">
+    <h1 class="mb-0" style="font-weight:800; color:#003746;">Panel de Administración</h1>
+    <a href="{{ url_for('core.inicio_productos') }}" class="btn btn-outline-secondary btn-soft">
+      <i class="bi bi-grid me-1"></i> Ver productos
+    </a>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 admin-grid">
+    <!-- Plantillas -->
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-filetype-html"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Plantillas de Documentos</h5>
+              <p class="admin-desc">Crea y versiona plantillas HTML/Jinja y controla su CSS.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('templates_admin.list_templates') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
+          </a>
+          <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Solo admin</span>
         </div>
       </div>
     </div>
 
-    <!-- Contratos de adhesión -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Contratos de Adhesión</h5>
-          <p class="card-text">Administra números de Contratos de Adhesión (RECA) para los formatos.</p>
-          <!-- OJO: blueprint 'adh_admin', endpoint 'list_adh' -->
-          <a class="btn btn-primary" href="{{ url_for('adh_admin.list_adh') }}">Ir a Contratos de Adhesión</a>
+    <!-- Contratos de Adhesión -->
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-collection"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Contratos de Adhesión</h5>
+              <p class="admin-desc">Administra números RECA y su vigencia para documentos.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('adh_admin.list_adh') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
+          </a>
+          <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Solo admin</span>
         </div>
       </div>
     </div>
 
     <!-- Catálogos -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Catálogos</h5>
-          <p class="card-text">Mantenimientos de CPAE, ETV, Estados, Minicipio, etc.</p>
-          <!-- Después (elige un catálogo por defecto, p. ej. 'cpae') -->
-          <a class="btn btn-primary" href="{{ url_for('catalogos.ver_catalogos') }}">
-            Ir a Catálogos
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-journal-text"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Catálogos</h5>
+              <p class="admin-desc">Mantén CPAE, ETV, estados, municipios y más.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('catalogos.ver_catalogos') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
           </a>
+          <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Solo admin</span>
         </div>
       </div>
     </div>
 
-    <!-- Minutas (si aplica) -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Minutas</h5>
-          <p class="card-text">Registro de minutas de reuniones.</p>
-          <a class="btn btn-primary" href="{{ url_for('minutas.lista') }}">Ir a Minutas</a>
+    <!-- Minutas -->
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-clipboard2-check"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Minutas</h5>
+              <p class="admin-desc">Registro y seguimiento de minutas de reuniones.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('minutas.lista') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
+          </a>
+          <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Solo admin</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <hr class="my-4">
+    <!-- Parámetros del sistema -->
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-sliders2"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Parámetros del sistema</h5>
+              <p class="admin-desc">Configura el tiempo de inactividad y otros ajustes.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('params_admin.editar_timeout') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
+          </a>
+          <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Solo admin</span>
+        </div>
+      </div>
+    </div>
 
-  <div class="d-flex gap-2">
-    <!-- Para probar “flujo usuario” desde admin -->
-    <a class="btn btn-outline-secondary" href="{{ url_for('core.inicio_productos') }}">Ver productos (vista usuario)</a>
+    <!-- Vista usuario (acceso rápido) -->
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-grid"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Vista de Productos</h5>
+              <p class="admin-desc">Acceso rápido a la landing de productos para pruebas.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('core.inicio_productos') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
+          </a>
+          <span class="text-muted small text-nowrap">Modo usuario</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuración de Campos (NUEVO) -->
+    <div class="col">
+      <div class="admin-card">
+        <div class="admin-body">
+          <div class="admin-media">
+            <div class="admin-thumb"><i class="bi bi-toggles2"></i></div>
+            <div>
+              <h5 class="admin-title mb-1">Configuración de Campos</h5>
+              <p class="admin-desc">Define visibilidad y obligatoriedad por frame y campo.</p>
+            </div>
+          </div>
+        </div>
+        <div class="admin-footer">
+          <a class="btn btn-redondo" href="{{ url_for('config_campos_admin.listar') }}">
+            <i class="bi bi-play-fill me-1"></i> Abrir
+          </a>
+          <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Solo admin</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
+
 {% endblock %}

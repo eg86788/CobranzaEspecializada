@@ -1,0 +1,62 @@
+ <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora ISR México 2026</title>
+</head>
+<body>
+  <h1>Calculadora ISR México 2026</h1>
+  <label>Sueldo bruto mensual:</label>
+  <input id="sueldo" type="number" value="0"><br><br>
+
+  <label>Bono bruto mensual:</label>
+  <input id="bono" type="number" value="0"><br><br>
+
+  <button onclick="calcularISR()">Calcular ISR</button>
+
+  <h2>Resultados</h2>
+  <div id="result"></div>
+
+  <script>
+    const tablaISR = [
+      [0.01, 844.59, 0, 0.0192],
+      [844.60, 7168.51, 16.22, 0.064],
+      [7168.52, 12598.02, 420.95, 0.1088],
+      [12598.03, 14644.64, 1011.68, 0.16],
+      [14644.65, 17533.64, 1339.14, 0.1792],
+      [17533.65, 35362.83, 1856.84, 0.2136],
+      [35362.84, 55736.68, 5665.16, 0.2352],
+      [55736.69, 106410.50, 10457.09, 0.30],
+      [106410.51, 141880.66, 25659.23, 0.32],
+      [141880.67, 425641.99, 37009.69, 0.34],
+      [425642.00, Infinity, 133488.54, 0.35]
+    ];
+
+    function calcISR(valor) {
+      for (let r of tablaISR) {
+        if (valor > r[0] && valor <= r[1]) {
+          return r[2] + (valor - r[0]) * r[3];
+        }
+      }
+      return 0;
+    }
+
+    function calcularISR() {
+      const sueldo = Number(document.getElementById("sueldo").value);
+      const bono = Number(document.getElementById("bono").value);
+
+      const isrSueldo = calcISR(sueldo);
+      const isrBono = calcISR(bono);
+
+      const totalISR = (isrSueldo + isrBono).toFixed(2);
+      const neto = (sueldo + bono - totalISR).toFixed(2);
+
+      document.getElementById("result").innerHTML =
+        "<p>ISR Sueldo: $" + isrSueldo.toFixed(2) +
+        "</p><p>ISR Bono: $" + isrBono.toFixed(2) +
+        "</p><p>Total ISR: $" + totalISR +
+        "</p><p>Neto estimado: $" + neto + "</p>";
+    }
+  </script>
+</body>
+</html>

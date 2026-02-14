@@ -1,5 +1,5 @@
 # app/blueprints/auth_admin.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, redirect, url_for, session, flash, request
 from werkzeug.security import check_password_hash
 import psycopg2.extras
 from ..db_legacy import conectar
@@ -38,6 +38,7 @@ def login():
             session["role"] = user.get("role", "user")  # 'admin' o 'user'
             session["fullname"] = user.get("fullname")  # ← correcto
 
+
             # Soportar ?next= tanto en GET como POST
             next_url = request.values.get("next")
             if next_url and next_url.startswith("/"):
@@ -56,9 +57,13 @@ def login():
 
 @auth_bp.route("/logout")
 def logout():
-    # Limpiar toda la sesión
+    # Limpia la sesión
     session.clear()
-    flash("Sesión cerrada.", "info")
+    motivo = request.args.get("motivo", "manual")
+    if motivo == "inactividad":
+        flash("Tu sesión se cerró por inactividad.", "warning")
+    else:
+        flash("Sesión cerrada.", "info")
     return redirect(url_for("auth_admin.login"))
 
 def admin_required() -> bool:

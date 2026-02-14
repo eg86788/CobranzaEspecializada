@@ -3,27 +3,138 @@
 {% block title %}Catálogos{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2>Catálogos disponibles</h2>
-  <ul class="list-group mb-4">
-    {% for clave in catalogos %}
-      <li class="list-group-item">
-        <a href="{{ url_for('catalogos.administrar_catalogo', catalogo=clave) }}">{{ clave|capitalize }}</a>
-      </li>
-    {% endfor %}
-  </ul>
 
-  {# Campo de búsqueda dinámica para registros del catálogo seleccionado (ejemplo) #}
-  {% if registros %}
-  <label for="registroSelect" class="form-label">Buscar registro:</label>
-  <select id="registroSelect" class="form-select">
-    {% for registro in registros %}
-      <option value="{{ registro.id }}">{{ registro.nombre }}</option>
+<!-- Estilos SOLO para esta página (mismos del panel admin) -->
+<style>
+  .admin-grid{ row-gap: 1.25rem; }
+  .admin-card{
+    background:#fff;
+    border:1px solid #e6edf2;
+    border-radius:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+  }
+  .admin-card:hover{
+    transform: translateY(-2px);
+    box-shadow:0 14px 28px rgba(0,0,0,.10);
+    border-color:#d7e7ee;
+  }
+  .admin-body{ padding:.95rem 1rem; }
+  .admin-media{
+    display:grid;
+    grid-template-columns: 64px 1fr;
+    gap:14px;
+    align-items:center;
+  }
+  .admin-thumb{
+    width:64px; height:64px;
+    border-radius:12px;
+    background:linear-gradient(180deg,#f7fbfc,#eef4f6);
+    border:1px solid #e6edf2;
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px; color:#0f6f85;
+  }
+  .admin-title{
+    margin:2px 0 4px;
+    font-weight:800; color:#003746;
+    font-size:1.02rem; line-height:1.15;
+  }
+  .admin-desc{
+    margin:0; color:#36515b; font-size:.93rem; line-height:1.35;
+  }
+  .admin-footer{
+    margin-top:auto;
+    border-top:1px solid #e6edf2;
+    background:#fbfdff;
+    padding:.7rem 1rem;
+    display:flex; gap:.5rem; align-items:center; justify-content:space-between;
+    border-bottom-left-radius:18px; border-bottom-right-radius:18px;
+  }
+  .btn-redondo{
+    background-color:#003746; color:#fff; border-radius:999px;
+    font-weight:700; padding:.5rem 1.05rem; font-size:.93rem; border:none;
+    transition: background-color .2s ease, transform .1s ease; white-space:nowrap;
+  }
+  .btn-redondo:hover{ background-color:#002b35; color:#fff; }
+  .admin-header{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom: .75rem;
+  }
+</style>
+
+<div class="container py-2">
+  <div class="admin-header">
+    <h1 class="mb-0" style="font-weight:800; color:#003746;">Catálogos</h1>
+    <a href="{{ url_for('admin_portal.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Panel admin
+    </a>
+  </div>
+
+  <!-- Grid de tarjetas para cada catálogo -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 admin-grid mb-3">
+    {% for clave in catalogos %}
+      <div class="col">
+        <div class="admin-card">
+          <div class="admin-body">
+            <div class="admin-media">
+              <div class="admin-thumb">
+                <i class="bi bi-journal-text"></i>
+              </div>
+              <div>
+                <h5 class="admin-title">{{ clave|capitalize }}</h5>
+                <p class="admin-desc mb-0">Administrar registros del catálogo <strong>{{ clave }}</strong>.</p>
+              </div>
+            </div>
+          </div>
+          <div class="admin-footer">
+            <a class="btn btn-redondo" href="{{ url_for('catalogos.administrar_catalogo', catalogo=clave) }}">
+              <i class="bi bi-play-fill me-1"></i> Abrir
+            </a>
+            <span class="text-muted small"><i class="bi bi-sliders me-1"></i>Gestión</span>
+          </div>
+        </div>
+      </div>
     {% endfor %}
-  </select>
+  </div>
+
+  {# Card de búsqueda (si hay 'registros' en el contexto) #}
+  {% if registros %}
+    <div class="row">
+      <div class="col-12 col-lg-8">
+        <div class="admin-card">
+          <div class="admin-body">
+            <div class="admin-media" style="grid-template-columns: 48px 1fr;">
+              <div class="admin-thumb" style="width:48px; height:48px; font-size:22px;">
+                <i class="bi bi-search"></i>
+              </div>
+              <div>
+                <h5 class="admin-title mb-1">
+                  Buscar en {{ catalogo_actual or 'catálogo' }}
+                </h5>
+                <p class="admin-desc">Escribe para filtrar rápidamente un registro.</p>
+              </div>
+            </div>
+
+            <label for="registroSelect" class="form-label mt-2">Registro</label>
+            <select id="registroSelect" class="form-select">
+              {% for registro in registros %}
+                <option value="{{ registro.id }}">{{ registro.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="admin-footer">
+            <span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Usa el buscador para seleccionar.</span>
+          </div>
+        </div>
+      </div>
+    </div>
   {% endif %}
 </div>
 
+<!-- Choices.js (mejora del select) -->
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
 
@@ -40,4 +151,5 @@
     }
   });
 </script>
+
 {% endblock %}

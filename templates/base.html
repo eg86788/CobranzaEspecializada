@@ -235,7 +235,38 @@
   };
 </script>
 
+<script>
+  (function () {
+    // Minutos de inactividad (viene del backend; default 15 si no está definido)
+    const INACTIVITY_LIMIT_MIN = {{ inactivity_minutes | default(15) | int }};
+    const INACTIVITY_LIMIT_MS  = INACTIVITY_LIMIT_MIN * 60 * 1000;
+
+    let timeout;
+
+    function resetTimer() {
+      clearTimeout(timeout);
+      timeout = setTimeout(logoutUser, INACTIVITY_LIMIT_MS);
+    }
+
+    function logoutUser() {
+      // Ruta de logout del blueprint auth_admin
+      window.location.href = "{{ url_for('auth_admin.logout') }}?motivo=inactividad";
+    }
+
+    // Eventos que reinician el contador
+    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+      document.addEventListener(evt, resetTimer, true);
+    });
+
+    // Inicia el contador al cargar
+    resetTimer();
+  })();
+</script>
+
 
   {% block scripts %}{% endblock %}
 </body>
+
+
+  
 </html>

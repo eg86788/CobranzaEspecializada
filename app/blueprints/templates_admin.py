@@ -55,7 +55,7 @@ def sanitize_html(raw: str) -> str:
 @templates_bp.route("/")
 def list_templates():
     items = fetchall("""
-      SELECT DISTINCT ON (slug) id, slug, name, version, is_active, updated_at
+      SELECT DISTINCT ON (slug) id, slug, name, cascaron, version, is_active, updated_at
       FROM document_templates
       ORDER BY slug, version DESC
     """)
@@ -67,18 +67,20 @@ def create_template():
     if request.method == "POST":
         slug = (request.form.get("slug") or "").strip()
         name = (request.form.get("name") or "").strip()
+        cascaron = (request.form.get("cascaron") or "").strip()
+
         # ⚠️ Guardar TAL CUAL
         content_html = request.form.get("content_html") or ""
         css = request.form.get("css", "")  # se guarda por compatibilidad, pero no se usa al render
 
-        if not slug or not name:
-            flash("Slug y Nombre son obligatorios.", "warning")
+        if not slug or not name or not cascaron:
+            flash("Slug, Nombre y Casocaron son obligatorios.", "warning")
             return redirect(url_for("templates_admin.create_template", token=request.args.get("token")))
 
         execute("""
-          INSERT INTO document_templates (slug,name,content_html,css,version,is_active,updated_by,updated_at)
-          VALUES (%s,%s,%s,%s,1,TRUE,%s,%s)
-        """, (slug, name, content_html, css, "admin@local", datetime.utcnow()))
+          INSERT INTO document_templates (slug,name,cascaron,content_html,css,version,is_active,updated_by,updated_at)
+          VALUES (%s,%s,%s,%s,%s,1,TRUE,%s,%s)
+        """, (slug, name, cascaron, content_html, css, "admin@local", datetime.utcnow()))
         flash("Plantilla creada.", "success")
         return redirect(url_for("templates_admin.list_templates", token=request.args.get("token")))
 
@@ -103,11 +105,11 @@ def edit_template(slug):
         # Crear nueva versión activa y desactivar la anterior
         execute("""
           WITH prev AS (
-            SELECT id, slug, name, version FROM document_templates
+            SELECT id, slug, name, cascaron, version FROM document_templates
             WHERE id=%s
           )
-          INSERT INTO document_templates (slug,name,content_html,css,version,is_active,updated_by,updated_at)
-          SELECT slug, name, %s, %s, version+1, TRUE, %s, %s FROM prev;
+          INSERT INTO document_templates (slug,name, cascaron, content_html,css,version,is_active,updated_by,updated_at)
+          SELECT slug, name, cascaron, %s, %s, version+1, TRUE, %s, %s FROM prev;
         """, (tpl["id"], new_html, new_css, "admin@local", datetime.utcnow()))
         execute("UPDATE document_templates SET is_active=FALSE WHERE id=%s", (tpl["id"],))
         flash("Plantilla actualizada.", "success")
@@ -223,11 +225,11 @@ def activate(slug, tpl_id):
 
 @templates_bp.route("/<slug>/revert/<int:tpl_id>", methods=["POST"])
 def revert(slug, tpl_id):
-    tpl = fetchone("SELECT slug, name, content_html, css, version FROM document_templates WHERE id=%s", (tpl_id,))
+    tpl = fetchone("SELECT slug, name, cascaron, content_html, css, version FROM document_templates WHERE id=%s", (tpl_id,))
     if not tpl:
         abort(404)
     execute("""
-      INSERT INTO document_templates (slug,name,content_html,css,version,is_active,updated_by,updated_at)
+      INSERT INTO document_templates (slug,name,cascaron,content_html,css,version,is_active,updated_by,updated_at)
       VALUES (%s,%s,%s,%s,%s,TRUE,%s,NOW())
     """, (tpl["slug"], tpl["name"], tpl["content_html"], tpl["css"], tpl["version"]+1, "admin@local"))
     # Desactiva la versión activa anterior

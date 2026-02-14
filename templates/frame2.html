@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<!-- ===== RESUMEN DE SOLICITUD ===== -->
+<!-- ===== RESUMEN DE LA SOLICITUD ===== -->
 <div class="card shadow-sm mb-4 border-0">
   <div class="card-header d-flex align-items-center justify-content-between" style="background:#003746; color:#fff;">
     <div class="d-flex align-items-center gap-2">
@@ -48,7 +48,6 @@
 
 <!-- ===== FORMULARIO: UNIDADES ===== -->
 <div class="card shadow-sm border-0 mb-4">
-  <!-- Regla 0: título visible siempre -->
   <div class="card-header d-flex align-items-center gap-2" style="background:#F7FBFD; color:#003746;">
     <h2 class="h5 mb-0 d-flex align-items-center gap-2">
       <i class="bi bi-building"></i>
@@ -73,35 +72,44 @@
       <input type="hidden" id="servicio_tipo_oculto" value="{{ frame1.tipo_servicio }}">
       <input type="hidden" name="origen_unidad" id="origen_unidad" value="">
 
-      {# === NUEVO: ocultos para enviar tambien los nombres de catálogo === #}
+      <!-- ocultos para enviar tambien los nombres de catálogo -->
       <input type="hidden" name="cpae_nombre" id="cpae_nombre" value="">
       <input type="hidden" name="estado_nombre" id="estado_nombre" value="">
       <input type="hidden" name="municipio_nombre" id="municipio_nombre" value="">
       <input type="hidden" name="etv_nombre" id="etv_nombre" value="">
 
       {% if frame1.tipo_tramite == "SUSTITUCIÓN" %}
-      <!-- Regla 5: Sustitución (a/b) -->
       <div class="row g-3 mb-2">
         <div class="col-12">
           <label class="form-label">¿Qué desea hacer?</label>
         </div>
         <div class="col-md-6">
-          <div class="form-check border rounded-3 p-3 h-100">
-            <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_sustituir" value="sustituir" checked>
-            <label class="form-check-label ms-1" for="radio_sustituir">
-              Modificar datos de una unidad existente
-            </label>
-            <div class="form-text">Obliga <strong>No. de Terminal SEF</strong>; el resto es opcional.</div>
-          </div>
+          <label class="form-label">
+            Tipo de movimiento *
+            <i class="bi bi-info-circle-fill text-primary ms-1"
+               data-bs-toggle="tooltip" title="Selecciona si es ALTA, MODIFICACIÓN o BAJA."></i>
+          </label>
+          <select class="form-select uc" name="tipo_movimiento" id="tipo_movimiento" required>
+            <option value="">Selecciona…</option>
+            <option value="ALTA">ALTA</option>
+            <option value="MODIFICACIÓN">MODIFICACIÓN</option>
+            <option value="BAJA">BAJA</option>
+          </select>
         </div>
-        <div class="col-md-6">
-          <div class="form-check border rounded-3 p-3 h-100">
-            <input class="form-check-input" type="radio" name="accion_sustitucion" id="radio_agregar" value="agregar">
-            <label class="form-check-label ms-1" for="radio_agregar">
-              Agregar nueva Unidad al contrato
-            </label>
-            <div class="form-text">`numero_terminal_sef` por defecto <strong>0000000000</strong>; se pide nombre y demás obligatorios.</div>
-          </div>
+        <div class="col-md-6" id="grupo_campo_mod_unidad" style="display:none;">
+          <label class="form-label">Campo a modificar</label>
+          <select id="campo_mod_unidad" name="campo_mod_unidad" class="form-select">
+            <option value="">Selecciona…</option>
+            <option value="NOMBRE_UNIDAD">NOMBRE UNIDAD DE NEGOCIO</option>
+            <option value="CPAE">CPAE</option>
+            <option value="SERVICIO_UNIDAD">SERVICIO DE LA UNIDAD</option>
+            <option value="ETV">EMPRESA DE TRASLADO DE VALORES</option>
+            <option value="DOMICILIO">DOMICILIO</option>
+            <option value="TERM_INTEG">NO. TERMINAL INTEGRADORA</option>
+            <option value="TERM_DOT_CENT">NO. TERMINAL DOTACIÓN CENTRALIZADA</option>
+            <option value="TERM_CERT_CENT">NO. TERMINAL CLIENTE CERTIFICADO</option>
+          </select>
+          <div class="form-text">Selecciona el dato específico que vas a cambiar.</div>
         </div>
       </div>
       {% endif %}
@@ -112,7 +120,7 @@
           <label class="form-label">
             Número de Terminal SEF
             <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Hasta 10 dígitos numéricos. En sustitución: obligatorio al modificar existente."></i>
+               title="10 dígitos numéricos. Obligatorio en MODIFICACIÓN y BAJA."></i>
           </label>
           <input type="text" class="form-control input-digit" id="numero_terminal_sef" name="numero_terminal_sef" maxlength="10" placeholder="Ej. 0001234567">
         </div>
@@ -134,10 +142,7 @@
       <!-- Datos principales -->
       <div class="row g-3">
         <div class="col-lg-4">
-          <label class="form-label">
-            CPAE *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Selecciona el CPAE del catálogo. Busca por nombre."></i>
-          </label>
+          <label class="form-label">CPAE *</label>
           <select class="form-select" name="cpae" required id="cpaeSelect">
             <option value="">Selecciona…</option>
             {% for cpae in catalogo_cpae %}
@@ -147,10 +152,7 @@
         </div>
 
         <div class="col-lg-4">
-          <label class="form-label">
-            Servicio en la Unidad *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Se filtra en base al servicio general (Frame 1)."></i>
-          </label>
+          <label class="form-label">Servicio en la Unidad *</label>
           <select class="form-select" name="tipo_servicio_unidad" id="tipo_servicio_unidad" required>
             <option value="">Selecciona…</option>
             <option value="DEPÓSITO TRADICIONAL">DEPÓSITO TRADICIONAL</option>
@@ -165,10 +167,7 @@
         </div>
 
         <div class="col-lg-4">
-          <label class="form-label">
-            Empresa de Traslado de Valores *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Selecciona la ETV responsable de recolección."></i>
-          </label>
+          <label class="form-label">Empresa de Traslado de Valores *</label>
           <select class="form-select" name="empresa_traslado" id="empresa_traslado" required>
             <option value="">SELECCIONA...</option>
             {% for etv in catalogo_etv %}
@@ -181,30 +180,22 @@
       <!-- Dirección -->
       <div class="row g-3 mt-1">
         <div class="col-md-4">
-          <label class="form-label">Calle y número *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Domicilio de la Unidad."></i>
-          </label>
+          <label class="form-label">Calle y número *</label>
           <input type="text" class="form-control uc" name="calle_numero" id="calle_numero" required>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Colonia *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Colonia o barrio."></i>
-          </label>
+          <label class="form-label">Colonia *</label>
           <input type="text" class="form-control uc" name="colonia" id="colonia" required>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Código Postal *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Se guardará con 5 dígitos (relleno con ceros a la izquierda si faltan)."></i>
-          </label>
+          <label class="form-label">Código Postal *</label>
           <input type="text" class="form-control input-digit cp-5" name="codigo_postal" id="codigo_postal" maxlength="5" required>
         </div>
       </div>
 
       <div class="row g-3 mt-1">
         <div class="col-md-6">
-          <label class="form-label">Estado *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Selecciona el estado; luego el municipio."></i>
-          </label>
+          <label class="form-label">Estado *</label>
           <select class="form-select" name="estado" id="estadoSelect" required>
             <option value="">Selecciona…</option>
             {% for estado in catalogo_estados %}
@@ -213,9 +204,7 @@
           </select>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Ciudad/Municipio *
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Se carga al seleccionar el estado."></i>
-          </label>
+          <label class="form-label">Ciudad/Municipio *</label>
           <select class="form-select" name="municipio_id" id="municipioSelect" required>
             <option value="">Selecciona...</option>
           </select>
@@ -225,36 +214,50 @@
       <!-- Terminales relacionadas -->
       <div class="row g-3 mt-1">
         <div class="col-md-4">
-          <label class="form-label">No. Terminal Integradora
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Solo aplica si su servicio lo permite."></i>
-          </label>
+          <label class="form-label">No. Terminal Integradora</label>
           <input type="text" class="form-control uc" name="terminal_integradora" id="terminal_integradora">
         </div>
         <div class="col-md-4">
-          <label class="form-label">No. Terminal Dotación Centralizada
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Solo aplica si su servicio lo permite."></i>
-          </label>
+          <label class="form-label">No. Terminal Dotación Centralizada</label>
           <input type="text" class="form-control uc" name="terminal_dotacion_centralizada" id="terminal_dotacion_centralizada">
         </div>
         <div class="col-md-4">
-          <label class="form-label">No. Terminal Cliente Certificado Centralizada
-            <i class="bi bi-info-circle-fill text-primary ms-1" data-bs-toggle="tooltip" title="Obligatorio para 'DEPÓSITO CLIENTE CERTIFICADO'."></i>
-          </label>
+          <label class="form-label">No. Terminal Cliente Certificado Centralizada</label>
           <input type="text" class="form-control uc" name="terminal_certificado_centralizada" id="terminal_certificado_centralizada">
         </div>
       </div>
 
-      <div class="d-flex justify-content-end mt-4 gap-2">
-        <button type="button" class="btn btn-outline-secondary" id="btnLimpiar">Limpiar</button>
-        <button type="submit" class="btn btn-success">
-          <i class="bi bi-plus-circle"></i> Guardar Unidad
+      {# === Botonera: depende de si hay acción en UNIDADES desde frame1 === #}
+      {% set es_sust = frame1 and (frame1.tipo_tramite in ['SUSTITUCIÓN','SUSTITUCION']) %}
+      {% set marco_mod_unidades  = es_sust and frame1.sust_mod  and ('UNIDADES' in frame1.sust_mod) %}
+      {% set marco_crea_unidades = es_sust and frame1.sust_crea and ('UNIDADES' in frame1.sust_crea) %}
+      {% set sin_accion_unidades = es_sust and (not marco_mod_unidades) and (not marco_crea_unidades) %}
+      
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" name="regresar_frame1" value="1" class="btn btn-outline-secondary btn-sm">
+          ← Regresar
         </button>
+      
+        {% if sin_accion_unidades %}
+          <a href="{{ url_for('frames.frame3') }}" class="btn btn-primary btn-sm">
+            Siguiente — Cuentas →
+          </a>
+        {% else %}
+          <button type="submit" name="agregar" value="1" class="btn btn-primary btn-sm">
+            Guardar Unidad
+          </button>
+          <a href="{{ url_for('frames.frame3') }}" class="btn btn-outline-primary btn-sm">
+            Siguiente — Cuentas →
+          </a>
+        {% endif %}
+      </div>
+      
       </div>
     </form>
   </div>
 </div>
 
-<!-- ===== UNIDADES CAPTURADAS (SIN edición) ===== -->
+<!-- ===== UNIDADES CAPTURADAS ===== -->
 <div class="card shadow-sm border-0">
   <div class="card-header bg-white d-flex align-items-center justify-content-between">
     <h3 class="h6 mb-0">Unidades Capturadas</h3>
@@ -274,13 +277,12 @@
                       data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
                       aria-controls="collapse{{ loop.index }}">
                 <strong>#{{ loop.index }}</strong>
-                &nbsp;– {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | SEF: {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}
+                &nbsp;– [{{ u.tipo_movimiento or 'ALTA' }}] {{ u.tipo_servicio_unidad or '-' }} | {{ u.cpae_nombre or '-' }} | SEF: {{ u.numero_terminal_sef or '-' }} | {{ u.nombre_unidad or '-' }}
               </button>
             </h2>
             <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionUnidades">
               <div class="accordion-body small">
                 <div class="row g-2">
-                  <div class="col-md-6"><strong>Origen:</strong> {{ u.origen_unidad or '-' }}</div>
                   <div class="col-md-6"><strong>ETV:</strong> {{ u.etv_nombre or '-' }}</div>
                   <div class="col-md-6"><strong>Estado:</strong> {{ u.estado_nombre or '-' }}</div>
                   <div class="col-md-6"><strong>Municipio:</strong> {{ u.municipio_nombre or '-' }}</div>
@@ -293,7 +295,6 @@
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-3">
-                  <!-- SOLO eliminar (sin editar) -->
                   <form method="POST" class="mb-0">
                     <input type="hidden" name="eliminar" value="{{ loop.index0 }}">
                     <button type="submit" class="btn btn-outline-danger btn-sm">
@@ -313,305 +314,489 @@
   </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
-
-<!-- (A) Tooltips -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const els = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  els.map(el => new bootstrap.Tooltip(el));
-});
-</script>
-
-<!-- (B) Filtrado de Servicio en la Unidad por Servicio General -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const servicioGeneral = (document.getElementById('servicio_tipo_oculto')?.value || '').trim();
-  const selectServicioUnidad = document.getElementById("tipo_servicio_unidad");
-  if (!selectServicioUnidad) return;
-
-  const reglas = {
-    "DEPÓSITO TRADICIONAL": ["DEPÓSITO TRADICIONAL"],
-    "DEPÓSITO ELECTRÓNICO": [
-      "DEPÓSITO ELECTRÓNICO",
-      "INTEGRADORA (SOLO DEPÓSITO)",
-      "DEPOSITO CLIENTE CERTIFICADO",
-      "CENTRALIZADA CLIENTE CERTIFICADO"
-    ],
-    "DOTACIÓN ELECTRÓNICA": [
-      "DOTACIÓN ELECTRÓNICA",
-      "CENTRALIZADA (SOLO DOTACIÓN)"
-    ],
-    "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA": [
-      "DEPÓSITO ELECTRÓNICO",
-      "DOTACIÓN ELECTRÓNICA",
-      "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA",
-      "CENTRALIZADA (SOLO DOTACIÓN)",
-      "INTEGRADORA (SOLO DEPÓSITO)",
-      "DEPOSITO CLIENTE CERTIFICADO",
-      "CENTRALIZADA CLIENTE CERTIFICADO"
-    ]
-  };
-
-  const visibles = reglas[servicioGeneral] || [];
-  const todas = Array.from(selectServicioUnidad.options);
-  selectServicioUnidad.innerHTML = "";
-  todas.forEach(opt => {
-    if (opt.value === "" || visibles.includes(opt.value)) selectServicioUnidad.appendChild(opt);
-  });
-});
-</script>
-
-<!-- (C) Reglas 1–4: inhabilitar/obligar terminales según “Tipo de Servicio Unidad” -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const sel = document.getElementById('tipo_servicio_unidad');
-  const tInt  = document.getElementById('terminal_integradora');
-  const tDot  = document.getElementById('terminal_dotacion_centralizada');
-  const tCert = document.getElementById('terminal_certificado_centralizada');
-
-  function setDisabled(el, disabled, clear=false) {
-    if (!el) return;
-    el.disabled = !!disabled;
-    if (disabled && clear) el.value = '';
-  }
-  function setRequired(el, required) {
-    if (!el) return;
-    if (required) el.setAttribute('required', 'required'); else el.removeAttribute('required');
-  }
-
-  function aplicaReglasServicioUnidad() {
-    const v = (sel?.value || '').toUpperCase();
-
-    // Reset por defecto
-    setDisabled(tInt,  false);
-    setDisabled(tDot,  false);
-    setDisabled(tCert, false);
-    setRequired(tCert, false);
-
-    // 1) CENTRALIZADA (SOLO DOTACIÓN)
-    if (v.includes('CENTRALIZADA') && v.includes('SOLO DOTACIÓN')) {
-      setDisabled(tDot,  true, true);
-      setDisabled(tCert, true, true);
-      setDisabled(tInt,  true, true);
-      return;
-    }
-
-    // 2) INTEGRADORA (SOLO DEPÓSITO)
-    if (v.includes('INTEGRADORA') && v.includes('SOLO DEPÓSITO')) {
-      setDisabled(tDot,  true, true);
-      setDisabled(tCert, true, true);
-      setDisabled(tInt,  true, true);
-      return;
-    }
-
-    // 3) CENTRALIZADA CLIENTE CERTIFICADO
-    if (v === 'CENTRALIZADA CLIENTE CERTIFICADO') {
-      setDisabled(tDot,  true, true);
-      setDisabled(tCert, true, true);
-      setDisabled(tInt,  true, true);
-      return;
-    }
-
-    // 4) DEPOSITO CLIENTE CERTIFICADO
-    if (v === 'DEPOSITO CLIENTE CERTIFICADO' || v === 'DEPÓSITO CLIENTE CERTIFICADO') {
-      setDisabled(tDot,  true, true);
-      setDisabled(tInt,  true, true);
-      setDisabled(tCert, false);
-      setRequired(tCert, true);
-      return;
-    }
-  }
-
-  sel && sel.addEventListener('change', aplicaReglasServicioUnidad);
-  aplicaReglasServicioUnidad();
-});
-</script>
-
-<!-- (D) Sustitución (a/b) + UX “Limpiar” + (3) validación num_terminal 10 dígitos -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const esSustitucion = ("{{ frame1.tipo_tramite }}" === "SUSTITUCIÓN");
-
-  const radioSustituir = document.getElementById("radio_sustituir");
-  const radioAgregar   = document.getElementById("radio_agregar");
-
-  const grupoTerminal  = document.getElementById("grupo_terminal");
-  const inputTerminal  = document.getElementById("numero_terminal_sef");
-  const grupoNombre    = document.getElementById("grupo_nombre_unidad");
-  const inputNombre    = document.getElementById("nombre_unidad");
-  const origen         = document.getElementById("origen_unidad");
-
-  const obligatorios = [
-    "cpaeSelect","tipo_servicio_unidad","empresa_traslado",
-    "calle_numero","colonia","codigo_postal",
-    "estadoSelect","municipioSelect"
-  ];
-
-  function setRequired(id, req) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (req) el.setAttribute('required','required'); else el.removeAttribute('required');
-  }
-
-  // (3) numero_terminal_sef: solo dígitos y máx 10
-  if (inputTerminal) {
-    inputTerminal.addEventListener('input', function(){
-      this.value = this.value.replace(/\D/g,'').slice(0,10);
-    }, {passive:true});
-  }
-
-  function aplicarSustitucionUI() {
-    if (!esSustitucion) {
-      // ALTA
-      grupoTerminal.style.display = "none";
-      inputTerminal && inputTerminal.removeAttribute("required");
-      grupoNombre.style.display = "block";
-      inputNombre && inputNombre.setAttribute("required","required");
-      obligatorios.forEach(id => setRequired(id, true));
-      origen.value = "NUEVA";
-      inputTerminal.value = '0000000000';
-      return;
-    }
-
-    if (radioSustituir && radioSustituir.checked) {
-      // 5a) Modificar existente:
-      grupoNombre.style.display = "none";
-      if (inputNombre) {
-        inputNombre.value = "-";
-        inputNombre.removeAttribute("required");
-        inputTerminal.disabled = false;
-        inputTerminal.value = '';
-      }
-      grupoTerminal.style.display = "flex";
-      inputTerminal && inputTerminal.setAttribute("required","required");
-      obligatorios.forEach(id => setRequired(id, false));
-      origen.value = "SUSTITUCIÓN";
-    } else {
-      // 5b) Agregar nueva:
-      grupoTerminal.style.display = "none";
-      inputTerminal && inputTerminal.removeAttribute("required");
-      inputTerminal.value = '0000000000';
-      inputTerminal.disabled = true;
-
-      grupoNombre.style.display = "block";
-      if (inputNombre) {
-        inputNombre.disabled = false;
-        inputNombre.setAttribute("required","required");
-        if (inputNombre.value === "-") inputNombre.value = "";
-      }
-      obligatorios.forEach(id => setRequired(id, true));
-      origen.value = "NUEVA";
-    }
-  }
-
-  const btnLimpiar = document.getElementById('btnLimpiar');
-  btnLimpiar && btnLimpiar.addEventListener('click', function(){
-    document.querySelector('form.needs-validation').reset();
-    if (radioAgregar) radioAgregar.checked = true;
-    aplicarSustitucionUI();
-  });
-
-  if (radioSustituir) radioSustituir.addEventListener("change", aplicarSustitucionUI);
-  if (radioAgregar)   radioAgregar.addEventListener("change",   aplicarSustitucionUI);
-  aplicarSustitucionUI();
-});
-</script>
-
-<!-- (E) C.P. a 5 dígitos (rellena con ceros a la izquierda) -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const cp = document.getElementById('codigo_postal');
-  if (!cp) return;
-  cp.addEventListener('input', function(){
-    this.value = this.value.replace(/\D/g,'').slice(0,5);
-  }, {passive:true});
-  cp.addEventListener('blur', function(){
-    const v = (this.value || '').replace(/\D/g,'');
-    this.value = v.padStart(5, '0');
-  });
-});
-</script>
-
-<!-- (F) Estados/Municipios + === NUEVO: alimentar ocultos de nombres === -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const estadoSelect = document.getElementById('estadoSelect');
-  const municipioSelect = document.getElementById('municipioSelect');
-  const cpaeSelect = document.getElementById('cpaeSelect');
-  const etvSelect = document.getElementById('empresa_traslado');
-
-  const inpCpaeNombre = document.getElementById('cpae_nombre');
-  const inpEstadoNombre = document.getElementById('estado_nombre');
-  const inpMunicipioNombre = document.getElementById('municipio_nombre');
-  const inpEtvNombre = document.getElementById('etv_nombre');
-
-  function setHiddenFromSelect(selectEl, hiddenEl) {
-    if (!selectEl || !hiddenEl) return;
-    const txt = selectEl.options[selectEl.selectedIndex]?.textContent?.trim() || '';
-    hiddenEl.value = txt;
-  }
-
-  cpaeSelect && cpaeSelect.addEventListener('change', () => setHiddenFromSelect(cpaeSelect, inpCpaeNombre));
-  etvSelect && etvSelect.addEventListener('change', () => setHiddenFromSelect(etvSelect, inpEtvNombre));
-  estadoSelect && estadoSelect.addEventListener('change', () => {
-    setHiddenFromSelect(estadoSelect, inpEstadoNombre);
-
-    const estadoId = estadoSelect.value;
-    municipioSelect.innerHTML = '<option value="">Cargando...</option>';
-    municipioSelect.disabled = true;
-
-    if (!estadoId) {
-      municipioSelect.innerHTML = '<option value="">Selecciona el estado primero</option>';
-      municipioSelect.disabled = true;
-      return;
-    }
-
-    fetch(`/api/municipios/${estadoId}`)
-      .then(r => r.json())
-      .then(data => {
-        municipioSelect.innerHTML = '<option value="">Selecciona…</option>';
-        data.municipios.forEach(mun => {
-          const option = document.createElement('option');
-          option.value = mun.id;
-          option.textContent = mun.nombre;
-          municipioSelect.appendChild(option);
-        });
-        municipioSelect.disabled = false;
-
-        // al cambiar el estado, reseteamos el nombre de municipio oculto
-        if (inpMunicipioNombre) inpMunicipioNombre.value = '';
-      })
-      .catch(() => {
-        municipioSelect.innerHTML = '<option value="">Error al cargar</option>';
+  document.addEventListener('DOMContentLoaded', function () {
+    /* =========================
+       0) Utilidades generales
+       ========================= */
+    const $  = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const req = (el,on)=>{ if(!el) return; on ? el.setAttribute('required','required') : el.removeAttribute('required'); };
+    const ena = (el,on)=>{ if(!el) return; el.disabled = !on; };
+    const show= (el,on)=>{ if(!el) return; el.style.display = on ? '' : 'none'; };
+    const clr = (el)=>{ if(!el) return; el.tagName === 'SELECT' ? (el.value='', el.dispatchEvent(new Event('change',{bubbles:true}))) : (el.value=''); };
+    const applyRulesEngine = ()=> window.RequiredRules?.applyRequiredRules?.(window.RequiredRules.getCurrentFormState?.());
+  
+    // Tooltips
+    $$( '[data-bs-toggle="tooltip"]' ).forEach(el => new bootstrap.Tooltip(el));
+  
+    // Contexto de frame1
+    const TIPO_TRAMITE = "{{ frame1.tipo_tramite }}";
+    const esSust = (TIPO_TRAMITE === "SUSTITUCIÓN" || TIPO_TRAMITE === "SUSTITUCION");
+    const sustMod  = {{ (frame1.sust_mod  or [])|tojson }};
+    const sustCrea = {{ (frame1.sust_crea or [])|tojson }};
+    const modUnidades  = Array.isArray(sustMod)  && sustMod.includes('UNIDADES');
+    const creaUnidades = Array.isArray(sustCrea) && sustCrea.includes('UNIDADES');
+  
+    /* =========================
+       1) Filtrar "Servicio en la Unidad"
+          según servicio general del frame1
+       ========================= */
+    (function filtraServiciosUnidadPorServicioGeneral(){
+      const servicioGeneral = ($('#servicio_tipo_oculto')?.value || '').trim();
+      const selectServicioUnidad = $("#tipo_servicio_unidad");
+      if (!selectServicioUnidad) return;
+  
+      const reglas = {
+        "DEPÓSITO TRADICIONAL": ["DEPÓSITO TRADICIONAL"],
+        "DEPÓSITO ELECTRÓNICO": [
+          "DEPÓSITO ELECTRÓNICO",
+          "INTEGRADORA (SOLO DEPÓSITO)",
+          "DEPOSITO CLIENTE CERTIFICADO",
+          "CENTRALIZADA CLIENTE CERTIFICADO"
+        ],
+        "DOTACIÓN ELECTRÓNICA": [
+          "DOTACIÓN ELECTRÓNICA",
+          "CENTRALIZADA (SOLO DOTACIÓN)"
+        ],
+        "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA": [
+          "DEPÓSITO ELECTRÓNICO",
+          "DOTACIÓN ELECTRÓNICA",
+          "DEPÓSITO ELECTRÓNICO Y DOTACIÓN ELECTRÓNICA",
+          "CENTRALIZADA (SOLO DOTACIÓN)",
+          "INTEGRADORA (SOLO DEPÓSITO)",
+          "DEPOSITO CLIENTE CERTIFICADO",
+          "CENTRALIZADA CLIENTE CERTIFICADO"
+        ]
+      };
+  
+      const visibles = reglas[servicioGeneral] || [];
+      const todas = Array.from(selectServicioUnidad.options);
+      selectServicioUnidad.innerHTML = "";
+      todas.forEach(opt => {
+        if (opt.value === "" || visibles.includes(opt.value)) selectServicioUnidad.appendChild(opt);
       });
+    })();
+  
+    /* =========================
+       2) Reglas de terminales extra
+          según "Servicio en la Unidad"
+          + neutralización en BAJA
+       ========================= */
+    (function reglasTerminalesPorServicioUnidad(){
+      const sel = $('#tipo_servicio_unidad');
+      const tInt  = $('#terminal_integradora');
+      const tDot  = $('#terminal_dotacion_centralizada');
+      const tCert = $('#terminal_certificado_centralizada');
+
+      function setDisabled(el, disabled, clear=false) {
+        if (!el) return;
+        el.disabled = !!disabled;
+        if (disabled && clear) el.value = '';
+      }
+      function setRequired(el, required) {
+        if (!el) return;
+        if (required) el.setAttribute('required', 'required'); else el.removeAttribute('required');
+      }
+      function isBaja(){
+        const mv = ($('#tipo_movimiento')?.value || '').toUpperCase();
+        return mv === 'BAJA';
+      }
+
+      function aplicaReglas() {
+        const v = (sel?.value || '').toUpperCase();
+
+        // Si es BAJA, neutraliza terminales sí o sí
+        if (isBaja()){
+          setDisabled(tInt,  true, true);
+          setDisabled(tDot,  true, true);
+          setDisabled(tCert, true, true);
+          setRequired(tCert, false);
+          return;
+        }
+
+        // Reset
+        setDisabled(tInt,  false);
+        setDisabled(tDot,  false);
+        setDisabled(tCert, false);
+        setRequired(tCert, false);
+
+        // CENTRALIZADA (SOLO DOTACIÓN)
+        if (v.includes('CENTRALIZADA') && v.includes('SOLO DOTACIÓN')) {
+          setDisabled(tDot,  true, true);
+          setDisabled(tCert, true, true);
+          setDisabled(tInt,  true, true);
+          return;
+        }
+        // INTEGRADORA (SOLO DEPÓSITO)
+        if (v.includes('INTEGRADORA') && v.includes('SOLO DEPÓSITO')) {
+          setDisabled(tDot,  true, true);
+          setDisabled(tCert, true, true);
+          setDisabled(tInt,  true, true);
+          return;
+        }
+        // CENTRALIZADA CLIENTE CERTIFICADO
+        if (v === 'CENTRALIZADA CLIENTE CERTIFICADO') {
+          setDisabled(tDot,  true, true);
+          setDisabled(tCert, true, true);
+          setDisabled(tInt,  true, true);
+          return;
+        }
+        // DEPOSITO CLIENTE CERTIFICADO
+        if (v === 'DEPOSITO CLIENTE CERTIFICADO' || v === 'DEPÓSITO CLIENTE CERTIFICADO') {
+          setDisabled(tDot,  true, true);
+          setDisabled(tInt,  true, true);
+          setDisabled(tCert, false);
+          setRequired(tCert, true);
+          return;
+        }
+      }
+
+      sel && sel.addEventListener('change', ()=>{aplicaReglas(); applyRulesEngine();});
+
+      // Re-evaluar también cuando cambie el tipo de movimiento
+      const selMov = $('#tipo_movimiento');
+      selMov && selMov.addEventListener('change', ()=>{aplicaReglas(); applyRulesEngine();});
+
+      aplicaReglas();
+    })();
+  
+    /* =========================
+       3) Estados/Municipios + nombres ocultos
+       ========================= */
+    (function wireEstadosMunicipios(){
+      const estadoSelect = $('#estadoSelect');
+      const municipioSelect = $('#municipioSelect');
+      const cpaeSelect = $('#cpaeSelect');
+      const etvSelect  = $('#empresa_traslado');
+  
+      const inpCpaeNombre = $('#cpae_nombre');
+      const inpEstadoNombre = $('#estado_nombre');
+      const inpMunicipioNombre = $('#municipio_nombre');
+      const inpEtvNombre = $('#etv_nombre');
+  
+      function setHiddenFromSelect(selectEl, hiddenEl) {
+        if (!selectEl || !hiddenEl) return;
+        const txt = selectEl.options[selectEl.selectedIndex]?.textContent?.trim() || '';
+        hiddenEl.value = txt;
+      }
+  
+      cpaeSelect && cpaeSelect.addEventListener('change', () => setHiddenFromSelect(cpaeSelect, inpCpaeNombre));
+      etvSelect  && etvSelect.addEventListener('change', () => setHiddenFromSelect(etvSelect, inpEtvNombre));
+      estadoSelect && estadoSelect.addEventListener('change', () => {
+        setHiddenFromSelect(estadoSelect, inpEstadoNombre);
+  
+        const estadoId = estadoSelect.value;
+        municipioSelect.innerHTML = '<option value="">Cargando...</option>';
+        municipioSelect.disabled = true;
+  
+        if (!estadoId) {
+          municipioSelect.innerHTML = '<option value="">Selecciona el estado primero</option>';
+          municipioSelect.disabled = true;
+          return;
+        }
+  
+        fetch(`/api/municipios?estado_id=${estadoId}`)
+          .then(r => r.json())
+          .then(resp => {
+            const data = resp.data || [];
+            municipioSelect.innerHTML = '<option value="">Selecciona…</option>';
+            data.forEach(mun => {
+              const option = document.createElement('option');
+              option.value = mun.id;
+              option.textContent = mun.nombre;
+              municipioSelect.appendChild(option);
+            });
+            municipioSelect.disabled = false;
+            if (inpMunicipioNombre) inpMunicipioNombre.value = '';
+          })
+          .catch(() => {
+            municipioSelect.innerHTML = '<option value="">Error al cargar</option>';
+          });
+      });
+  
+      municipioSelect && municipioSelect.addEventListener('change', () => setHiddenFromSelect(municipioSelect, inpMunicipioNombre));
+  
+      // Iniciales
+      setHiddenFromSelect(cpaeSelect, inpCpaeNombre);
+      setHiddenFromSelect(etvSelect,  inpEtvNombre);
+      setHiddenFromSelect(estadoSelect, inpEstadoNombre);
+      setHiddenFromSelect(municipioSelect, inpMunicipioNombre);
+    })();
+  
+    /* =========================
+       4) Choices.js para CPAE
+       ========================= */
+    (function initChoicesCPAE(){
+      const sel = $('#cpaeSelect');
+      if (sel && window.Choices) {
+        new Choices(sel, {
+          searchEnabled: true,
+          itemSelectText: '',
+          placeholderValue: 'Escribe para buscar…',
+          searchPlaceholderValue: 'Buscar CPAE…'
+        });
+      }
+    })();
+  
+    /* =========================
+       5) Lógica de Sustitución:
+          ALTA / MODIFICACIÓN / BAJA
+          + selector "Campo a modificar"
+          + limpieza y requireds
+          + modo sin acción en UNIDADES
+       ========================= */
+    (function sustitucionUnidadUI(){
+      const selMov     = $('#tipo_movimiento');                 // ALTA/MODIFICACIÓN/BAJA
+      const selCampo   = $('#campo_mod_unidad');                // selector de campo puntual
+      const grupoCampo = $('#grupo_campo_mod_unidad');          // wrapper del selector
+      const terminal   = $('#numero_terminal_sef');
+      const origen     = $('#origen_unidad');
+  
+      // Nº terminal: solo dígitos
+      terminal && terminal.addEventListener('input', function(){
+        this.value = this.value.replace(/\D/g,'').slice(0,10);
+      }, {passive:true});
+
+      // Limpia un <select> y su campo espejo de texto (si existe)
+      function clearSelectAndMirror(selectEl, mirrorEl){
+        if (selectEl){
+          selectEl.value = '';
+          selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (mirrorEl){ mirrorEl.value = ''; }
+      }
+      // Espejos
+      const MIR = {
+        cpae_nombre:    document.getElementById('cpae_nombre'),
+        estado_nombre:  document.getElementById('estado_nombre'),
+        municipio_nombre: document.getElementById('municipio_nombre'),
+        etv_nombre:     document.getElementById('etv_nombre')
+      };
+  
+      // Campos gobernables
+      const F = {
+        nombre_unidad: $('#nombre_unidad'),
+        cpaeSelect: $('#cpaeSelect'),
+        tipo_servicio_unidad: $('#tipo_servicio_unidad'),
+        empresa_traslado: $('#empresa_traslado'),
+        // Domicilio
+        calle_numero: $('#calle_numero'),
+        colonia: $('#colonia'),
+        codigo_postal: $('#codigo_postal'),
+        estadoSelect: $('#estadoSelect'),
+        municipioSelect: $('#municipioSelect'),
+        // Terminales extra
+        terminal_integradora: $('#terminal_integradora'),
+        terminal_dotacion_centralizada: $('#terminal_dotacion_centralizada'),
+        terminal_certificado_centralizada: $('#terminal_certificado_centralizada'),
+        // Terminal clave
+        numero_terminal_sef: terminal
+      };
+      const PACK_DOM = ['calle_numero','colonia','codigo_postal','estadoSelect','municipioSelect'];
+      const ALTA_REQ = ['nombre_unidad','cpaeSelect','tipo_servicio_unidad','empresa_traslado', ...PACK_DOM];
+  
+      const ALL_KEYS = Object.keys(F);
+  
+      function disableAll(removeReq=true){
+        ALL_KEYS.forEach(k => { ena(F[k], false); if(removeReq) req(F[k], false); });
+      }
+      function clearAllExcept(keepSet=new Set()){
+        ALL_KEYS.forEach(k => { if (!keepSet.has(k)) clr(F[k]); });
+      }
+      function setEnabled(ids,on){ (ids||[]).forEach(id=>ena(F[id],on)); }
+      function setRequired(ids,on){ (ids||[]).forEach(id=>req(F[id],on)); }
+  
+      function modoAlta(){
+        disableAll(false);
+        setEnabled(ALTA_REQ, true);
+        setRequired(ALTA_REQ, true);
+        req(F.numero_terminal_sef, false);
+        show(grupoCampo,false);
+        req(selCampo,false);
+        if (origen) origen.value = esSust ? (creaUnidades ? "SUST_CREAR" : "NUEVA") : "NUEVA";
+        applyRulesEngine();
+      }
+  
+      function modoBaja(){
+        const keep = new Set(['numero_terminal_sef']);
+
+        // Limpia TODO excepto el terminal SEF
+        clearAllExcept(keep);
+
+        // Limpia selects y espejos para que no queden "SELECCIONA..." como texto
+        clearSelectAndMirror(F.cpaeSelect,       MIR.cpae_nombre);
+        clearSelectAndMirror(F.estadoSelect,     MIR.estado_nombre);
+        clearSelectAndMirror(F.municipioSelect,  MIR.municipio_nombre);
+        clearSelectAndMirror(F.empresa_traslado, MIR.etv_nombre);
+
+        // Deshabilita todo y quita requireds
+        disableAll(true);
+
+        // Terminal SEF sí habilitado y requerido
+        ena(F.numero_terminal_sef, true);
+        req(F.numero_terminal_sef, true);
+
+        // Oculta el selector de “campo a modificar”
+        show(grupoCampo,false);
+        req(selCampo,false);
+
+        if (origen) origen.value = "SUST_BAJA";
+        applyRulesEngine();
+
+        // Re-evaluar terminales por si quedaron reglas previas
+        document.getElementById('tipo_servicio_unidad')?.dispatchEvent(new Event('change', { bubbles:true }));
+      }
+  
+      function modoModificacion(){
+        disableAll(true);
+        ena(F.numero_terminal_sef, true);
+        req(F.numero_terminal_sef, true);
+  
+        show(grupoCampo,true);
+        req(selCampo,true);
+  
+        const pick = (selCampo?.value || '').toUpperCase();
+        const keep = new Set(['numero_terminal_sef']);
+  
+        switch(pick){
+          case 'NOMBRE_UNIDAD':
+            keep.add('nombre_unidad'); break;
+          case 'CPAE':
+            keep.add('cpaeSelect'); break;
+          case 'SERVICIO_UNIDAD':
+            keep.add('tipo_servicio_unidad'); break;
+          case 'ETV':
+            keep.add('empresa_traslado'); break;
+          case 'DOMICILIO':
+            PACK_DOM.forEach(k=>keep.add(k)); break;
+          case 'TERM_INTEG':
+            keep.add('terminal_integradora'); break;
+          case 'TERM_DOT_CENT':
+            keep.add('terminal_dotacion_centralizada'); break;
+          case 'TERM_CERT_CENT':
+            keep.add('terminal_certificado_centralizada'); break;
+          default:
+            clearAllExcept(keep);
+            if (origen) origen.value = "SUST_MOD";
+            applyRulesEngine();
+            return;
+        }
+  
+        clearAllExcept(keep);
+        setEnabled([...keep], true);
+        const reqSolo = [...keep].filter(k => k !== 'numero_terminal_sef');
+        setRequired(reqSolo, true);
+  
+        if (origen) origen.value = "SUST_MOD";
+        applyRulesEngine();
+      }
+  
+      function aplicarReglaSinAccionUnidades(){
+        const sinAccion = esSust && !modUnidades && !creaUnidades;
+        if (!sinAccion) return false;
+  
+        // Deshabilita todo y quita required
+        const form = document.querySelector('form.needs-validation') || document.querySelector('form');
+        if (form) {
+          form.querySelectorAll('input,select,textarea').forEach(el=>{
+            if (el.type==='hidden' || el.type==='submit' || el.type==='button') return;
+            el.disabled = true; el.removeAttribute('required');
+          });
+        }
+        // Limpia selector de movimiento y oculta campo a modificar
+        if (selMov) { selMov.innerHTML = '<option value="">(No aplica: no seleccionaste acción en Unidades)</option>'; selMov.value = ''; selMov.disabled = true; }
+        show(grupoCampo,false); req(selCampo,false);
+        // Oculta terminal y nombre para no confundir
+        $('#grupo_terminal') && ( $('#grupo_terminal').style.display='none' );
+        $('#grupo_nombre_unidad') && ( $('#grupo_nombre_unidad').style.display='none' );
+        if (origen) origen.value = "SIN_ACCION_UNIDADES";
+        applyRulesEngine();
+        return true;
+      }
+  
+      function configurarOpcionesTipoMovimiento(){
+        if (!esSust || !selMov) return;
+  
+        if (aplicarReglaSinAccionUnidades()) return;
+  
+        if (modUnidades && !creaUnidades) {
+          selMov.disabled = false;
+          selMov.innerHTML =
+            '<option value="">Selecciona…</option>' +
+            '<option value="MODIFICACIÓN">MODIFICACIÓN UNIDAD DE NEGOCIO</option>' +
+            '<option value="BAJA">BAJA UNIDAD DE NEGOCIO</option>';
+        } else if (creaUnidades && !modUnidades) {
+          selMov.innerHTML = '<option value="ALTA" selected>ALTA UNIDAD DE NEGOCIO</option>';
+          selMov.disabled = true;
+        } else {
+          selMov.disabled = false;
+          selMov.innerHTML =
+            '<option value="">Selecciona…</option>' +
+            '<option value="ALTA">ALTA UNIDAD DE NEGOCIO</option>' +
+            '<option value="MODIFICACIÓN">MODIFICACIÓN UNIDAD DE NEGOCIO</option>' +
+            '<option value="BAJA">BAJA UNIDAD DE NEGOCIO</option>';
+        }
+      }
+  
+      function aplicarUI(){
+        if (!esSust || (!modUnidades && !creaUnidades)) {
+          modoAlta();
+          return;
+        }
+        const mov = (selMov?.value || '').toUpperCase();
+        if (creaUnidades && !modUnidades) return modoAlta();
+        if (modUnidades && !creaUnidades) {
+          if (mov === 'BAJA') return modoBaja();
+          if (mov === 'MODIFICACIÓN' || mov === 'MODIFICACION') return modoModificacion();
+          show(grupoCampo, true); req(selCampo, true);
+          disableAll(true); ena(F.numero_terminal_sef, true); req(F.numero_terminal_sef, true);
+          applyRulesEngine();
+          return;
+        }
+        if (mov === 'ALTA') return modoAlta();
+        if (mov === 'BAJA') return modoBaja();
+        return modoModificacion();
+      }
+  
+      // Validación en submit
+      const form = document.querySelector('form.needs-validation') || document.querySelector('form');
+      form && form.addEventListener('submit', function(ev){
+        aplicarUI();
+        if (!form.checkValidity()) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          form.classList.add('was-validated');
+        }
+      });
+  
+      // Eventos
+      selMov   && selMov.addEventListener('change', aplicarUI);
+      selCampo && selCampo.addEventListener('change', aplicarUI);
+  
+      // Primera corrida
+      configurarOpcionesTipoMovimiento();
+      if (!aplicarReglaSinAccionUnidades()) aplicarUI();
+    })();
+  
+    /* =========================
+       6) Código Postal a 5 dígitos
+       ========================= */
+    (function cpCinco(){
+      const cp = $('#codigo_postal');
+      if (!cp) return;
+      cp.addEventListener('input', function(){
+        this.value = this.value.replace(/\D/g,'').slice(0,5);
+      }, {passive:true});
+      cp.addEventListener('blur', function(){
+        const v = (this.value || '').replace(/\D/g,'');
+        this.value = v.padStart(5, '0');
+      });
+    })();
+  
+    // Último: empuja reglas centralizadas si existen
+    applyRulesEngine();
   });
-
-  municipioSelect && municipioSelect.addEventListener('change', () => setHiddenFromSelect(municipioSelect, inpMunicipioNombre));
-
-  // Inicialización por si ya vienen preseleccionados
-  setHiddenFromSelect(cpaeSelect, inpCpaeNombre);
-  setHiddenFromSelect(etvSelect, inpEtvNombre);
-  setHiddenFromSelect(estadoSelect, inpEstadoNombre);
-  setHiddenFromSelect(municipioSelect, inpMunicipioNombre);
-});
-</script>
-
-<!-- (G) Choices.js en CPAE -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const select = document.getElementById('cpaeSelect');
-  if (select) {
-    new Choices(select, {
-      searchEnabled: true,
-      itemSelectText: '',
-      placeholderValue: 'Escribe para buscar…',
-      searchPlaceholderValue: 'Buscar CPAE…'
-    });
-  }
-});
 </script>
 
 {% endblock %}
