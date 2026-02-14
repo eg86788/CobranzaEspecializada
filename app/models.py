@@ -58,3 +58,14 @@ class Solicitud(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow
     )
+
+class Producto(db.Model):
+    __tablename__ = "catalogo_productos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    descripcion = db.Column(db.Text)
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

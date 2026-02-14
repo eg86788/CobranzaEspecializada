@@ -1241,3 +1241,18 @@ def finalizar():
         contactos=session.get("contactos", []),
         paso_actual=6
     )
+
+@frames_bp.route("/formulario/<int:solicitud_id>/<int:step>")
+def formulario_step(solicitud_id, step):
+    from app.models import Solicitud
+
+    solicitud = Solicitud.query.get_or_404(solicitud_id)
+
+    # aquí decides qué template cargar según step
+    template = f"frames/step_{step}.html"
+
+    return render_template(
+        template,
+        solicitud=solicitud,
+        step=step
+    )

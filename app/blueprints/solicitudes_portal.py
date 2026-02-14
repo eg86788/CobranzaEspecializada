@@ -92,99 +92,69 @@ def crear_solicitud(producto):
         )
     )
 
+from app.models import Solicitud
+
 @sol_portal.route("/lista", methods=["GET"])
 def lista():
-    user_id = session.get("user_id")
+
     username = session.get("username") or session.get("user_name") or session.get("login")
 
-    if not user_id and not username:
-        return redirect(_login_url())
-
-    if not user_id and username:
-        resolved = _resolve_user_id_from_username(username)
-        if resolved is None:
-            flash("No fue posible resolver el usuario actual. Inicia sesión de nuevo.", "warning")
-            session.pop("user_id", None)
-            return redirect(_login_url())
-        session["user_id"] = resolved
-        user_id = resolved
-
-    try:
-        user_id = int(user_id)
-    except Exception:
-        flash("Sesión inconsistente: identificador de usuario inválido.", "danger")
-        session.pop("user_id", None)
+    if not username:
         return redirect(_login_url())
 
     is_admin = _is_admin_current()
 
-    # ---------- SQL distinto según rol ----------
     if is_admin:
-        # Todas las solicitudes + nombre del creador (si existe)
-        sql = """
-            SELECT
-                s.id,
-                s.updated_at,
-                s.numero_cliente,
-                s.numero_contrato,
-                s.razon_social,
-                s.tipo_tramite,
-                s.tipo_contrato,
-                s.tipo_servicio,
-                s.created_by,
-                au.username AS created_by_name
-            FROM solicitudes AS s
-            LEFT JOIN admin_users au ON au.id = s.created_by
-            ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
-        """
-        params = ()
+        solicitudes = (
+            Solicitud.query
+            .order_by(Solicitud.fecha_actualizacion.desc())
+            .all()
+        )
     else:
-        # Sólo las del usuario actual
-        sql = """
-            SELECT
-                s.id,
-                s.updated_at,
-                s.numero_cliente,
-                s.numero_contrato,
-                s.razon_social,
-                s.tipo_tramite,
-                s.tipo_contrato,
-                s.tipo_servicio,
-                s.created_by
-            FROM solicitudes AS s
-            WHERE s.created_by = %s
-            ORDER BY s.updated_at DESC NULLS LAST, s.id DESC
-        """
-        params = (user_id,)
+        solicitudes = (
+            Solicitud.query
+            .filter_by(usuario_creador=username)
+            .order_by(Solicitud.fecha_actualizacion.desc())
+            .all()
+        )
 
-    solicitudes = fetchall(sql, params) or []
-    ids = [int(s["id"]) for s in solicitudes if s.get("id") is not None]
-
-    # Tabla de firmantes (opcional)
-    firmantes_table = None
-    if _table_exists("public", "firmantes"):
-        firmantes_table = "firmantes"
-    elif _table_exists("public", "solicitudes_firmantes"):
-        firmantes_table = "solicitudes_firmantes"
-
-    counts = {}
-    if firmantes_table and ids:
-        counts = _firmantes_count_by_solicitud(firmantes_table, ids)
-
-    for s in solicitudes:
-        sid = int(s["id"])
-        if firmantes_table:
-            cnt = counts.get(sid, 0)
-            s["firmantes_completos"] = (cnt >= REQUIRED_FIRMANTES)
-            s["firmantes_count"] = cnt
-        else:
-            s["firmantes_completos"] = True
-            s["firmantes_count"] = None
-
-    # Render (pasamos is_admin para que el template ajuste columnas/título)
     return render_template(
         ["solicitudes/lista.html", "lista.html"],
         solicitudes=solicitudes,
         is_admin=is_admin
     )
 
+from app.models import Producto, RoleProductAccess
+
+@sol_portal.route("/nueva", methods=["GET"])
+def nueva():
+    print(">>> ENTRANDO A NUEVA PRODUCTO <<<")
+
+    username = session.get("username")
+    if not username:
+        return redirect(_login_url())
+
+    is_admin = _is_admin_current()
+    role = (session.get("role") or "").lower()
+
+    if is_admin:
+        productos = Producto.query.filter_by(activo=True).all()
+    else:
+        accesos = RoleProductAccess.query.filter_by(
+            role=role,
+            habilitado=True
+        ).all()
+
+        codes = [a.producto_code for a in accesos]
+
+        productos = (
+            Producto.query
+            .filter(Producto.code.in_(codes))
+            .filter_by(activo=True)
+            .all()
+        )
+
+    return render_template(
+        "solicitudes/seleccionar_producto.html",
+        productos=productos
+    )

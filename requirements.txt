@@ -19,6 +19,7 @@ et_xmlfile==2.0.0
 executing==2.2.1
 fastjsonschema==2.21.2
 Flask==3.1.1
+Flask-Migrate==4.1.0
 Flask-SQLAlchemy==3.1.1
 fonttools==4.59.1
 idna==3.10
