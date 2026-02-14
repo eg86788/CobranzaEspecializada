@@ -5,6 +5,7 @@ from datetime import timedelta
 from flask_migrate import Migrate
 from app.extensions import db
 
+
 import psycopg2.extras
 from flask import Flask, session, redirect, url_for
 
@@ -25,6 +26,10 @@ def create_app():
     migrate.init_app(app, db)
 
     return app
+
+# después de init_app y migrate.init_app
+from app import models  # importa todos los modelos
+
 
 def create_app():
     project_root = Path(__file__).resolve().parent.parent
