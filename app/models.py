@@ -38,10 +38,22 @@ class RoleProductAccess(db.Model):
 
 from sqlalchemy.dialects.postgresql import JSONB
 
+class Producto(db.Model):
+    __tablename__ = "catalogo_productos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    descripcion = db.Column(db.Text)
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
 class Solicitud(db.Model):
     __tablename__ = "solicitudes"
 
     id = db.Column(db.Integer, primary_key=True)
+
     producto = db.Column(db.String(50), nullable=False, index=True)
     tipo_tramite = db.Column(db.String(50))
     estado_actual = db.Column(db.String(50), nullable=False)
@@ -63,17 +75,6 @@ class Solicitud(db.Model):
     razon_social = db.Column(db.String(255))
     observaciones = db.Column(db.Text)
     rfc = db.Column(db.String(20))
-
-class Producto(db.Model):
-    __tablename__ = "catalogo_productos"
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(50), unique=True, nullable=False, index=True)
-    nombre = db.Column(db.String(120), nullable=False)
-    descripcion = db.Column(db.Text)
-    activo = db.Column(db.Boolean, nullable=False, default=True)
-
-    fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 class SolicitudSEF(db.Model):
     __tablename__ = "solicitudes_sef"
@@ -135,7 +136,7 @@ class SolicitudSEF(db.Model):
 
     sef_unidades = db.relationship(
     "SolicitudSEFUnidad",
-    back_populates="solicitud",
+    back_populates="sef",
     cascade="all, delete-orphan"
     )
 
@@ -150,7 +151,7 @@ class SolicitudSEFUnidad(db.Model):
 
         solicitud_id = db.Column(
         db.Integer,
-        db.ForeignKey("solicitudes.id"),
+        db.ForeignKey("solicitudes_sef.id"),
         nullable=False,
         index=True
     )
@@ -177,4 +178,4 @@ class SolicitudSEFUnidad(db.Model):
         entidad_federativa = db.Column(db.Integer) # Id Catálogo Entidades
         codigo_postal = db.Column(db.String(10))
 
-        solicitud = db.relationship("Solicitud", back_populates="sef_unidades")
+        solicitud = db.relationship("SolicitudSEF", back_populates="sef_unidades")
