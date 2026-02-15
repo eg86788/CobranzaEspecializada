@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+
+  <h4 class="mb-3">
+    Servicios de Efectivo
+    <small class="text-muted">– Configuración del servicio</small>
+  </h4>
+
+  <form method="POST" autocomplete="off">
+
+    <!-- ===================== Datos de la solicitud ===================== -->
+    <fieldset class="border p-3 mb-3 compact">
+      <legend class="float-none w-auto px-2">Datos del Servicio</legend>
+
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">Nombre del Ejecutivo</label>
+          <input type="text"
+                 class="form-control"
+                 name="nombre_ejecutivo"
+                 value="{{ solicitud.sef.nombre_ejecutivo if solicitud.sef else '' }}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Tipo Contrato</label>
+          <select class="form-select" name="tipo_contrato">
+            <option value="">Selecciona…</option>
+            <option value="CPAE TRADICIONAL"
+              {% if solicitud.sef and solicitud.sef.tipo_contrato == 'CPAE TRADICIONAL' %}selected{% endif %}>
+              CPAE TRADICIONAL
+            </option>
+            <option value="SEF ELECTRÓNICO"
+              {% if solicitud.sef and solicitud.sef.tipo_contrato == 'SEF ELECTRÓNICO' %}selected{% endif %}>
+              SEF ELECTRÓNICO
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Servicio</label>
+          <select class="form-select" name="tipo_servicio">
+            <option value="">Selecciona…</option>
+            <option value="DEPÓSITO TRADICIONAL">DEPÓSITO TRADICIONAL</option>
+            <option value="DEPÓSITO ELECTRÓNICO">DEPÓSITO ELECTRÓNICO</option>
+            <option value="DOTACIÓN ELECTRÓNICA">DOTACIÓN ELECTRÓNICA</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Servicio Adicional</label>
+            <select class="form-select" name="servicio_adicional">
+              <option value="">Selecciona…</option>
+              <option value="TRASLADO DE VALORES">TRASLADO DE VALORES</option>
+              <option value="COFRE ELECTRÓNICO">COFRE ELECTRÓNICO</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Cortes de Abono y Horarios</label>
+            <select class="form-select" name="servicio_adicional">
+              <option value="">Selecciona…</option>
+              <option value="08:00">08:00</option>
+              <option value="14:00">14:00</option>
+              <option value="18:00">18:00</option>
+            </select>
+          </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Tipo de Cobro</label>
+          <select class="form-select" name="tipo_cobro">
+            <option value="">Selecciona…</option>
+            <option value="LOCAL">LOCAL</option>
+            <option value="CENTRALIZADO">CENTRALIZADO</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Importe Máximo de Diferencias</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number"
+                   step="0.01"
+                   class="form-control"
+                   name="importe_maximo_dif"
+                   value="{{ solicitud.sef.importe_maximo_dif if solicitud.sef else '' }}">
+          </div>
+        </div>
+
+      </div>
+    </fieldset>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary btn-sm">
+        Siguiente →
+      </button>
+      <a href="{{ url_for('sol_portal.lista') }}" class="btn btn-outline-secondary btn-sm">
+        Cancelar
+      </a>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

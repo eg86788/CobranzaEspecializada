@@ -35,6 +35,21 @@ def step(solicitud_id, step):
                 )
             )
 
+        # ===============================
+        # PRODUCTOS
+        # ===============================
+        if solicitud.producto == "sef":
+            from app.flows.sef_flow import handle_step
+            next_step = handle_step(solicitud, step, request.form)
+
+            if next_step:
+                return redirect(
+                    url_for(
+                        "solicitudes_flow.step",
+                        solicitud_id=solicitud.id,
+                        step=next_step
+                    )
+                )
     # ===== Render template =====
     template_producto = f"solicitudes/flows/{solicitud.producto}/step_{step}.html"
     template_base = f"solicitudes/flows/base/step_{step}.html"

@@ -24,7 +24,7 @@ def create_app():
         static_folder=str(BASE_DIR / "static")
     )
 
-    print("TEMPLATE FOLDER:", app.template_folder)
+  #  print("TEMPLATE FOLDER:", app.template_folder)
 
   # ----- Config -----
     app.config.from_object(Config)

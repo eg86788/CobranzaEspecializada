@@ -1,7 +1,7 @@
-from . import sef
+from . import sef_flow
 
 FLOWS = {
-    "sef": sef
+    "sef": sef_flow
 }
 
 def get_flow_handler(producto):
