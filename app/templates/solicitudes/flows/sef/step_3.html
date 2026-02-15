@@ -131,7 +131,7 @@
     </div>
     <div class="card-body p-0">
 
-      {% if solicitud.sef and solicitud.sef.unidades %}
+        {% if sef and unidades %}
         <div class="table-responsive">
           <table class="table table-sm table-striped mb-0">
             <thead>
@@ -144,8 +144,8 @@
               </tr>
             </thead>
             <tbody>
-              {% for u in solicitud.sef.unidades %}
-              <tr>
+                {% for u in unidades %}
+                <tr>
                 <td>{{ u.id }}</td>
                 <td>{{ u.accion_unidad }}</td>
                 <td>{{ u.nombre_unidad }}</td>
