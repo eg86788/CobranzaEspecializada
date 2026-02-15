@@ -1,4 +1,7 @@
-from app.models import SolicitudSEF
+
+from flask import request
+from app.forms.SEF.steps import unidades
+from app.models import SolicitudSEF, SolicitudSEFUnidad
 from app.extensions import db
 
 
@@ -12,6 +15,48 @@ def handle_step(solicitud, step, form):
     else:
         sef = solicitud.sef
 
+
+        # ---------- STEP 3 (SEF UNIDADES) ----------
+        sef = solicitud.sef  # relación 1 a 1
+        
+        if step == 3:
+            if not sef:
+                # si no existe todavía, créalo
+                sef = SolicitudSEF(solicitud=solicitud)
+                db.session.add(sef)
+                db.session.flush()  # para obtener ID
+            nueva = SolicitudSEFUnidad(
+                sef=sef,
+                accion_unidad=request.form.get("accion_unidad"),
+                nombre_unidad=request.form.get("nombre_unidad"),
+                cpae_unidad=request.form.get("cpae_unidad"),
+                etv_unidad=request.form.get("etv_unidad"),
+                procesadora_unidad=request.form.get("procesadora_unidad"),
+
+                servicio_verificacion_tradicional=bool(request.form.get("servicio_verificacion_tradicional")),
+                servicio_verificacion_electronica=bool(request.form.get("servicio_verificacion_electronica")),
+                servicio_cliente_certificado_central=bool(request.form.get("servicio_cliente_certificado_central")),
+                servicio_dotacion_centralizada=bool(request.form.get("servicio_dotacion_centralizada")),
+                servicio_integradora=bool(request.form.get("servicio_integradora")),
+                servicio_dotacion=bool(request.form.get("servicio_dotacion")),
+                servicio_traslado=bool(request.form.get("servicio_traslado")),
+                servicio_cofre=bool(request.form.get("servicio_cofre")),
+
+                calle_numero=request.form.get("calle_numero"),
+                municipio=request.form.get("municipio"),
+                entidad_federativa=request.form.get("entidad_federativa"),
+                codigo_postal=request.form.get("codigo_postal"),
+            )
+
+            db.session.add(nueva)
+            db.session.commit()
+
+            return render_template(
+                "solicitudes/flows/sef/step_3.html",
+                solicitud=solicitud,
+                sef=sef,
+                unidades=unidades
+            )
     # ===============================
     # STEP 2  (Frame 1 anterior)
     # ===============================

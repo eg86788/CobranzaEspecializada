@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from app.models import Solicitud, SolicitudSEFUnidad
+from app.models import Solicitud, SolicitudSEF, SolicitudSEFUnidad
 from app.extensions import db
 
 flow_bp = Blueprint(
@@ -35,43 +35,6 @@ def step(solicitud_id, step):
                     "solicitudes_flow.step",
                     solicitud_id=solicitud.id,
                     step=2
-                )
-            )
-
-        # ---------- STEP 3 (SEF UNIDADES) ----------
-        if step == 3:
-
-            nueva = SolicitudSEFUnidad(
-                solicitud_id=solicitud.id,
-                accion_unidad=request.form.get("accion_unidad"),
-                nombre_unidad=request.form.get("nombre_unidad"),
-                cpae_unidad=request.form.get("cpae_unidad"),
-                etv_unidad=request.form.get("etv_unidad"),
-                procesadora_unidad=request.form.get("procesadora_unidad"),
-
-                servicio_verificacion_tradicional=bool(request.form.get("servicio_verificacion_tradicional")),
-                servicio_verificacion_electronica=bool(request.form.get("servicio_verificacion_electronica")),
-                servicio_cliente_certificado_central=bool(request.form.get("servicio_cliente_certificado_central")),
-                servicio_dotacion_centralizada=bool(request.form.get("servicio_dotacion_centralizada")),
-                servicio_integradora=bool(request.form.get("servicio_integradora")),
-                servicio_dotacion=bool(request.form.get("servicio_dotacion")),
-                servicio_traslado=bool(request.form.get("servicio_traslado")),
-                servicio_cofre=bool(request.form.get("servicio_cofre")),
-
-                calle_numero=request.form.get("calle_numero"),
-                municipio=request.form.get("municipio"),
-                entidad_federativa=request.form.get("entidad_federativa"),
-                codigo_postal=request.form.get("codigo_postal"),
-            )
-
-            db.session.add(nueva)
-            db.session.commit()
-
-            return redirect(
-                url_for(
-                    "solicitudes_flow.step",
-                    solicitud_id=solicitud.id,
-                    step=3
                 )
             )
 

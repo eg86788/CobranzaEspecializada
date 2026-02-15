@@ -160,7 +160,7 @@ class SolicitudSEF(db.Model):
     # Relación padre
     solicitud = db.relationship(
         "Solicitud",
-        back_populates="sef"
+        back_populates="sef", uselist=False, cascade="all, delete"
     )
 
     # 1 a N con Unidades
@@ -214,5 +214,4 @@ class SolicitudSEFUnidad(db.Model):
     # Relación inversa
     sef = db.relationship(
         "SolicitudSEF",
-        back_populates="sef_unidades"
-    )
+        back_populates="sef_unidades")

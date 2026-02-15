@@ -1,50 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="container mt-4">
 
-  <h4 class="mb-3">Unidades de Negocio – SEF</h4>
+    <h4 class="mb-3">
+        Servicios de Efectivo
+        <small class="text-muted">– Unidades de Negocio </small>
+      </h4>
 
-  <!-- LISTADO EXISTENTE -->
-  {% if solicitud.sef_unidades %}
+  <!-- ===================== FORMULARIO NUEVA UNIDAD ===================== -->
   <div class="card mb-4">
-    <div class="card-body p-2">
-      <table class="table table-sm table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>CPAE</th>
-            <th>ETV</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for u in solicitud.sef_unidades %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ u.nombre_unidad }}</td>
-            <td>{{ u.cpae_unidad }}</td>
-            <td>{{ u.etv_unidad }}</td>
-            <td>{{ u.accion_unidad }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="card-header bg-light">
+      <strong>Agregar nueva Unidad</strong>
     </div>
-  </div>
-  {% endif %}
+    <div class="card-body">
 
-  <!-- FORMULARIO NUEVA UNIDAD -->
-  <form method="POST">
-
-    <div class="card shadow-sm mb-3">
-      <div class="card-body">
+      <form method="POST">
 
         <div class="row g-3">
 
           <div class="col-md-4">
             <label class="form-label">Acción</label>
-            <select name="accion_unidad" class="form-select">
+            <select name="accion_unidad" class="form-select" required>
+              <option value="">Selecciona...</option>
               <option value="ALTA">ALTA</option>
               <option value="MODIFICACION">MODIFICACIÓN</option>
               <option value="BAJA">BAJA</option>
@@ -53,7 +31,7 @@
 
           <div class="col-md-8">
             <label class="form-label">Nombre Unidad</label>
-            <input type="text" name="nombre_unidad" class="form-control">
+            <input type="text" name="nombre_unidad" class="form-control" required>
           </div>
 
           <div class="col-md-4">
@@ -77,7 +55,7 @@
 
         <h6>Servicios</h6>
 
-        <div class="row g-2">
+        <div class="row g-3">
 
           <div class="col-md-4 form-check">
             <input class="form-check-input" type="checkbox" name="servicio_verificacion_tradicional">
@@ -87,21 +65,6 @@
           <div class="col-md-4 form-check">
             <input class="form-check-input" type="checkbox" name="servicio_verificacion_electronica">
             <label class="form-check-label">Depósito Electrónico</label>
-          </div>
-
-          <div class="col-md-4 form-check">
-            <input class="form-check-input" type="checkbox" name="servicio_cliente_certificado_central">
-            <label class="form-check-label">Cliente Certificado Central</label>
-          </div>
-
-          <div class="col-md-4 form-check">
-            <input class="form-check-input" type="checkbox" name="servicio_dotacion_centralizada">
-            <label class="form-check-label">Dotación Centralizada</label>
-          </div>
-
-          <div class="col-md-4 form-check">
-            <input class="form-check-input" type="checkbox" name="servicio_integradora">
-            <label class="form-check-label">Unidad Integradora</label>
           </div>
 
           <div class="col-md-4 form-check">
@@ -133,44 +96,89 @@
           </div>
 
           <div class="col-md-3">
-            <label class="form-label">Municipio (ID)</label>
-            <input type="number" name="municipio" class="form-control">
+            <label class="form-label">Municipio</label>
+            <input type="text" name="municipio" class="form-control">
           </div>
 
           <div class="col-md-3">
-            <label class="form-label">Entidad Federativa (ID)</label>
-            <input type="number" name="entidad_federativa" class="form-control">
+            <label class="form-label">Entidad Federativa</label>
+            <input type="text" name="entidad_federativa" class="form-control">
           </div>
 
           <div class="col-md-3">
             <label class="form-label">Código Postal</label>
-            <input type="number" name="codigo_postal" class="form-control">
+            <input type="text" name="codigo_postal" class="form-control">
           </div>
 
         </div>
 
-      </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary btn-sm">
+            Guardar Unidad
+          </button>
+        </div>
+
+      </form>
+
     </div>
+  </div>
 
-    <div class="d-flex justify-content-between">
-      <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=2) }}"
-         class="btn btn-outline-secondary btn-sm">
-        ← Regresar
-      </a>
+  <!-- ===================== LISTADO DE UNIDADES ===================== -->
 
-      <div>
-        <button type="submit" class="btn btn-primary btn-sm">
-          Guardar Unidad
-        </button>
-
-        <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=4) }}"
-           class="btn btn-success btn-sm">
-          Siguiente →
-        </a>
-      </div>
+  <div class="card">
+    <div class="card-header bg-light">
+      <strong>Unidades capturadas</strong>
     </div>
+    <div class="card-body p-0">
 
-  </form>
+      {% if solicitud.sef and solicitud.sef.unidades %}
+        <div class="table-responsive">
+          <table class="table table-sm table-striped mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Acción</th>
+                <th>Nombre</th>
+                <th>CPAE</th>
+                <th>ETV</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in solicitud.sef.unidades %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.accion_unidad }}</td>
+                <td>{{ u.nombre_unidad }}</td>
+                <td>{{ u.cpae_unidad }}</td>
+                <td>{{ u.etv_unidad }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="p-3 text-muted">
+          No hay unidades registradas.
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ===================== NAVEGACIÓN ===================== -->
+
+  <div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=2) }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Regresar
+    </a>
+
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=4) }}"
+       class="btn btn-success btn-sm">
+      Continuar →
+    </a>
+  </div>
 
 </div>
+
 {% endblock %}
