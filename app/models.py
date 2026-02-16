@@ -8,6 +8,19 @@ from sqlalchemy.dialects.postgresql import JSONB
 # ADMIN / PERMISOS
 # =====================================================
 
+class Role(db.Model):
+    __tablename__ = "roles"
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(50), unique=True, nullable=False)
+    descripcion = db.Column(db.String(150))
+
+    activo = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return self.code
+
+
 class AdminUser(db.Model):
     __tablename__ = "admin_users"
 
@@ -189,9 +202,12 @@ class SolicitudSEFUnidad(db.Model):
 
     accion_unidad = db.Column(db.String(20))
     nombre_unidad = db.Column(db.String(150))
-    cpae_unidad = db.Column(db.String(50))
-    etv_unidad = db.Column(db.String(50))
-    procesadora_unidad = db.Column(db.String(50))
+
+    cpae_id = db.Column(db.Integer, db.ForeignKey("catalogo_cpae.id"))
+    etv_id = db.Column(db.Integer, db.ForeignKey("catalogo_etv.id"))
+    procesadora_id = db.Column(db.Integer, db.ForeignKey("catalogo_procesadora.id"))
+    entidad_id = db.Column(db.Integer, db.ForeignKey("catalogo_entidad.id"))
+    municipio_id = db.Column(db.Integer, db.ForeignKey("catalogo_municipio.id"))
 
     servicio_verificacion_tradicional = db.Column(db.Boolean, default=False, nullable=False)
     servicio_verificacion_electronica = db.Column(db.Boolean, default=False, nullable=False)
@@ -207,11 +223,120 @@ class SolicitudSEFUnidad(db.Model):
     relacion_cc_centralizada = db.Column(db.String(50))
 
     calle_numero = db.Column(db.String(255))
-    municipio = db.Column(db.Integer)
-    entidad_federativa = db.Column(db.Integer)
+
     codigo_postal = db.Column(db.String(10))
 
     # Relación inversa
     sef = db.relationship(
         "SolicitudSEF",
         back_populates="sef_unidades")
+    
+    cpae = db.relationship("CatalogoCPAE")
+    etv = db.relationship("CatalogoETV")
+    procesadora = db.relationship("CatalogoProcesadora")
+    entidad = db.relationship("CatalogoEntidad")
+    municipio = db.relationship("CatalogoMunicipio")
+
+# ==========================================
+# CPAE
+# ==========================================
+class CatalogoCPAE(db.Model):
+    __tablename__ = "catalogo_cpae"
+
+    id = db.Column(db.Integer, primary_key=True)
+    clave = db.Column(db.String(10), nullable=False)
+    descripcion = db.Column(db.String(150), nullable=False)
+    abreviatura = db.Column(db.String(10), nullable=False)
+    activo = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f"{self.clave} - {self.descripcion}"
+
+# ==========================================
+# ETV (Empresas de Traslado de Valores)
+# ==========================================
+class CatalogoETV(db.Model):
+    __tablename__ = "catalogo_etv"
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(150), nullable=False)
+    activo = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f"{self.nombre}"
+
+
+# ==========================================
+# PROCESADORA
+# ==========================================
+class CatalogoProcesadora(db.Model):
+    __tablename__ = "catalogo_procesadora"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    clave = db.Column(db.String(10), nullable=True)
+    nombre = db.Column(db.String(150), nullable=False)
+
+    etv_id = db.Column(
+        db.Integer,
+        db.ForeignKey("catalogo_etv.id"),
+        nullable=True
+    )
+
+    cpae_id = db.Column(
+        db.Integer,
+        db.ForeignKey("catalogo_cpae.id"),
+        nullable=True
+    )
+
+    cpae = db.relationship("CatalogoCPAE")
+
+
+    etv = db.relationship("CatalogoETV", backref="procesadoras")
+
+    activo = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f"{self.nombre}"
+
+
+# ==========================================
+# ENTIDAD FEDERATIVA (INEGI)
+# ==========================================
+class CatalogoEntidad(db.Model):
+    __tablename__ = "catalogo_entidad"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    clave_inegi = db.Column(db.String(5), nullable=False)
+    nombre = db.Column(db.String(150), nullable=False)
+
+    activo = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f"{self.nombre}"
+
+
+# ==========================================
+# MUNICIPIO (INEGI)
+# ==========================================
+class CatalogoMunicipio(db.Model):
+    __tablename__ = "catalogo_municipio"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    clave_inegi = db.Column(db.String(10), nullable=True)
+    nombre = db.Column(db.String(150), nullable=False)
+
+    entidad_id = db.Column(
+        db.Integer,
+        db.ForeignKey("catalogo_entidad.id"),
+        nullable=False
+    )
+
+    entidad = db.relationship("CatalogoEntidad", backref="municipios")
+
+    activo = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f"{self.nombre}"

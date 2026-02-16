@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>{{ titulo }}</h3>
+    <a href="{{ url_for('catalog_admin.index') }}" class="btn btn-outline-secondary">
+      ← Volver
+    </a>
+  </div>
+
+  <!-- BUSCADOR -->
+  <form method="GET" class="mb-3">
+    <div class="input-group">
+      <input type="text" name="q"
+             value="{{ request.args.get('q','') }}"
+             class="form-control"
+             placeholder="Buscar...">
+      <button class="btn btn-outline-secondary">Buscar</button>
+    </div>
+  </form>
+
+  <!-- FORM CREAR -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <form method="POST">
+        <div class="row g-3">
+          {% for campo in campos %}
+          <div class="col-md-4">
+            <label class="form-label text-capitalize">
+              {{ campo.replace('_',' ') }}
+            </label>
+            <input type="text" name="{{ campo }}" class="form-control">
+          </div>
+          {% endfor %}
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100">Crear</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            {% for campo in campos %}
+            <th>{{ campo.replace('_',' ') }}</th>
+            {% endfor %}
+            <th width="120">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in registros %}
+          <tr>
+            <td>{{ r.id }}</td>
+            {% for campo in campos %}
+            <td>{{ r|attr(campo) }}</td>
+            {% endfor %}
+            <td>
+              <form method="POST"
+                    action="{{ url_for('catalog_admin.eliminar', catalogo=catalogo, item_id=r.id) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar registro?');">
+                <button class="btn btn-sm btn-outline-danger">
+                  Eliminar
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+
+          {% if not registros %}
+          <tr>
+            <td colspan="{{ campos|length + 2 }}" class="text-center text-muted p-3">
+              Sin registros
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Administración de Catálogos{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="mb-4">Administración de Catálogos del Sistema</h2>
+
+  <div class="row g-4">
+
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='cpae') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>CPAE</h5>
+        <p class="text-muted">Administrar ubicaciones de bóvedas.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='etv') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>ETV</h5>
+        <p class="text-muted">Empresas de traslado de valores.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='productos') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Productos</h5>
+        <p class="text-muted">Productos disponibles en el sistema.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='procesadoras') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Procesadoras</h5>
+        <p class="text-muted">Empresas procesadoras por plaza.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='entidades') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Entidades</h5>
+        <p class="text-muted">Entidades federativas (INEGI).</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='municipios') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Municipios</h5>
+        <p class="text-muted">Municipios por entidad.</p>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="mt-4">
+    <a class="btn btn-outline-secondary"
+       href="{{ url_for('admin_portal.dashboard') }}">
+       ← Volver al Panel
+    </a>
+  </div>
+
+</div>
+
+<style>
+.catalog-card {
+  border-radius: 16px;
+  transition: all .2s ease;
+}
+
+.catalog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.1);
+}
+</style>
+
+{% endblock %}

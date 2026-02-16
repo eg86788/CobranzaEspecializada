@@ -27,9 +27,10 @@ def login():
             return redirect(next_url)
 
         if user["role"] == "admin":
-            return redirect(url_for("admin.inicio"))  # dashboard admin
-        else:
-            return redirect(url_for("core.inicio_productos"))
+            return redirect(url_for("admin.inicio"))
+
+        return redirect(url_for("solicitudes.lista"))
+
 
     return render_template("auth_login.html")
 

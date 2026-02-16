@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Asignación de Productos por Rol{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h3 class="mb-4">Asignación de Productos por Rol</h3>
+
+  <!-- Selector Rol -->
+  <form method="GET" class="mb-4">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Rol</label>
+        <select name="role" class="form-select" onchange="this.form.submit()">
+          {% for r in roles %}
+          <option value="{{ r.code }}" {% if r.code == selected_role %}selected{% endif %}>
+            {{ r }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <!-- Tabla -->
+  <form method="POST">
+    <input type="hidden" name="role" value="{{ selected_role }}">
+
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th width="150">Habilitado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in productos %}
+            <tr>
+              <td>{{ p.nombre }}</td>
+              <td>
+                <input type="checkbox"
+                       name="producto_{{ p.code }}"
+                       {% if accesos.get(p.code) %}checked{% endif %}>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <button class="btn btn-primary">Guardar Cambios</button>
+      <a href="{{ url_for('admin_portal.dashboard') }}"
+         class="btn btn-outline-secondary">
+         ← Volver
+      </a>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

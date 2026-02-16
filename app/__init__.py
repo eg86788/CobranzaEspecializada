@@ -79,6 +79,8 @@ def create_app():
     from .blueprints.catalogos import catalogos_bp
     from .blueprints.api import api_bp
     from .blueprints.users_admin import users_admin
+    from app.blueprints.catalog_admin import catalog_admin_bp
+
 
 
     # Login (admin/user) y panel admin
@@ -93,10 +95,9 @@ def create_app():
     from .blueprints.params_admin import params_bp  # módulo de parámetros
     from .blueprints.solicitudes_flow import flow_bp
     from .blueprints.productos_admin import productos_admin_bp
+    from .blueprints.roles_product_admin import roles_product_admin_bp
 
-
-
-
+    from .blueprints.roles_admin import roles_admin_bp
 
     # Registro
     app.register_blueprint(core_bp)
@@ -115,6 +116,10 @@ def create_app():
     app.register_blueprint(users_admin)
     app.register_blueprint(flow_bp)
     app.register_blueprint(productos_admin_bp)
+    app.register_blueprint(catalog_admin_bp)
+    app.register_blueprint(roles_product_admin_bp)
+    app.register_blueprint(roles_admin_bp)
+
 
     @app.route("/sol")
     def home():

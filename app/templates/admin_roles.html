@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Administrar Roles{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Catálogo de Roles</h3>
+    <a href="{{ url_for('admin_portal.dashboard') }}"
+       class="btn btn-outline-secondary">
+      ← Volver
+    </a>
+  </div>
+
+  <!-- FORM CREAR -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <form method="POST">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Código</label>
+            <input type="text" name="code" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Descripción</label>
+            <input type="text" name="descripcion" class="form-control">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100">Crear</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Descripción</th>
+            <th width="120">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in roles %}
+          <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.code }}</td>
+            <td>{{ r.descripcion }}</td>
+            <td>
+              <form method="POST"
+                    action="{{ url_for('roles_admin.delete', role_id=r.id) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar rol?');">
+                <button class="btn btn-sm btn-outline-danger">
+                  Eliminar
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+
+          {% if not roles %}
+          <tr>
+            <td colspan="4" class="text-center text-muted p-3">
+              Sin registros
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

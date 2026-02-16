@@ -1,5 +1,10 @@
 from flask import request
-from app.models import SolicitudSEF, SolicitudSEFUnidad
+from app.models import (
+    CatalogoEntidad,
+    CatalogoProcesadora,
+    SolicitudSEF,
+    SolicitudSEFUnidad
+)
 from app.extensions import db
 
 
@@ -11,12 +16,12 @@ def handle_step(solicitud, step, form):
     if not sef:
         sef = SolicitudSEF(solicitud=solicitud)
         db.session.add(sef)
-        db.session.flush()  # no commit aún
+        db.session.flush()
 
-    # ===============================
+    # =====================================================
     # STEP 2 (Datos generales SEF)
-    # ===============================
-    if step == 2:
+    # =====================================================
+    if step == 2 and form:
 
         sef.tipo_contrato = form.get("tipo_contrato")
         sef.tipo_servicio = form.get("tipo_servicio")
@@ -52,41 +57,131 @@ def handle_step(solicitud, step, form):
 
         return 3
 
-    # ===============================
+    # =====================================================
     # STEP 3 (Unidades SEF)
-    # ===============================
+    # =====================================================
     if step == 3:
 
-        if request.method == "POST":
+        # ==========================================
+        # ELIMINAR UNIDAD
+        # ==========================================
+        if form and form.get("eliminar_unidad_id"):
 
-            nueva = SolicitudSEFUnidad(
-                sef=sef,
-                accion_unidad=form.get("accion_unidad"),
-                nombre_unidad=form.get("nombre_unidad"),
-                cpae_unidad=form.get("cpae_unidad"),
-                etv_unidad=form.get("etv_unidad"),
-                procesadora_unidad=form.get("procesadora_unidad"),
-
-                servicio_verificacion_tradicional=bool(form.get("servicio_verificacion_tradicional")),
-                servicio_verificacion_electronica=bool(form.get("servicio_verificacion_electronica")),
-                servicio_cliente_certificado_central=bool(form.get("servicio_cliente_certificado_central")),
-                servicio_dotacion_centralizada=bool(form.get("servicio_dotacion_centralizada")),
-                servicio_integradora=bool(form.get("servicio_integradora")),
-                servicio_dotacion=bool(form.get("servicio_dotacion")),
-                servicio_traslado=bool(form.get("servicio_traslado")),
-                servicio_cofre=bool(form.get("servicio_cofre")),
-
-                calle_numero=form.get("calle_numero"),
-                municipio=form.get("municipio"),
-                entidad_federativa=form.get("entidad_federativa"),
-                codigo_postal=form.get("codigo_postal"),
+            unidad = SolicitudSEFUnidad.query.get(
+                form.get("eliminar_unidad_id")
             )
 
-            db.session.add(nueva)
+            if unidad and unidad.sef_id == sef.id:
+                db.session.delete(unidad)
+                db.session.commit()
+
+            return None
+
+        # ==========================================
+        # CREAR / EDITAR UNIDAD
+        # ==========================================
+        if form and form.get("guardar_unidad"):
+
+            unidad_id = form.get("unidad_id")
+
+            if unidad_id:
+                unidad = SolicitudSEFUnidad.query.get(unidad_id)
+            else:
+                unidad = SolicitudSEFUnidad(sef=sef)
+                db.session.add(unidad)
+
+            # ==========================
+            # CAMPOS BASE
+            # ==========================
+            unidad.accion_unidad = form.get("accion_unidad")
+            unidad.nombre_unidad = form.get("nombre_unidad")
+
+            # ==========================
+            # IDS DE CATÁLOGOS
+            # ==========================
+            unidad.cpae_id = form.get("cpae_id") or None
+            unidad.etv_id = form.get("etv_id") or None
+            unidad.procesadora_id = form.get("procesadora_id") or None
+            unidad.entidad_id = form.get("entidad_id") or None
+            unidad.municipio_id = form.get("municipio_id") or None
+
+            # ==========================
+            # VALIDACIÓN PROCESADORA
+            # ==========================
+            if unidad.procesadora_id:
+
+                proc = CatalogoProcesadora.query.get(
+                    unidad.procesadora_id
+                )
+
+                if proc:
+
+                    if unidad.etv_id and proc.etv_id != int(unidad.etv_id):
+                        raise ValueError(
+                            "Procesadora no corresponde a la ETV seleccionada"
+                        )
+
+                    if unidad.cpae_id and proc.cpae_id and proc.cpae_id != int(unidad.cpae_id):
+                        raise ValueError(
+                            "Procesadora no corresponde al CPAE seleccionado"
+                        )
+
+            # ==========================
+            # SERVICIOS
+            # ==========================
+            unidad.servicio_verificacion_tradicional = bool(
+                form.get("servicio_verificacion_tradicional")
+            )
+            unidad.servicio_verificacion_electronica = bool(
+                form.get("servicio_verificacion_electronica")
+            )
+            unidad.servicio_cliente_certificado_central = bool(
+                form.get("servicio_cliente_certificado_central")
+            )
+            unidad.servicio_dotacion_centralizada = bool(
+                form.get("servicio_dotacion_centralizada")
+            )
+            unidad.servicio_integradora = bool(
+                form.get("servicio_integradora")
+            )
+            unidad.servicio_dotacion = bool(
+                form.get("servicio_dotacion")
+            )
+            unidad.servicio_traslado = bool(
+                form.get("servicio_traslado")
+            )
+            unidad.servicio_cofre = bool(
+                form.get("servicio_cofre")
+            )
+
+            # ==========================
+            # DOMICILIO
+            # ==========================
+            unidad.calle_numero = form.get("calle_numero")
+            unidad.codigo_postal = form.get("codigo_postal")
+
             db.session.commit()
 
-            # SIEMPRE cargar unidades después
-            unidades = sef.sef_unidades
+            return None
 
-        return {"sef": sef, "unidades": unidades}, None
+        # ==========================================
+        # GET
+        # ==========================================
+        unidades = sef.sef_unidades
 
+        entidades = CatalogoEntidad.query.order_by(
+            CatalogoEntidad.nombre
+        ).all()
+
+        unidad_editar = None
+        if request.args.get("editar"):
+            unidad_editar = SolicitudSEFUnidad.query.get(
+                request.args.get("editar")
+            )
+
+        return {
+            "sef": sef,
+            "unidades": unidades,
+            "entidades": entidades,
+            "unidad_editar": unidad_editar
+        }

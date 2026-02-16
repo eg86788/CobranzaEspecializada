@@ -123,12 +123,6 @@
           <a class="nav-link dropdown-toggle active" href="#" id="menuAdmin">Administración</a>
           <div class="dropdown-menu dropdown-menu-custom" aria-labelledby="menuAdmin">
             <a href="{{ url_for('admin_portal.dashboard') }}">Panel admin</a>
-            <a href="{{ url_for('catalogos.ver_catalogos') }}">Catálogos</a>
-            <a href="{{ url_for('templates_admin.list_templates') }}">Plantillas</a>
-            <a href="{{ url_for('adh_admin.list_adh') }}">Contratos de adhesión</a>
-            <hr class="dropdown-divider">
-            <a href="{{ url_for('users_admin.listar_usuarios') }}">Usuarios</a>
-            <a href="{{ url_for('users_admin.roles_permisos') }}">Roles & Permisos</a>
           </div>
         </div>
         {% endif %}

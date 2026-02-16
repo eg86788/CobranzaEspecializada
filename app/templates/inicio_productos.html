@@ -100,16 +100,8 @@
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4">
   {% set productos = [
-    {"nombre": "Servicios de Efectivo", "descripcion": "Captura y administración de solicitudes de Servicio de Efectivo (SEF).", "url": url_for('sol_portal.lista'), "imagen": url_for('static', filename='/sef.png')},
-    {"nombre": "Depósito Electrónico Banamex", "descripcion": "Alternativa moderna para recepción de depósitos bancarios.", "url": "#", "imagen": url_for('static', filename='/deb.png')},
-    {"nombre": "PEMEX Gas/Línea", "descripcion": "Servicio especializado para clientes con convenios de suministro PEMEX.", "url": "#", "imagen": url_for('static', filename='/pemex.png')},
-    {"nombre": "Concentración de Fondos", "descripcion": "Soluciones para agrupar saldos de cuentas y optimizar liquidez.", "url": "#", "imagen": url_for('static', filename='/concentracion.png')},
-    {"nombre": "Cobranza Universal", "descripcion": "Gestión de cobranza de múltiples canales y formatos.", "url": "#", "imagen": url_for('static', filename='/cobranza.png')},
-    {"nombre": "Impuestos Aduanales", "descripcion": "Servicio para pago especializado de contribuciones aduanales.", "url": "#", "imagen": url_for('static', filename='/aduanales.png')},
-    {"nombre": "Impuestos Federales", "descripcion": "Recaudación y pago eficiente de impuestos federales.", "url": "#", "imagen": url_for('static', filename='/federales.png')},
-    {"nombre": "Servicio Electrónico de Pagos", "descripcion": "Facilita pagos de servicios e impuestos en línea.", "url": "#", "imagen": url_for('static', filename='/sep.png')},
-    {"nombre": "SUA - SIPARE", "descripcion": "Herramientas para pago de cuotas obrero-patronales al IMSS e Infonavit.", "url": "#", "imagen": url_for('static', filename='/sua_sipare.png')},
-    {"nombre": "Domiciliación", "descripcion": "Automatiza el cobro de servicios y pagos recurrentes.", "url": "#", "imagen": url_for('static', filename='/domiciliacion.png')}
+    {"nombre": "Cobranza Especializada", "descripcion": "Captura y administración de solicitudes de los productos de Cobranza Especializada.", "url": url_for('sol_portal.lista'), "imagen": url_for('static', filename='/sef.png')},
+    {"nombre": "Pagos", "descripcion": "Captura y administración de solicitudes de los productos de Pagos.", "url": url_for('sol_portal.lista'), "imagen": url_for('static', filename='/sef.png')},
   ] %}
 
   {% for producto in productos %}
@@ -131,7 +123,7 @@
       </div>
       <div class="prod-footer">
         <a href="{{ producto.url }}" class="btn btn-redondo">
-          <i class="bi bi-play-fill me-1"></i> Iniciar Solicitud
+          <i class="bi bi-play-fill me-1"></i> Entrar
         </a>
         <!-- Badge opcional; puedes ocultarlo si no lo usas -->
         <!-- <span class="prod-badge">Producto</span> -->

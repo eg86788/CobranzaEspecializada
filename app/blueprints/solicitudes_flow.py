@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from app.models import Solicitud, SolicitudSEF, SolicitudSEFUnidad
+from app.models import Solicitud
 from app.extensions import db
 
 flow_bp = Blueprint(
@@ -41,6 +41,7 @@ def step(solicitud_id, step):
         # ---------- PRODUCTOS ----------
         if solicitud.producto == "sef":
             from app.flows.sef_flow import handle_step
+
             next_step = handle_step(solicitud, step, request.form)
 
             if next_step:
@@ -53,8 +54,33 @@ def step(solicitud_id, step):
                 )
 
     # ==========================================
-    # RENDER
+    # GET (delegar al flow si es producto)
     # ==========================================
+
+    # Step 1 siempre usa base
+    if step == 1:
+        template_base = f"solicitudes/flows/base/step_{step}.html"
+        return render_template(template_base, solicitud=solicitud, step=step)
+
+    # Para productos específicos desde step 2
+    if solicitud.producto == "sef":
+        from app.flows.sef_flow import handle_step
+
+        context = handle_step(solicitud, step, None) or {}  
+
+        template = f"solicitudes/flows/sef/step_{step}.html"
+
+        return render_template(
+            template,
+            solicitud=solicitud,
+            step=step,
+            **(context or {})
+        )
+
+    # ==========================================
+    # BASE (productos sin flow específico)
+    # ==========================================
+
     template_producto = f"solicitudes/flows/{solicitud.producto}/step_{step}.html"
     template_base = f"solicitudes/flows/base/step_{step}.html"
 
@@ -62,7 +88,6 @@ def step(solicitud_id, step):
         return render_template(template_producto, solicitud=solicitud, step=step)
     except:
         return render_template(template_base, solicitud=solicitud, step=step)
-
 
 # ==========================================
 # FUNCIONES AUXILIARES
