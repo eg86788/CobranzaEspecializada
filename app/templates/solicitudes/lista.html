@@ -59,10 +59,12 @@
           </td>
 
           <td class="text-end">
-            <a href="{{ url_for('frames.formulario_step', solicitud_id=s.id, step=1) }}"
-               class="btn btn-sm btn-primary">
-              Abrir
-            </a>
+                      <a href="{{ url_for('solicitudes_flow.step',
+                      solicitud_id=s.id,
+                      step=1) }}"
+          class="btn btn-sm btn-primary">
+          Abrir
+          </a>
           </td>
         </tr>
         {% else %}
