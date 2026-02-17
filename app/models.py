@@ -262,7 +262,7 @@ class SolicitudSEFCuenta(db.Model):
     numero_cuenta = db.Column(db.String(20))
     moneda = db.Column(db.String(10))
     tipo_cuenta = db.Column(db.String(50))
-
+     
     sef = db.relationship("SolicitudSEF", backref="sef_cuentas")
     unidad = db.relationship("SolicitudSEFUnidad")
 
