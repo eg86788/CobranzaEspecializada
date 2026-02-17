@@ -237,6 +237,35 @@ class SolicitudSEFUnidad(db.Model):
     entidad = db.relationship("CatalogoEntidad")
     municipio = db.relationship("CatalogoMunicipio")
 
+# =====================================================
+# SEF - CUENTAS (HIJAS DE SOLICITUDSEF)
+# =====================================================
+
+class SolicitudSEFCuenta(db.Model):
+    __tablename__ = "solicitudes_sef_cuentas"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    sef_id = db.Column(
+        db.Integer,
+        db.ForeignKey("solicitudes_sef.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    unidad_id = db.Column(
+        db.Integer,
+        db.ForeignKey("solicitudes_sef_unidades.id"),
+        nullable=True
+    )
+
+    sucursal = db.Column(db.String(10))
+    numero_cuenta = db.Column(db.String(20))
+    moneda = db.Column(db.String(10))
+    tipo_cuenta = db.Column(db.String(50))
+
+    sef = db.relationship("SolicitudSEF", backref="sef_cuentas")
+    unidad = db.relationship("SolicitudSEFUnidad")
+
 # ==========================================
 # CPAE
 # ==========================================

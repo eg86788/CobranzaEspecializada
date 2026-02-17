@@ -3,6 +3,7 @@ from app.models import (
     CatalogoEntidad,
     CatalogoProcesadora,
     SolicitudSEF,
+    SolicitudSEFCuenta,
     SolicitudSEFUnidad
 )
 from app.extensions import db
@@ -185,3 +186,46 @@ def handle_step(solicitud, step, form):
             "entidades": entidades,
             "unidad_editar": unidad_editar
         }
+    # ===============================
+    # STEP 4 (Cuentas SEF)
+    # ===============================
+    if step == 4:
+
+        # ELIMINAR
+        if form and form.get("eliminar_cuenta_id"):
+            cuenta = SolicitudSEFCuenta.query.get(form.get("eliminar_cuenta_id"))
+            if cuenta and cuenta.sef_id == sef.id:
+                db.session.delete(cuenta)
+                db.session.commit()
+            return None
+
+        # CREAR / EDITAR
+        if form and form.get("guardar_cuenta"):
+
+            cuenta_id = form.get("cuenta_id")
+
+            if cuenta_id:
+                cuenta = SolicitudSEFCuenta.query.get(cuenta_id)
+            else:
+                cuenta = SolicitudSEFCuenta(sef=sef)
+                db.session.add(cuenta)
+
+            cuenta.unidad_id = form.get("unidad_id")
+            cuenta.banco = form.get("banco")
+            cuenta.numero_cuenta = form.get("numero_cuenta")
+            cuenta.clabe = form.get("clabe")
+            cuenta.moneda = form.get("moneda")
+            cuenta.tipo_cuenta = form.get("tipo_cuenta")
+
+            db.session.commit()
+            return None
+
+        cuentas = sef.sef_cuentas
+        unidades = sef.sef_unidades
+
+        return {
+            "sef": sef,
+            "cuentas": cuentas,
+            "unidades": unidades
+        }
+

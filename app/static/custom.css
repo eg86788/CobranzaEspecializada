@@ -32,11 +32,10 @@
     color: var(--color-secondary) !important;
     border-color: var(--color-secondary) !important;
   }
-  
-  /* Tarjetas, encabezados, etc. */
-  .card-header{
+
+  .admin-card .card-header{
     background: var(--color-primary);
-    color:#fff;
+    color:#003746;
   }
   
   .alert-success{  background:#E9F6FD; color:var(--color-primary);}
