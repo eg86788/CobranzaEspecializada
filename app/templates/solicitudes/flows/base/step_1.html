@@ -19,32 +19,41 @@
 
         <div class="row g-3">
 
+          <!-- NUMERO CLIENTE -->
           <div class="col-md-6">
             <label class="form-label">Número Cliente</label>
             <input type="text"
                    name="numero_cliente"
                    class="form-control"
                    data-type="numero_cliente"
+                   inputmode="numeric"
+                   maxlength="10"
+                   pattern="\d{10}"
                    required
                    value="{{ solicitud.numero_cliente or '' }}">
             <div class="invalid-feedback">
-              Debe contener 10 dígitos numéricos.
+              Debe contener exactamente 10 dígitos numéricos.
             </div>
           </div>
 
+          <!-- NUMERO CONTRATO -->
           <div class="col-md-6">
             <label class="form-label">Número Contrato</label>
             <input type="text"
                    name="numero_contrato"
                    class="form-control"
                    data-type="numero_contrato"
+                   inputmode="numeric"
+                   maxlength="12"
+                   pattern="\d{12}"
                    required
                    value="{{ solicitud.numero_contrato or '' }}">
             <div class="invalid-feedback">
-              Debe contener 12 dígitos numéricos.
+              Debe contener exactamente 12 dígitos numéricos.
             </div>
           </div>
 
+          <!-- RAZON SOCIAL -->
           <div class="col-md-8">
             <label class="form-label">Razón Social</label>
             <input type="text"
@@ -57,16 +66,19 @@
             </div>
           </div>
 
+          <!-- RFC -->
           <div class="col-md-4">
             <label class="form-label">RFC</label>
             <input type="text"
                    name="rfc"
                    class="form-control"
                    data-type="rfc"
+                   maxlength="13"
+                   pattern="^([A-ZÑ&]{3,4})\d{6}[A-Z0-9]{3}$"
                    required
                    value="{{ solicitud.rfc or '' }}">
             <div class="invalid-feedback">
-              Formato de RFC inválido. Ejemplo: ABCD-123456-XYZ
+              Formato inválido. Ejemplo: ABCD123456XYZ
             </div>
           </div>
 
@@ -86,6 +98,7 @@
 
         <div class="row g-3">
 
+          <!-- TIPO TRAMITE -->
           <div class="col-md-6">
             <label class="form-label">Tipo de Trámite</label>
             <select name="tipo_tramite"
@@ -110,6 +123,7 @@
             </div>
           </div>
 
+          <!-- OBSERVACIONES -->
           <div class="col-md-12">
             <label class="form-label">Observaciones</label>
             <textarea name="observaciones"
@@ -122,6 +136,7 @@
       </div>
     </div>
 
+    <!-- BOTON -->
     <div class="d-flex justify-content-end">
       <button type="submit" class="btn btn-primary px-4">
         Guardar y continuar →

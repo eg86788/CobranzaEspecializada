@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <h4 class="mb-3">
+    Servicios de Efectivo
+    <small class="text-muted">– Cuentas</small>
+  </h4>
+
+  <!-- ================= FORMULARIO ================= -->
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <strong>Agregar Cuenta</strong>
+    </div>
+    <div class="card-body">
+
+      <form method="POST">
+
+        <div class="row g-3">
+
+          <!-- UNIDAD -->
+          <div class="col-md-4">
+            <label class="form-label">Unidad</label>
+            <select name="unidad_id" class="form-select">
+              <option value="">Sin unidad específica</option>
+              {% for u in unidades %}
+                <option value="{{ u.id }}"
+                {% if cuenta_editar and cuenta_editar.unidad_id == u.id %} selected {% endif %}>
+                  {{ u.nombre_unidad }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- SUCURSAL -->
+          <div class="col-md-2">
+            <label class="form-label">Sucursal</label>
+            <input type="text"
+                   name="sucursal"
+                   class="form-control"
+                   maxlength="10"
+                   value="{{ cuenta_editar.sucursal if cuenta_editar else '' }}">
+          </div>
+
+          <!-- NUMERO CUENTA -->
+          <div class="col-md-3">
+            <label class="form-label">Número Cuenta</label>
+            <input type="text"
+                   name="numero_cuenta"
+                   class="form-control"
+                   maxlength="20"
+                   value="{{ cuenta_editar.numero_cuenta if cuenta_editar else '' }}">
+          </div>
+
+          <!-- MONEDA -->
+          <div class="col-md-2">
+            <label class="form-label">Moneda</label>
+            <select name="moneda" class="form-select">
+              <option value="">Selecciona</option>
+              <option value="MXN" {% if cuenta_editar and cuenta_editar.moneda == "MXN" %}selected{% endif %}>MXN</option>
+              <option value="USD" {% if cuenta_editar and cuenta_editar.moneda == "USD" %}selected{% endif %}>USD</option>
+            </select>
+          </div>
+
+          <!-- TIPO CUENTA -->
+          <div class="col-md-3">
+            <label class="form-label">Tipo Cuenta</label>
+            <select name="tipo_cuenta" class="form-select">
+              <option value="">Selecciona</option>
+              <option value="DEPÓSITO" {% if cuenta_editar and cuenta_editar.tipo_cuenta == "DEPÓSITO" %}selected{% endif %}>Operativa</option>
+              <option value="DOTACIÓN" {% if cuenta_editar and cuenta_editar.tipo_cuenta == "DOTACIÓN" %}selected{% endif %}>Dotación</option>
+              <option value="TRASLADO" {% if cuenta_editar and cuenta_editar.tipo_cuenta == "TRASLADO" %}selected{% endif %}>Traslado</option>
+              <option value="COMISIÓN" {% if cuenta_editar and cuenta_editar.tipo_cuenta == "COMISION" %}selected{% endif %}>Comisión</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary btn-sm">
+            Guardar Cuenta
+          </button>
+        </div>
+
+        <input type="hidden" name="cuenta_id" value="{{ cuenta_editar.id if cuenta_editar else '' }}">
+        <input type="hidden" name="guardar_cuenta" value="1">
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================= LISTADO ================= -->
+
+  <div class="card">
+    <div class="card-header bg-light">
+      <strong>Cuentas registradas</strong>
+    </div>
+    <div class="card-body p-0">
+
+      {% if cuentas %}
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Unidad</th>
+              <th>Sucursal</th>
+              <th>Cuenta</th>
+              <th>Moneda</th>
+              <th>Tipo</th>
+              <th width="120">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in cuentas %}
+            <tr>
+              <td>{{ c.unidad.nombre_unidad if c.unidad else "-" }}</td>
+              <td>{{ c.sucursal }}</td>
+              <td>{{ c.numero_cuenta }}</td>
+              <td>{{ c.moneda }}</td>
+              <td>{{ c.tipo_cuenta }}</td>
+              <td>
+                <a href="?editar={{ c.id }}" class="btn btn-sm btn-primary">
+                  Editar
+                </a>
+
+                <form method="POST" style="display:inline;"
+                      onsubmit="return confirm('¿Eliminar cuenta?');">
+                  <input type="hidden" name="eliminar_cuenta_id" value="{{ c.id }}">
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    X
+                  </button>
+                </form>
+
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-3 text-muted">
+        No hay cuentas registradas.
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ================= NAV ================= -->
+
+  <div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=3) }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Regresar
+    </a>
+
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=5) }}"
+       class="btn btn-success btn-sm">
+      Continuar →
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}
