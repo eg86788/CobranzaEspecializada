@@ -1,106 +1,257 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="container mt-4">
 
   <h4 class="mb-3">
     Servicios de Efectivo
-    <small class="text-muted">– Configuración del servicio</small>
+    <small class="text-muted">– Datos Generales</small>
   </h4>
 
-  <form method="POST" autocomplete="off">
+  <form method="POST" class="needs-validation" novalidate>
 
-    <!-- ===================== Datos de la solicitud ===================== -->
-    <fieldset class="border p-3 mb-3 compact">
-      <legend class="float-none w-auto px-2">Datos del Servicio</legend>
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-light">
+        <strong>Información del Servicio</strong>
+      </div>
+      <div class="card-body">
 
-      <div class="row g-3">
+        <div class="row g-3">
 
-        <div class="col-md-6">
-          <label class="form-label">Nombre del Ejecutivo</label>
-          <input type="text"
-                 class="form-control"
-                 name="nombre_ejecutivo"
-                 value="{{ solicitud.sef.nombre_ejecutivo if solicitud.sef else '' }}">
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Tipo Contrato</label>
-          <select class="form-select" name="tipo_contrato">
-            <option value="">Selecciona…</option>
-            <option value="CPAE TRADICIONAL"
-              {% if solicitud.sef and solicitud.sef.tipo_contrato == 'CPAE TRADICIONAL' %}selected{% endif %}>
-              CPAE TRADICIONAL
-            </option>
-            <option value="SEF ELECTRÓNICO"
-              {% if solicitud.sef and solicitud.sef.tipo_contrato == 'SEF ELECTRÓNICO' %}selected{% endif %}>
-              SEF ELECTRÓNICO
-            </option>
-          </select>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Servicio</label>
-          <select class="form-select" name="tipo_servicio">
-            <option value="">Selecciona…</option>
-            <option value="DEPÓSITO TRADICIONAL">DEPÓSITO TRADICIONAL</option>
-            <option value="DEPÓSITO ELECTRÓNICO">DEPÓSITO ELECTRÓNICO</option>
-            <option value="DOTACIÓN ELECTRÓNICA">DOTACIÓN ELECTRÓNICA</option>
-          </select>
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Servicio Adicional</label>
-            <select class="form-select" name="servicio_adicional">
-              <option value="">Selecciona…</option>
-              <option value="TRASLADO DE VALORES">TRASLADO DE VALORES</option>
-              <option value="COFRE ELECTRÓNICO">COFRE ELECTRÓNICO</option>
-            </select>
-          </div>
-
+          <!-- TIPO CONTRATO -->
           <div class="col-md-6">
-            <label class="form-label">Cortes de Abono y Horarios</label>
-            <select class="form-select" name="servicio_adicional">
-              <option value="">Selecciona…</option>
-              <option value="08:00">08:00</option>
-              <option value="14:00">14:00</option>
-              <option value="18:00">18:00</option>
+            <label class="form-label">Tipo de Contrato</label>
+            <select name="tipo_contrato" class="form-select" required>
+              <option value="">Seleccione...</option>
+              <option value="NUEVO"
+                {% if sef.tipo_contrato == "NUEVO" %}selected{% endif %}>
+                Nuevo
+              </option>
+              <option value="EXISTENTE"
+                {% if sef.tipo_contrato == "EXISTENTE" %}selected{% endif %}>
+                Existente
+              </option>
             </select>
+            <div class="invalid-feedback">
+              Debe seleccionar tipo de contrato.
+            </div>
           </div>
 
-        <div class="col-md-6">
-          <label class="form-label">Tipo de Cobro</label>
-          <select class="form-select" name="tipo_cobro">
-            <option value="">Selecciona…</option>
-            <option value="LOCAL">LOCAL</option>
-            <option value="CENTRALIZADO">CENTRALIZADO</option>
-          </select>
-        </div>
+          <!-- TIPO SERVICIO -->
+          <div class="col-md-6">
+            <label class="form-label">Tipo de Servicio</label>
+            <input type="text"
+                   name="tipo_servicio"
+                   class="form-control"
+                   required
+                   value="{{ sef.tipo_servicio or '' }}">
+            <div class="invalid-feedback">
+              Campo obligatorio.
+            </div>
+          </div>
 
-        <div class="col-md-6">
-          <label class="form-label">Importe Máximo de Diferencias</label>
-          <div class="input-group">
-            <span class="input-group-text">$</span>
+          <!-- SERVICIO ADICIONAL -->
+          <div class="col-md-6">
+            <label class="form-label">Servicio Adicional</label>
+            <input type="text"
+                   name="servicio_adicional"
+                   class="form-control"
+                   value="{{ sef.servicio_adicional or '' }}">
+          </div>
+
+          <!-- CORTES ENVIO -->
+          <div class="col-md-6">
+            <label class="form-label">Cortes de Envío</label>
+            <input type="text"
+                   name="cortes_envio"
+                   class="form-control"
+                   value="{{ sef.cortes_envio or '' }}">
+          </div>
+
+          <!-- TIPO COBRO -->
+          <div class="col-md-4">
+            <label class="form-label">Tipo de Cobro</label>
+            <select name="tipo_cobro" class="form-select" required>
+              <option value="">Seleccione...</option>
+              <option value="FIJO"
+                {% if sef.tipo_cobro == "FIJO" %}selected{% endif %}>
+                Fijo
+              </option>
+              <option value="VARIABLE"
+                {% if sef.tipo_cobro == "VARIABLE" %}selected{% endif %}>
+                Variable
+              </option>
+            </select>
+            <div class="invalid-feedback">
+              Debe seleccionar tipo de cobro.
+            </div>
+          </div>
+
+          <!-- IMPORTE MAX DIF -->
+          <div class="col-md-4">
+            <label class="form-label">Importe Máximo Diferencia</label>
             <input type="number"
                    step="0.01"
-                   class="form-control"
                    name="importe_maximo_dif"
-                   value="{{ solicitud.sef.importe_maximo_dif if solicitud.sef else '' }}">
+                   class="form-control"
+                   value="{{ sef.importe_maximo_dif or '' }}">
           </div>
+
+          <!-- SEGMENTO -->
+          <div class="col-md-4">
+            <label class="form-label">Segmento</label>
+            <input type="text"
+                   name="segmento"
+                   class="form-control"
+                   value="{{ sef.segmento or '' }}">
+          </div>
+
+          <!-- TIPO PERSONA -->
+          <div class="col-md-6">
+            <label class="form-label">Tipo Persona</label>
+            <select name="tipo_persona" class="form-select" required>
+              <option value="">Seleccione...</option>
+              <option value="FISICA"
+                {% if sef.tipo_persona == "FISICA" %}selected{% endif %}>
+                Física
+              </option>
+              <option value="MORAL"
+                {% if sef.tipo_persona == "MORAL" %}selected{% endif %}>
+                Moral
+              </option>
+            </select>
+            <div class="invalid-feedback">
+              Campo obligatorio.
+            </div>
+          </div>
+
         </div>
 
       </div>
-    </fieldset>
+    </div>
 
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary btn-sm">
-        Siguiente →
-      </button>
-      <a href="{{ url_for('sol_portal.lista') }}" class="btn btn-outline-secondary btn-sm">
-        Cancelar
+    <!-- ========================= -->
+    <!-- DATOS DE CONTACTO -->
+    <!-- ========================= -->
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-light">
+        <strong>Datos de Contacto</strong>
+      </div>
+      <div class="card-body">
+
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label class="form-label">Apoderado Legal</label>
+            <input type="text"
+                   name="apoderado_legal"
+                   class="form-control"
+                   value="{{ sef.apoderado_legal or '' }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Correo Apoderado</label>
+            <input type="email"
+                   name="correo_apoderado_legal"
+                   class="form-control"
+                   value="{{ sef.correo_apoderado_legal or '' }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input type="text"
+                   name="telefono_cliente"
+                   class="form-control"
+                   data-type="telefono"
+                   value="{{ sef.telefono_cliente or '' }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Domicilio Cliente</label>
+            <input type="text"
+                   name="domicilio_cliente"
+                   class="form-control"
+                   value="{{ sef.domicilio_cliente or '' }}">
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- SUSTITUCIONES -->
+    <!-- ========================= -->
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-light">
+        <strong>Sustituciones</strong>
+      </div>
+      <div class="card-body">
+
+        <div class="row g-3">
+
+          <div class="col-md-4 form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="smod_unidades"
+                   {% if sef.sust_mod_unidades %}checked{% endif %}>
+            <label class="form-check-label">Modificar Unidades</label>
+          </div>
+
+          <div class="col-md-4 form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="smod_cuentas"
+                   {% if sef.sust_mod_cuentas %}checked{% endif %}>
+            <label class="form-check-label">Modificar Cuentas</label>
+          </div>
+
+          <div class="col-md-4 form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="smod_usuarios"
+                   {% if sef.sust_mod_usuarios %}checked{% endif %}>
+            <label class="form-check-label">Modificar Usuarios</label>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=1) }}"
+         class="btn btn-outline-secondary">
+        ← Regresar
       </a>
+
+      <button type="submit" class="btn btn-primary">
+        Guardar y continuar →
+      </button>
     </div>
 
   </form>
 
 </div>
+
+<script>
+// Bootstrap validation
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})();
+</script>
+
 {% endblock %}
