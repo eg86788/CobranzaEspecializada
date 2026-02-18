@@ -218,6 +218,72 @@
     </div>
   </div>
 
+    <!-- ===================== LISTADO ===================== -->
+
+    <div class="card">
+      <div class="card-header bg-light">
+        <strong>Unidades capturadas</strong>
+      </div>
+      <div class="card-body p-0">
+  
+        {% if sef and unidades %}
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Acción</th>
+                <th>Nombre</th>
+                <th>CPAE</th>
+                <th>ETV</th>
+                <th>Servicios</th>
+                <th width="120">Opciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in unidades %}
+              <tr>
+                <td>{{ u.accion_unidad }}</td>
+                <td>{{ u.nombre_unidad }}</td>
+                <td>{{ u.cpae.descripcion if u.cpae else '' }}</td>
+                <td>{{ u.etv.nombre if u.etv else '' }}</td>
+                <td>
+                  {% if u.servicio_verificacion_tradicional %}VT {% endif %}
+                  {% if u.servicio_verificacion_electronica %}VE {% endif %}
+                  {% if u.servicio_dotacion %}DOT {% endif %}
+                  {% if u.servicio_traslado %}TRAS {% endif %}
+                  {% if u.servicio_cofre %}COFRE {% endif %}
+                </td>
+                <td>
+                  <a href="?editar={{ u.id }}"
+                     class="btn btn-sm btn-primary">
+                    Editar
+                  </a>
+  
+                  <form method="POST"
+                        style="display:inline;"
+                        onsubmit="return confirm('¿Eliminar esta unidad?');">
+                    <input type="hidden"
+                           name="eliminar_unidad_id"
+                           value="{{ u.id }}">
+                    <button type="submit"
+                            class="btn btn-sm btn-danger">
+                      X
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div class="p-3 text-muted">
+            No hay unidades registradas.
+          </div>
+        {% endif %}
+  
+      </div>
+    </div>
 </div>
 
 <script>
