@@ -8,18 +8,20 @@
     <small class="text-muted">– Unidades de Negocio</small>
   </h4>
 
-  <!-- ===================== FORMULARIO ===================== -->
-  <div class="card mb-4">
+  <div class="card mb-4 shadow-sm">
     <div class="card-header bg-light">
-      <strong>Agregar / Editar Unidad</strong>
+      <strong>{{ 'Editar Unidad' if unidad_editar else 'Agregar nueva Unidad' }}</strong>
     </div>
+
     <div class="card-body">
 
-      <form method="POST">
+      <form method="POST" class="needs-validation" novalidate>
 
+        <!-- ========================= -->
+        <!-- DATOS GENERALES -->
+        <!-- ========================= -->
         <div class="row g-3">
 
-          <!-- ACCIÓN -->
           <div class="col-md-4">
             <label class="form-label">Acción</label>
             <select name="accion_unidad" class="form-select" required>
@@ -37,9 +39,9 @@
                 BAJA
               </option>
             </select>
+            <div class="invalid-feedback">Debe seleccionar una acción.</div>
           </div>
 
-          <!-- NOMBRE -->
           <div class="col-md-8">
             <label class="form-label">Nombre Unidad</label>
             <input type="text"
@@ -47,15 +49,24 @@
                    class="form-control"
                    required
                    value="{{ unidad_editar.nombre_unidad if unidad_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
-          <!-- CPAE -->
+        </div>
+
+        <hr class="my-4">
+
+        <!-- ========================= -->
+        <!-- AUTOCOMPLETE -->
+        <!-- ========================= -->
+        <div class="row g-3">
+
           <div class="col-md-4">
             <label>CPAE</label>
             <input type="text"
                    id="cpae_search"
                    class="form-control"
-                   value="{% if unidad_editar and unidad_editar.cpae %}{{ unidad_editar.cpae.descripcion }}{% endif %}">
+                   value="{{ unidad_editar.cpae.descripcion if unidad_editar and unidad_editar.cpae else '' }}">
             <input type="hidden"
                    name="cpae_id"
                    id="cpae_id"
@@ -63,13 +74,12 @@
             <ul id="cpae_results" class="list-group"></ul>
           </div>
 
-          <!-- ETV -->
           <div class="col-md-4">
             <label>ETV</label>
             <input type="text"
                    id="etv_search"
                    class="form-control"
-                   value="{% if unidad_editar and unidad_editar.etv %}{{ unidad_editar.etv.nombre }}{% endif %}">
+                   value="{{ unidad_editar.etv.nombre if unidad_editar and unidad_editar.etv else '' }}">
             <input type="hidden"
                    name="etv_id"
                    id="etv_id"
@@ -77,13 +87,12 @@
             <ul id="etv_results" class="list-group"></ul>
           </div>
 
-          <!-- PROCESADORA -->
           <div class="col-md-4">
             <label>Procesadora</label>
             <input type="text"
                    id="procesadora_search"
                    class="form-control"
-                   value="{% if unidad_editar and unidad_editar.procesadora %}{{ unidad_editar.procesadora.nombre }}{% endif %}">
+                   value="{{ unidad_editar.procesadora.nombre if unidad_editar and unidad_editar.procesadora else '' }}">
             <input type="hidden"
                    name="procesadora_id"
                    id="procesadora_id"
@@ -95,8 +104,11 @@
 
         <hr class="my-4">
 
+        <!-- ========================= -->
         <!-- SERVICIOS -->
+        <!-- ========================= -->
         <h6>Servicios</h6>
+
         <div class="row g-3">
 
           <div class="col-md-4 form-check">
@@ -143,9 +155,9 @@
 
         <hr class="my-4">
 
+        <!-- ========================= -->
         <!-- DOMICILIO -->
-        <h6>Domicilio</h6>
-
+        <!-- ========================= -->
         <div class="row g-3">
 
           <div class="col-md-6">
@@ -156,10 +168,11 @@
                    value="{{ unidad_editar.calle_numero if unidad_editar else '' }}">
           </div>
 
-          <!-- ENTIDAD -->
           <div class="col-md-3">
             <label>Entidad Federativa</label>
-            <select name="entidad_id" id="entidad_select" class="form-select">
+            <select name="entidad_id"
+                    id="entidad_select"
+                    class="form-select">
               <option value="">Seleccione</option>
               {% for e in entidades %}
                 <option value="{{ e.id }}"
@@ -170,24 +183,17 @@
             </select>
           </div>
 
-          <!-- MUNICIPIO -->
           <div class="col-md-3">
             <label>Municipio</label>
-            <select name="municipio_id" id="municipio_select" class="form-select">
+            <select name="municipio_id"
+                    id="municipio_select"
+                    class="form-select">
               <option value="">Seleccione</option>
-              {% if unidad_editar and unidad_editar.entidad %}
-                {% for m in unidad_editar.entidad.municipios %}
-                  <option value="{{ m.id }}"
-                    {% if unidad_editar.municipio_id == m.id %}selected{% endif %}>
-                    {{ m.nombre }}
-                  </option>
-                {% endfor %}
-              {% endif %}
             </select>
           </div>
 
           <div class="col-md-3">
-            <label class="form-label">Código Postal</label>
+            <label>Código Postal</label>
             <input type="text"
                    name="codigo_postal"
                    class="form-control"
@@ -203,85 +209,74 @@
           </button>
         </div>
 
-        <input type="hidden"
-               name="unidad_id"
+        <input type="hidden" name="unidad_id"
                value="{{ unidad_editar.id if unidad_editar else '' }}">
-        <input type="hidden"
-               name="guardar_unidad"
-               value="1">
+        <input type="hidden" name="guardar_unidad" value="1">
 
       </form>
 
     </div>
   </div>
 
-  <!-- ===================== LISTADO ===================== -->
-
-  <div class="card">
-    <div class="card-header bg-light">
-      <strong>Unidades capturadas</strong>
-    </div>
-    <div class="card-body p-0">
-
-      {% if sef and unidades %}
-      <div class="table-responsive">
-        <table class="table table-sm table-bordered">
-          <thead class="table-light">
-            <tr>
-              <th>Acción</th>
-              <th>Nombre</th>
-              <th>CPAE</th>
-              <th>ETV</th>
-              <th>Servicios</th>
-              <th width="120">Opciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for u in unidades %}
-            <tr>
-              <td>{{ u.accion_unidad }}</td>
-              <td>{{ u.nombre_unidad }}</td>
-              <td>{{ u.cpae.descripcion if u.cpae else '' }}</td>
-              <td>{{ u.etv.nombre if u.etv else '' }}</td>
-              <td>
-                {% if u.servicio_verificacion_tradicional %}VT {% endif %}
-                {% if u.servicio_verificacion_electronica %}VE {% endif %}
-                {% if u.servicio_dotacion %}DOT {% endif %}
-                {% if u.servicio_traslado %}TRAS {% endif %}
-                {% if u.servicio_cofre %}COFRE {% endif %}
-              </td>
-              <td>
-                <a href="?editar={{ u.id }}"
-                   class="btn btn-sm btn-primary">
-                  Editar
-                </a>
-
-                <form method="POST"
-                      style="display:inline;"
-                      onsubmit="return confirm('¿Eliminar esta unidad?');">
-                  <input type="hidden"
-                         name="eliminar_unidad_id"
-                         value="{{ u.id }}">
-                  <button type="submit"
-                          class="btn btn-sm btn-danger">
-                    X
-                  </button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-        <div class="p-3 text-muted">
-          No hay unidades registradas.
-        </div>
-      {% endif %}
-
-    </div>
-  </div>
-
 </div>
+
+<script>
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})();
+</script>
+
+<script>
+// Cargar municipios si ya hay entidad seleccionada
+document.addEventListener("DOMContentLoaded", function () {
+
+  const entidadSelect = document.getElementById("entidad_select");
+  const municipioSelect = document.getElementById("municipio_select");
+
+  function cargarMunicipios(entidadId, seleccionado=null) {
+    if (!entidadId) return;
+
+    fetch(`/catalogos/municipios/${entidadId}`)
+      .then(res => res.json())
+      .then(data => {
+        municipioSelect.innerHTML = "<option value=''>Seleccione</option>";
+
+        data.results.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = item.text;
+
+          if (seleccionado && seleccionado == item.id) {
+            option.selected = true;
+          }
+
+          municipioSelect.appendChild(option);
+        });
+      });
+  }
+
+  entidadSelect.addEventListener("change", function () {
+    cargarMunicipios(this.value);
+  });
+
+  {% if unidad_editar and unidad_editar.entidad_id %}
+    cargarMunicipios(
+      "{{ unidad_editar.entidad_id }}",
+      "{{ unidad_editar.municipio_id }}"
+    );
+  {% endif %}
+
+});
+</script>
 
 {% endblock %}

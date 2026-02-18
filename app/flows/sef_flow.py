@@ -59,6 +59,11 @@ def handle_step(solicitud, step, form):
 
         return 3
 
+    # GET
+    return {
+        "sef": sef
+    }
+
     # =====================================================
     # STEP 3 (Unidades SEF)
     # =====================================================
