@@ -151,17 +151,19 @@
 
   <!-- ================= NAV ================= -->
 
-  <div class="mt-4 d-flex justify-content-between">
-    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=3) }}"
-       class="btn btn-outline-secondary btn-sm">
-      ← Regresar
-    </a>
+      <!-- ================= NAV ================= -->
 
-    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=5) }}"
-       class="btn btn-success btn-sm">
-      Continuar →
-    </a>
-  </div>
+      <div class="mt-4 d-flex justify-content-between">
+        <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=3) }}"
+        class="btn btn-outline-secondary btn-sm">
+          ← Regresar
+        </a>
+    
+        <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=5) }}"
+          class="btn btn-primary px-4">
+          Continuar →
+        </a>
+      </div>
 
 </div>
 
