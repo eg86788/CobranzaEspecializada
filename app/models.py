@@ -296,6 +296,76 @@ class CatalogoETV(db.Model):
 
 
 # ==========================================
+# DOCUMENT TEMPLATES
+# ==========================================
+class DocumentTemplate(db.Model):
+    __tablename__ = "document_templates"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    slug = db.Column(db.Text, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    content_html = db.Column(db.Text, nullable=False)
+    css = db.Column(db.Text, nullable=False, default="")
+    cascaron = db.Column(db.Text, nullable=False)
+
+    version = db.Column(db.Integer, nullable=False, default=1)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+
+    updated_by = db.Column(db.Text, nullable=True)
+    updated_at = db.Column(
+        db.DateTime(timezone=True),
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint("slug", "version", name="uq_document_templates_slug_version"),
+        db.Index(
+            "idx_document_templates_active",
+            "slug",
+            postgresql_where=db.text("is_active = TRUE")
+        ),
+    )
+
+    def __repr__(self):
+        return f"{self.slug} v{self.version}"
+
+
+# ==========================================
+# ADHESIONES
+# ==========================================
+class CatalogoAdhesion(db.Model):
+    __tablename__ = "catalogo_adhesiones"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    clave = db.Column(db.String(100), nullable=False, index=True)
+    numero = db.Column(db.String(100), nullable=False)
+
+    vigente_desde = db.Column(db.Date, nullable=False)
+    vigente_hasta = db.Column(db.Date, nullable=True)
+
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    updated_by = db.Column(db.String(120), nullable=True)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    __table_args__ = (
+        db.Index("idx_adhesiones_clave", "clave"),
+    )
+
+    def __repr__(self):
+        return f"{self.clave} - {self.numero}"
+
+
+# ==========================================
 # PROCESADORA
 # ==========================================
 class CatalogoProcesadora(db.Model):
@@ -369,3 +439,90 @@ class CatalogoMunicipio(db.Model):
 
     def __repr__(self):
         return f"{self.nombre}"
+
+
+# ==========================================
+# MINUTAS
+# ==========================================
+
+class MeetingMinutes(db.Model):
+    __tablename__ = "meeting_minutes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_reunion = db.Column(db.Date, nullable=False)
+    asunto = db.Column(db.Text, nullable=False)
+    notas = db.Column(db.Text, nullable=True)
+    acuerdos = db.Column(db.Text, nullable=True)
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    # Relaciones
+    attendees = db.relationship(
+        "MeetingAttendee",
+        back_populates="meeting",
+        cascade="all, delete-orphan"
+    )
+
+    commitments = db.relationship(
+        "MeetingCommitment",
+        back_populates="meeting",
+        cascade="all, delete-orphan"
+    )
+
+    def __repr__(self):
+        return f"Minuta {self.id} - {self.asunto}"
+
+
+class MeetingAttendee(db.Model):
+    __tablename__ = "meeting_attendees"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    meeting_id = db.Column(
+        db.Integer,
+        db.ForeignKey("meeting_minutes.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    nombre = db.Column(db.Text, nullable=False)
+    cargo = db.Column(db.Text, nullable=True)
+
+    meeting = db.relationship(
+        "MeetingMinutes",
+        back_populates="attendees"
+    )
+
+    def __repr__(self):
+        return f"{self.nombre}"
+
+
+class MeetingCommitment(db.Model):
+    __tablename__ = "meeting_commitments"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    meeting_id = db.Column(
+        db.Integer,
+        db.ForeignKey("meeting_minutes.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    descripcion = db.Column(db.Text, nullable=False)
+    responsable = db.Column(db.Text, nullable=False)
+    eta = db.Column(db.Date, nullable=True)
+    estatus = db.Column(
+        db.Text,
+        nullable=False,
+        default="PENDIENTE"
+    )
+
+    meeting = db.relationship(
+        "MeetingMinutes",
+        back_populates="commitments"
+    )
+
+    def __repr__(self):
+        return f"{self.descripcion} - {self.estatus}"
