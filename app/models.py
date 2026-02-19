@@ -3,7 +3,6 @@ from datetime import datetime
 from app.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
 
-
 # =====================================================
 # ADMIN / PERMISOS
 # =====================================================
@@ -526,3 +525,68 @@ class MeetingCommitment(db.Model):
 
     def __repr__(self):
         return f"{self.descripcion} - {self.estatus}"
+
+
+# ==========================================
+# CONTACTOS
+# ==========================================
+class Contacto(db.Model):
+    __tablename__ = "solicitudes_sef_contactos"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    sef_id = db.Column(
+        db.Integer,
+        db.ForeignKey("solicitudes_sef.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    nombre_contacto = db.Column(db.Text, nullable=True)
+    correo = db.Column(db.Text, nullable=True)
+    telefono = db.Column(db.Text, nullable=True)
+    numero_terminal_sef = db.Column(db.Text, nullable=True)
+    tipos_contacto = db.Column(db.Text, nullable=True)
+
+    sef = db.relationship(
+        "SolicitudSEF",
+        backref=db.backref("sef_contactos", cascade="all, delete-orphan")
+    )
+
+    def __repr__(self):
+        return f"{self.nombre_contacto} - {self.correo}"
+
+# ==========================================
+# SEF - USUARIOS SEF (HIJAS DE SOLICITUDSEF)
+# ==========================================
+class SolicitudSEFUsuario(db.Model):
+    __tablename__ = "solicitudes_sef_usuarios_sef"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    sef_id = db.Column(
+        db.Integer,
+        db.ForeignKey("solicitudes_sef.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    unidad_id = db.Column(
+        db.Integer,
+        db.ForeignKey("solicitudes_sef_unidades.id"),
+        nullable=True
+    )
+
+    nombre = db.Column(db.String(150), nullable=True)
+    correo = db.Column(db.String(150), nullable=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    perfil = db.Column(db.String(100), nullable=True)
+    estatus = db.Column(db.String(20), nullable=False, default="ACTIVO")
+
+    sef = db.relationship(
+        "SolicitudSEF",
+        backref=db.backref("sef_usuarios", cascade="all, delete-orphan")
+    )
+    unidad = db.relationship("SolicitudSEFUnidad")
+
+    def __repr__(self):
+        return f"{self.nombre} - {self.perfil}"
