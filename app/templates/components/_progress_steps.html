@@ -1,0 +1,96 @@
+
+
+{% if total_steps and step %}
+
+<div class="progress-steps mb-4">
+  <div class="steps-wrapper">
+
+    {% for i in range(1, total_steps + 1) %}
+      <div class="step-item
+           {% if i < step %} completed
+           {% elif i == step %} active
+           {% endif %}">
+
+        {% if i < step %}
+          <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=i) }}"
+             class="step-link">
+            <div class="step-circle">
+              {{ i }}
+            </div>
+          </a>
+        {% else %}
+          <div class="step-circle">
+            {{ i }}
+          </div>
+        {% endif %}
+
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endif %}
+
+<style>
+.progress-steps {
+  width: 100%;
+}
+
+.steps-wrapper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 0 10px;
+}
+
+.steps-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #dee2e6;
+  z-index: 1;
+}
+
+.step-item {
+  position: relative;
+  z-index: 2;
+}
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dee2e6;
+  color: #6c757d;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.step-item.active .step-circle {
+  background: #C8102E;
+  color: #fff;
+}
+
+.step-item.completed .step-circle {
+  background: #198754;
+  color: #fff;
+}
+</style>
+
+<style>
+.step-link {
+  text-decoration: none;
+}
+
+.step-link:hover .step-circle {
+  transform: scale(1.05);
+  transition: 0.15s ease-in-out;
+}
+</style>

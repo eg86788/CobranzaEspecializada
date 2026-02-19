@@ -60,20 +60,33 @@ def step(solicitud_id, step):
     # Step 1 siempre usa base
     if step == 1:
         template_base = f"solicitudes/flows/base/step_{step}.html"
-        return render_template(template_base, solicitud=solicitud, step=step)
+
+        total_steps = None
+        if solicitud.producto == "sef":
+            total_steps = 6  # Total de pasos del flujo SEF
+
+        return render_template(
+            template_base,
+            solicitud=solicitud,
+            step=step,
+            total_steps=total_steps
+        )
 
     # Para productos específicos desde step 2
     if solicitud.producto == "sef":
         from app.flows.sef_flow import handle_step
 
-        context = handle_step(solicitud, step, None) or {}  
+        context = handle_step(solicitud, step, None) or {}
 
         template = f"solicitudes/flows/sef/step_{step}.html"
+
+        total_steps = 7  # Total de pasos del flujo SEF
 
         return render_template(
             template,
             solicitud=solicitud,
             step=step,
+            total_steps=total_steps,
             **(context or {})
         )
 

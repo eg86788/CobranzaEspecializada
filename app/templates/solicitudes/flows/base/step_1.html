@@ -5,6 +5,7 @@
 
   <h3>Solicitud #{{ solicitud.id }}</h3>
   <p class="text-muted">Producto: {{ solicitud.producto }}</p>
+  {% include "components/_progress_steps.html" %}
 
   <form method="POST" class="mt-4 needs-validation" novalidate>
 
