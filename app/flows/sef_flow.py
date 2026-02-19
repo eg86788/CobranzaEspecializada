@@ -10,6 +10,12 @@ from app.models import (
 from app.extensions import db
 
 
+def to_int(value):
+    if not value or value == "None":
+        return None
+    return int(value)
+
+
 def handle_step(solicitud, step, form):
 
     # =====================================================
@@ -23,7 +29,7 @@ def handle_step(solicitud, step, form):
         db.session.flush()
 
     # =====================================================
-    # STEP 2 (Datos generales SEF)
+    # STEP 2
     # =====================================================
     if step == 2:
 
@@ -35,7 +41,6 @@ def handle_step(solicitud, step, form):
             sef.cortes_envio = form.get("cortes_envio")
 
             sef.importe_maximo_dif = form.get("importe_maximo_dif") or None
-
             sef.segmento = form.get("segmento")
             sef.tipo_persona = form.get("tipo_persona")
 
@@ -59,21 +64,19 @@ def handle_step(solicitud, step, form):
             sef.sust_crea_contactos = bool(form.get("screa_contactos"))
 
             db.session.commit()
-
-            return 3  # avanzar al siguiente step
+            return 3
 
         return {"sef": sef}
 
     # =====================================================
-    # STEP 3 (Unidades SEF)
+    # STEP 3 (Unidades)
     # =====================================================
     if step == 3:
 
-        # ELIMINAR UNIDAD
         if form and form.get("eliminar_unidad_id"):
 
             unidad = SolicitudSEFUnidad.query.get(
-                int(form.get("eliminar_unidad_id"))
+                to_int(form.get("eliminar_unidad_id"))
             )
 
             if unidad and unidad.sef_id == sef.id:
@@ -82,13 +85,12 @@ def handle_step(solicitud, step, form):
 
             return None
 
-        # CREAR / EDITAR UNIDAD
         if form and form.get("guardar_unidad"):
 
             unidad_id = form.get("unidad_id")
 
             if unidad_id:
-                unidad = SolicitudSEFUnidad.query.get(int(unidad_id))
+                unidad = SolicitudSEFUnidad.query.get(to_int(unidad_id))
             else:
                 unidad = SolicitudSEFUnidad(sef=sef)
                 db.session.add(unidad)
@@ -96,72 +98,44 @@ def handle_step(solicitud, step, form):
             unidad.accion_unidad = form.get("accion_unidad")
             unidad.nombre_unidad = form.get("nombre_unidad")
 
-            unidad.cpae_id = int(form.get("cpae_id")) if form.get("cpae_id") else None
-            unidad.etv_id = int(form.get("etv_id")) if form.get("etv_id") else None
-            unidad.procesadora_id = int(form.get("procesadora_id")) if form.get("procesadora_id") else None
-            unidad.entidad_id = int(form.get("entidad_id")) if form.get("entidad_id") else None
-            unidad.municipio_id = int(form.get("municipio_id")) if form.get("municipio_id") else None
+            unidad.cpae_id = to_int(form.get("cpae_id"))
+            unidad.etv_id = to_int(form.get("etv_id"))
+            unidad.procesadora_id = to_int(form.get("procesadora_id"))
+            unidad.entidad_id = to_int(form.get("entidad_id"))
+            unidad.municipio_id = to_int(form.get("municipio_id"))
 
             if unidad.procesadora_id:
-
-                proc = CatalogoProcesadora.query.get(
-                    unidad.procesadora_id
-                )
+                proc = CatalogoProcesadora.query.get(unidad.procesadora_id)
 
                 if proc:
-
                     if unidad.etv_id and proc.etv_id != unidad.etv_id:
-                        raise ValueError(
-                            "Procesadora no corresponde a la ETV seleccionada"
-                        )
+                        raise ValueError("Procesadora no corresponde a la ETV seleccionada")
 
                     if unidad.cpae_id and proc.cpae_id and proc.cpae_id != unidad.cpae_id:
-                        raise ValueError(
-                            "Procesadora no corresponde al CPAE seleccionado"
-                        )
+                        raise ValueError("Procesadora no corresponde al CPAE seleccionado")
 
-            unidad.servicio_verificacion_tradicional = bool(
-                form.get("servicio_verificacion_tradicional")
-            )
-            unidad.servicio_verificacion_electronica = bool(
-                form.get("servicio_verificacion_electronica")
-            )
-            unidad.servicio_cliente_certificado_central = bool(
-                form.get("servicio_cliente_certificado_central")
-            )
-            unidad.servicio_dotacion_centralizada = bool(
-                form.get("servicio_dotacion_centralizada")
-            )
-            unidad.servicio_integradora = bool(
-                form.get("servicio_integradora")
-            )
-            unidad.servicio_dotacion = bool(
-                form.get("servicio_dotacion")
-            )
-            unidad.servicio_traslado = bool(
-                form.get("servicio_traslado")
-            )
-            unidad.servicio_cofre = bool(
-                form.get("servicio_cofre")
-            )
+            unidad.servicio_verificacion_tradicional = bool(form.get("servicio_verificacion_tradicional"))
+            unidad.servicio_verificacion_electronica = bool(form.get("servicio_verificacion_electronica"))
+            unidad.servicio_cliente_certificado_central = bool(form.get("servicio_cliente_certificado_central"))
+            unidad.servicio_dotacion_centralizada = bool(form.get("servicio_dotacion_centralizada"))
+            unidad.servicio_integradora = bool(form.get("servicio_integradora"))
+            unidad.servicio_dotacion = bool(form.get("servicio_dotacion"))
+            unidad.servicio_traslado = bool(form.get("servicio_traslado"))
+            unidad.servicio_cofre = bool(form.get("servicio_cofre"))
 
             unidad.calle_numero = form.get("calle_numero")
             unidad.codigo_postal = form.get("codigo_postal")
 
             db.session.commit()
-
             return None
 
         unidades = sef.sef_unidades
-
-        entidades = CatalogoEntidad.query.order_by(
-            CatalogoEntidad.nombre
-        ).all()
+        entidades = CatalogoEntidad.query.order_by(CatalogoEntidad.nombre).all()
 
         unidad_editar = None
         if request.args.get("editar"):
             unidad_editar = SolicitudSEFUnidad.query.get(
-                int(request.args.get("editar"))
+                to_int(request.args.get("editar"))
             )
 
         return {
@@ -172,15 +146,14 @@ def handle_step(solicitud, step, form):
         }
 
     # =====================================================
-    # STEP 4 (Cuentas SEF)
+    # STEP 4 (Cuentas)
     # =====================================================
     if step == 4:
 
-        # ELIMINAR CUENTA
         if form and form.get("eliminar_cuenta_id"):
 
             cuenta = SolicitudSEFCuenta.query.get(
-                int(form.get("eliminar_cuenta_id"))
+                to_int(form.get("eliminar_cuenta_id"))
             )
 
             if cuenta and cuenta.sef_id == sef.id:
@@ -189,18 +162,17 @@ def handle_step(solicitud, step, form):
 
             return None
 
-        # CREAR / EDITAR CUENTA
         if form and form.get("guardar_cuenta"):
 
             cuenta_id = form.get("cuenta_id")
 
             if cuenta_id:
-                cuenta = SolicitudSEFCuenta.query.get(int(cuenta_id))
+                cuenta = SolicitudSEFCuenta.query.get(to_int(cuenta_id))
             else:
                 cuenta = SolicitudSEFCuenta(sef=sef)
                 db.session.add(cuenta)
 
-            cuenta.unidad_id = int(form.get("unidad_id")) if form.get("unidad_id") else None
+            cuenta.unidad_id = to_int(form.get("unidad_id"))
             cuenta.sucursal = form.get("sucursal")
             cuenta.numero_cuenta = form.get("numero_cuenta")
             cuenta.moneda = form.get("moneda")
@@ -215,7 +187,7 @@ def handle_step(solicitud, step, form):
         cuenta_editar = None
         if request.args.get("editar"):
             cuenta_editar = SolicitudSEFCuenta.query.get(
-                int(request.args.get("editar"))
+                to_int(request.args.get("editar"))
             )
 
         return {
@@ -225,7 +197,4 @@ def handle_step(solicitud, step, form):
             "cuenta_editar": cuenta_editar
         }
 
-    # =====================================================
-    # Default fallback
-    # =====================================================
     return {"sef": sef}

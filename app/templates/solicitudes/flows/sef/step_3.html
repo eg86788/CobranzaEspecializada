@@ -70,8 +70,8 @@
             <input type="hidden"
                    name="cpae_id"
                    id="cpae_id"
-                   value="{{ unidad_editar.cpae_id if unidad_editar else '' }}">
-            <ul id="cpae_results" class="list-group"></ul>
+                   value="{{ unidad_editar.cpae_id if unidad_editar and unidad_editar.cpae_id else '' }}">
+                  <ul id="cpae_results" class="list-group"></ul>
           </div>
 
           <div class="col-md-4">
@@ -83,8 +83,8 @@
             <input type="hidden"
                    name="etv_id"
                    id="etv_id"
-                   value="{{ unidad_editar.etv_id if unidad_editar else '' }}">
-            <ul id="etv_results" class="list-group"></ul>
+                   value="{{ unidad_editar.etv_id if unidad_editar and unidad_editar.etv_id else '' }}">
+                        <ul id="etv_results" class="list-group"></ul>
           </div>
 
           <div class="col-md-4">
@@ -93,11 +93,10 @@
                    id="procesadora_search"
                    class="form-control"
                    value="{{ unidad_editar.procesadora.nombre if unidad_editar and unidad_editar.procesadora else '' }}">
-            <input type="hidden"
+          </div><input type="hidden"
                    name="procesadora_id"
                    id="procesadora_id"
-                   value="{{ unidad_editar.procesadora_id if unidad_editar else '' }}">
-            <ul id="procesadora_results" class="list-group"></ul>
+                   value="{{ unidad_editar.procesadora_id if unidad_editar and unidad_editar.procesadora_id else '' }}">     <ul id="procesadora_results" class="list-group"></ul>
           </div>
 
         </div>
