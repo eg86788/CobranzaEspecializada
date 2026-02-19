@@ -93,10 +93,11 @@
                    id="procesadora_search"
                    class="form-control"
                    value="{{ unidad_editar.procesadora.nombre if unidad_editar and unidad_editar.procesadora else '' }}">
-          </div><input type="hidden"
+            <input type="hidden"
                    name="procesadora_id"
                    id="procesadora_id"
-                   value="{{ unidad_editar.procesadora_id if unidad_editar and unidad_editar.procesadora_id else '' }}">     <ul id="procesadora_results" class="list-group"></ul>
+                   value="{{ unidad_editar.procesadora_id if unidad_editar and unidad_editar.procesadora_id else '' }}">
+            <ul id="procesadora_results" class="list-group"></ul>
           </div>
 
         </div>
