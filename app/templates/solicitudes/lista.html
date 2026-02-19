@@ -55,12 +55,33 @@
           </td>
 
           <td class="text-end">
-                      <a href="{{ url_for('solicitudes_flow.step',
+
+  {% if s.estatus != 'Cancelada' %}
+
+    <a href="{{ url_for('solicitudes_flow.step',
                       solicitud_id=s.id,
                       step=1) }}"
-          class="btn btn-sm btn-primary">
-          Abrir
-          </a>
+       class="btn btn-sm btn-primary">
+       Abrir
+    </a>
+
+    <form method="POST"
+          action="{{ url_for('solicitudes_flow.cancelar', solicitud_id=s.id) }}"
+          style="display:inline;"
+          onsubmit="return confirm('¿Estás seguro de cancelar esta solicitud? Esta acción no se puede deshacer.');">
+
+      <button type="submit" class="btn btn-sm btn-outline-danger">
+        Cancelar
+      </button>
+
+    </form>
+
+  {% else %}
+
+    <span class="badge bg-secondary">Cancelada</span>
+
+  {% endif %}
+
           </td>
         </tr>
         {% else %}

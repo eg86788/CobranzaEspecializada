@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <h4 class="mb-3">
+    Servicios de Efectivo
+    <small class="text-muted">– Usuarios</small>
+  </h4>
+
+  <!-- ================= FORMULARIO ================= -->
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <strong>Agregar Usuario SEF</strong>
+    </div>
+    <div class="card-body">
+
+      <form method="POST">
+
+        <div class="row g-3">
+
+          <!-- UNIDAD -->
+          <div class="col-md-4">
+            <label class="form-label">Unidad</label>
+            <select name="unidad_id" class="form-select">
+              <option value="">Selecciona</option>
+              {% for u in unidades %}
+                <option value="{{ u.id }}"
+                {% if usuario_editar and usuario_editar.unidad_id == u.id %} selected {% endif %}>
+                  {{ u.nombre_unidad }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- PERFIL PRODUCTO -->
+          <div class="col-md-4">
+            <label class="form-label">Perfil</label>
+            <select name="perfil_producto_id" class="form-select">
+              <option value="">Selecciona</option>
+              {% for p in perfiles_producto %}
+                <option value="{{ p.id }}"
+                {% if usuario_editar and usuario_editar.perfil_producto_id == p.id %} selected {% endif %}>
+                  {{ p.descripcion }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- USUARIO LOGIN -->
+          <div class="col-md-4">
+            <label class="form-label">Usuario</label>
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   value="{{ usuario_editar.username if usuario_editar else '' }}">
+          </div>
+
+          <!-- NOMBRE -->
+          <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <input type="text"
+                   name="nombre"
+                   class="form-control"
+                   value="{{ usuario_editar.nombre if usuario_editar else '' }}">
+          </div>
+
+          <!-- CORREO -->
+          <div class="col-md-4">
+            <label class="form-label">Correo</label>
+            <input type="email"
+                   name="correo"
+                   class="form-control"
+                   value="{{ usuario_editar.correo if usuario_editar else '' }}">
+          </div>
+
+          <!-- ACTIVO -->
+          <div class="col-md-2 d-flex align-items-end">
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     name="activo"
+                     value="1"
+                     {% if usuario_editar and usuario_editar.activo %} checked {% endif %}>
+              <label class="form-check-label">
+                Activo
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary btn-sm">
+            Guardar Usuario
+          </button>
+        </div>
+
+        <input type="hidden" name="usuario_id" value="{{ usuario_editar.id if usuario_editar else '' }}">
+        <input type="hidden" name="guardar_usuario" value="1">
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================= LISTADO ================= -->
+
+  <div class="card">
+    <div class="card-header bg-light">
+      <strong>Usuarios registrados</strong>
+    </div>
+    <div class="card-body p-0">
+
+      {% if usuarios %}
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Usuario</th>
+              <th>Nombre</th>
+              <th>Perfil</th>
+              <th>Unidad</th>
+              <th>Correo</th>
+              <th>Activo</th>
+              <th width="120">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in usuarios %}
+            <tr>
+              <td>{{ u.username }}</td>
+              <td>{{ u.nombre }}</td>
+              <td>{{ u.perfil_producto.descripcion if u.perfil_producto else '-' }}</td>
+              <td>{{ u.unidad.nombre_unidad if u.unidad else '-' }}</td>
+              <td>{{ u.correo }}</td>
+              <td>
+                {% if u.activo %}
+                  <span class="badge bg-success">Sí</span>
+                {% else %}
+                  <span class="badge bg-secondary">No</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="?editar={{ u.id }}" class="btn btn-sm btn-primary">
+                  Editar
+                </a>
+
+                <form method="POST" style="display:inline;"
+                      onsubmit="return confirm('¿Eliminar usuario?');">
+                  <input type="hidden" name="eliminar_usuario_id" value="{{ u.id }}">
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    X
+                  </button>
+                </form>
+
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-3 text-muted">
+        No hay usuarios registrados.
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ================= NAV ================= -->
+
+  <div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=5) }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Regresar
+    </a>
+
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=7) }}"
+       class="btn btn-primary px-4">
+      Finalizar →
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

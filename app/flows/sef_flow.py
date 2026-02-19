@@ -4,7 +4,11 @@ from app.models import (
     CatalogoProcesadora,
     SolicitudSEF,
     SolicitudSEFUnidad,
-    SolicitudSEFCuenta
+    SolicitudSEFCuenta,
+    SolicitudSEFUsuario,
+    CatalogoPerfilProducto,
+    Producto,
+    Role
 )
 
 from app.extensions import db
@@ -195,6 +199,136 @@ def handle_step(solicitud, step, form):
             "cuentas": cuentas,
             "unidades": unidades,
             "cuenta_editar": cuenta_editar
+        }
+
+    # =====================================================
+    # STEP 5 (Contactos)
+    # =====================================================
+    if step == 5:
+
+        from app.models import SolicitudSEFContacto, Role
+
+        if form and form.get("eliminar_contacto_id"):
+
+            contacto = SolicitudSEFContacto.query.get(
+                to_int(form.get("eliminar_contacto_id"))
+            )
+
+            if contacto and contacto.sef_id == sef.id:
+                db.session.delete(contacto)
+                db.session.commit()
+
+            return None
+
+        if form and form.get("guardar_contacto"):
+
+            contacto_id = form.get("contacto_id")
+
+            if contacto_id:
+                contacto = SolicitudSEFContacto.query.get(to_int(contacto_id))
+            else:
+                contacto = SolicitudSEFContacto(sef=sef)
+                db.session.add(contacto)
+
+            # Llaves foráneas (listas)
+            contacto.unidad_id = to_int(form.get("unidad_id"))
+            contacto.perfil_id = to_int(form.get("perfil_id"))
+            contacto.entidad_id = to_int(form.get("entidad_id"))
+
+            # Datos generales
+            contacto.nombre = form.get("nombre")
+            contacto.paterno = form.get("paterno")
+            contacto.materno = form.get("materno")
+            contacto.correo = form.get("correo")
+            contacto.telefono = form.get("telefono")
+            contacto.extension = form.get("extension")
+
+            db.session.commit()
+            return None
+
+        contactos = sef.sef_contactos
+        unidades = sef.sef_unidades
+        perfiles = Role.query.order_by(Role.descripcion).all()
+        entidades = CatalogoEntidad.query.order_by(CatalogoEntidad.nombre).all()
+
+        contacto_editar = None
+        if request.args.get("editar"):
+            contacto_editar = SolicitudSEFContacto.query.get(
+                to_int(request.args.get("editar"))
+            )
+
+        return {
+            "sef": sef,
+            "contactos": contactos,
+            "unidades": unidades,
+            "perfiles": perfiles,
+            "entidades": entidades,
+            "contacto_editar": contacto_editar
+        }
+
+    # =====================================================
+    # STEP 6 (Usuarios SEF)
+    # =====================================================
+    if step == 6:
+
+        # Obtener producto SEF
+        producto_sef = Producto.query.filter_by(code="sef").first()
+
+        if form and form.get("eliminar_usuario_id"):
+
+            usuario = SolicitudSEFUsuario.query.get(
+                to_int(form.get("eliminar_usuario_id"))
+            )
+
+            if usuario and usuario.sef_id == sef.id:
+                db.session.delete(usuario)
+                db.session.commit()
+
+            return None
+
+        if form and form.get("guardar_usuario"):
+
+            usuario_id = form.get("usuario_id")
+
+            if usuario_id:
+                usuario = SolicitudSEFUsuario.query.get(to_int(usuario_id))
+            else:
+                usuario = SolicitudSEFUsuario(sef=sef)
+                db.session.add(usuario)
+
+            usuario.unidad_id = to_int(form.get("unidad_id"))
+            usuario.perfil_producto_id = to_int(form.get("perfil_producto_id"))
+
+            usuario.username = form.get("username")
+            usuario.nombre = form.get("nombre")
+            usuario.correo = form.get("correo")
+            usuario.activo = bool(form.get("activo"))
+
+            db.session.commit()
+            return None
+
+        usuarios = sef.sef_usuarios
+        unidades = sef.sef_unidades
+
+        perfiles_producto = []
+        if producto_sef:
+            perfiles_producto = CatalogoPerfilProducto.query \
+                .filter_by(producto_id=producto_sef.id, activo=True) \
+                .order_by(CatalogoPerfilProducto.descripcion) \
+                .all()
+
+        usuario_editar = None
+        if request.args.get("editar"):
+            usuario_editar = SolicitudSEFUsuario.query.get(
+                to_int(request.args.get("editar"))
+            )
+
+        return {
+            "sef": sef,
+            "usuarios": usuarios,
+            "unidades": unidades,
+            "perfiles_producto": perfiles_producto,
+            "usuario_editar": usuario_editar
         }
 
     return {"sef": sef}

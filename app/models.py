@@ -79,6 +79,31 @@ class Producto(db.Model):
     fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
+# ==========================================
+# CATALOGO PERFILES POR PRODUCTO
+# ==========================================
+class CatalogoPerfilProducto(db.Model):
+    __tablename__ = "catalogo_perfiles_producto"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    descripcion = db.Column(db.String(150), nullable=False)
+
+    producto_id = db.Column(
+        db.Integer,
+        db.ForeignKey("catalogo_productos.id"),
+        nullable=False,
+        index=True
+    )
+
+    producto = db.relationship("Producto", backref="perfiles_producto")
+
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    def __repr__(self):
+        return f"{self.descripcion} ({self.producto.code if self.producto else ''})"
+
+
 # =====================================================
 # SOLICITUD BASE
 # =====================================================
@@ -530,7 +555,7 @@ class MeetingCommitment(db.Model):
 # ==========================================
 # CONTACTOS
 # ==========================================
-class Contacto(db.Model):
+class SolicitudSEFContacto(db.Model):
     __tablename__ = "solicitudes_sef_contactos"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -544,7 +569,11 @@ class Contacto(db.Model):
     nombre_contacto = db.Column(db.Text, nullable=True)
     correo = db.Column(db.Text, nullable=True)
     telefono = db.Column(db.Text, nullable=True)
-    numero_terminal_sef = db.Column(db.Text, nullable=True)
+    unidad_id = db.Column(
+        db.Integer,
+        db.ForeignKey("solicitudes_sef_unidades.id"),
+        nullable=True
+    )
     tipos_contacto = db.Column(db.Text, nullable=True)
 
     sef = db.relationship(
@@ -580,7 +609,6 @@ class SolicitudSEFUsuario(db.Model):
     correo = db.Column(db.String(150), nullable=True)
     telefono = db.Column(db.String(20), nullable=True)
     perfil = db.Column(db.String(100), nullable=True)
-    estatus = db.Column(db.String(20), nullable=False, default="ACTIVO")
 
     sef = db.relationship(
         "SolicitudSEF",

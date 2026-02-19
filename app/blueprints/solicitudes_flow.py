@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from app.models import Solicitud
+from app.models import Solicitud, Role
 from app.extensions import db
 
 flow_bp = Blueprint(
@@ -90,6 +90,29 @@ def step(solicitud_id, step):
         return render_template(template_base, solicitud=solicitud, step=step)
 
 # ==========================================
+# CANCELAR SOLICITUD
+# ==========================================
+@flow_bp.route("/<int:solicitud_id>/cancelar", methods=["POST"])
+def cancelar(solicitud_id):
+
+    solicitud = Solicitud.query.get_or_404(solicitud_id)
+
+    # Si ya está cancelada, no hacer nada
+    if solicitud.estatus == "Cancelada":
+        return redirect(url_for("sol_portal.lista"))
+
+    # Cambiar estatus
+    solicitud.estatus = "Cancelada"
+
+    # Opcional: limpiar registros dependientes si es SEF
+    if solicitud.producto == "sef":
+        borrar_registros_dependientes(solicitud.id)
+
+    db.session.commit()
+
+    return redirect(url_for("sol_portal.lista"))
+
+# ==========================================
 # FUNCIONES AUXILIARES
 # ==========================================
 
@@ -103,14 +126,27 @@ def config_cambio(solicitud, form):
 
 def borrar_registros_dependientes(solicitud_id):
     from app.models import (
+        SolicitudSEF,
         SolicitudSEFUnidad,
         SolicitudSEFCuenta,
         SolicitudSEFUsuario,
         SolicitudSEFContacto
     )
 
-    SolicitudSEFUnidad.query.filter_by(solicitud_id=solicitud_id).delete()
-    SolicitudSEFCuenta.query.filter_by(solicitud_id=solicitud_id).delete()
-    SolicitudSEFUsuario.query.filter_by(solicitud_id=solicitud_id).delete()
-    SolicitudSEFContacto.query.filter_by(solicitud_id=solicitud_id).delete()
+    # Obtener registro SEF asociado a la solicitud
+    sef = SolicitudSEF.query.filter_by(solicitud_id=solicitud_id).first()
+
+    if not sef:
+        return
+
+    # Primero borrar dependientes de unidad (cuentas)
+    SolicitudSEFCuenta.query.filter_by(sef_id=sef.id).delete()
+
+    # Luego borrar usuarios y contactos
+    SolicitudSEFUsuario.query.filter_by(sef_id=sef.id).delete()
+    SolicitudSEFContacto.query.filter_by(sef_id=sef.id).delete()
+
+    # Finalmente borrar unidades
+    SolicitudSEFUnidad.query.filter_by(sef_id=sef.id).delete()
+
     db.session.commit()

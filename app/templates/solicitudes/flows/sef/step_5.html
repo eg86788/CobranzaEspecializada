@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <h4 class="mb-3">
+    Servicios de Efectivo
+    <small class="text-muted">– Contactos</small>
+  </h4>
+
+  <!-- ================= FORMULARIO ================= -->
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <strong>Agregar Contacto</strong>
+    </div>
+    <div class="card-body">
+
+      <form method="POST">
+
+        <div class="row g-3">
+
+          <!-- UNIDAD -->
+          <div class="col-md-4">
+            <label class="form-label">Unidad</label>
+            <select name="unidad_id" class="form-select">
+              <option value="">Selecciona</option>
+              {% for u in unidades %}
+                <option value="{{ u.id }}"
+                {% if contacto_editar and contacto_editar.unidad_id == u.id %} selected {% endif %}>
+                  {{ u.nombre_unidad }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- PERFIL -->
+          <div class="col-md-4">
+            <label class="form-label">Perfil</label>
+            <select name="perfil_id" class="form-select">
+              <option value="">Selecciona</option>
+              {% for p in perfiles %}
+                <option value="{{ p.id }}"
+                {% if contacto_editar and contacto_editar.perfil_id == p.id %} selected {% endif %}>
+                  {{ p.descripcion }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- ENTIDAD -->
+          <div class="col-md-4">
+            <label class="form-label">Entidad</label>
+            <select name="entidad_id" class="form-select">
+              <option value="">Selecciona</option>
+              {% for e in entidades %}
+                <option value="{{ e.id }}"
+                {% if contacto_editar and contacto_editar.entidad_id == e.id %} selected {% endif %}>
+                  {{ e.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- NOMBRE -->
+          <div class="col-md-3">
+            <label class="form-label">Nombre</label>
+            <input type="text"
+                   name="nombre"
+                   class="form-control"
+                   value="{{ contacto_editar.nombre if contacto_editar else '' }}">
+          </div>
+
+          <!-- PATERNO -->
+          <div class="col-md-3">
+            <label class="form-label">Apellido Paterno</label>
+            <input type="text"
+                   name="paterno"
+                   class="form-control"
+                   value="{{ contacto_editar.paterno if contacto_editar else '' }}">
+          </div>
+
+          <!-- MATERNO -->
+          <div class="col-md-3">
+            <label class="form-label">Apellido Materno</label>
+            <input type="text"
+                   name="materno"
+                   class="form-control"
+                   value="{{ contacto_editar.materno if contacto_editar else '' }}">
+          </div>
+
+          <!-- CORREO -->
+          <div class="col-md-3">
+            <label class="form-label">Correo</label>
+            <input type="email"
+                   name="correo"
+                   class="form-control"
+                   value="{{ contacto_editar.correo if contacto_editar else '' }}">
+          </div>
+
+          <!-- TELEFONO -->
+          <div class="col-md-3">
+            <label class="form-label">Teléfono</label>
+            <input type="text"
+                   name="telefono"
+                   class="form-control"
+                   value="{{ contacto_editar.telefono if contacto_editar else '' }}">
+          </div>
+
+          <!-- EXTENSION -->
+          <div class="col-md-2">
+            <label class="form-label">Extensión</label>
+            <input type="text"
+                   name="extension"
+                   class="form-control"
+                   value="{{ contacto_editar.extension if contacto_editar else '' }}">
+          </div>
+
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary btn-sm">
+            Guardar Contacto
+          </button>
+        </div>
+
+        <input type="hidden" name="contacto_id" value="{{ contacto_editar.id if contacto_editar else '' }}">
+        <input type="hidden" name="guardar_contacto" value="1">
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================= LISTADO ================= -->
+
+  <div class="card">
+    <div class="card-header bg-light">
+      <strong>Contactos registrados</strong>
+    </div>
+    <div class="card-body p-0">
+
+      {% if contactos %}
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Nombre</th>
+              <th>Perfil</th>
+              <th>Unidad</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th width="120">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in contactos %}
+            <tr>
+              <td>{{ c.nombre }} {{ c.paterno }} {{ c.materno }}</td>
+              <td>{{ c.perfil.descripcion if c.perfil else '-' }}</td>
+              <td>{{ c.unidad.nombre_unidad if c.unidad else '-' }}</td>
+              <td>{{ c.correo }}</td>
+              <td>{{ c.telefono }}</td>
+              <td>
+                <a href="?editar={{ c.id }}" class="btn btn-sm btn-primary">
+                  Editar
+                </a>
+
+                <form method="POST" style="display:inline;"
+                      onsubmit="return confirm('¿Eliminar contacto?');">
+                  <input type="hidden" name="eliminar_contacto_id" value="{{ c.id }}">
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    X
+                  </button>
+                </form>
+
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-3 text-muted">
+        No hay contactos registrados.
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ================= NAV ================= -->
+
+  <div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=4) }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Regresar
+    </a>
+
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=6) }}"
+       class="btn btn-primary px-4">
+      Continuar →
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}
