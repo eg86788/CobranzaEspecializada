@@ -17,7 +17,7 @@
     </div>
     <div class="card-body">
 
-      <form method="POST" class="needs-validation" novalidate>
+      <form method="POST">
 
         <div class="row g-3">
 
@@ -186,19 +186,5 @@
   </div>
 
 </div>
-<script>
-  (() => {
-    'use strict'
-    const forms = document.querySelectorAll('.needs-validation')
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-        form.classList.add('was-validated')
-      }, false)
-    })
-  })();
-  </script>
+
 {% endblock %}

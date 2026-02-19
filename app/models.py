@@ -207,6 +207,27 @@ class SolicitudSEF(db.Model):
         cascade="all, delete-orphan"
     )
 
+    # 1 a N con Cuentas
+    sef_cuentas = db.relationship(
+        "SolicitudSEFCuenta",
+        back_populates="sef",
+        cascade="all, delete-orphan"
+    )
+
+    # 1 a N con Usuarios SEF
+    sef_usuarios = db.relationship(
+        "SolicitudSEFUsuario",
+        back_populates="sef",
+        cascade="all, delete-orphan"
+    )
+
+    # 1 a N con Contactos
+    sef_contactos = db.relationship(
+        "SolicitudSEFContacto",
+        back_populates="sef",
+        cascade="all, delete-orphan"
+    )
+
 
 # =====================================================
 # SEF - UNIDADES (HIJAS DE SOLICITUDSEF)
@@ -287,7 +308,10 @@ class SolicitudSEFCuenta(db.Model):
     moneda = db.Column(db.String(10))
     tipo_cuenta = db.Column(db.String(50))
      
-    sef = db.relationship("SolicitudSEF", backref="sef_cuentas")
+    sef = db.relationship(
+        "SolicitudSEF",
+        back_populates="sef_cuentas"
+    )
     unidad = db.relationship("SolicitudSEFUnidad")
 
 # ==========================================
@@ -578,7 +602,7 @@ class SolicitudSEFContacto(db.Model):
 
     sef = db.relationship(
         "SolicitudSEF",
-        backref=db.backref("sef_contactos", cascade="all, delete-orphan")
+        back_populates="sef_contactos"
     )
 
     def __repr__(self):
@@ -587,6 +611,7 @@ class SolicitudSEFContacto(db.Model):
 # ==========================================
 # SEF - USUARIOS SEF (HIJAS DE SOLICITUDSEF)
 # ==========================================
+
 class SolicitudSEFUsuario(db.Model):
     __tablename__ = "solicitudes_sef_usuarios_sef"
 
@@ -612,7 +637,7 @@ class SolicitudSEFUsuario(db.Model):
 
     sef = db.relationship(
         "SolicitudSEF",
-        backref=db.backref("sef_usuarios", cascade="all, delete-orphan")
+        back_populates="sef_usuarios"
     )
     unidad = db.relationship("SolicitudSEFUnidad")
 
