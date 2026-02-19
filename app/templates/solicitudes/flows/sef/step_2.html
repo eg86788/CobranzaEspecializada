@@ -221,16 +221,20 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-between">
-      <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=1) }}"
-         class="btn btn-outline-secondary">
-        ← Regresar
-      </a>
+  <!-- ================= NAV ================= -->
 
-      <button type="submit" class="btn btn-primary">
-        Guardar y continuar →
-      </button>
-    </div>
+  <div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=1) }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Regresar
+    </a>
+
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=3) }}"
+       class="btn btn-success btn-sm">
+      Continuar →
+    </a>
+  </div>
+
 
   </form>
 

@@ -284,6 +284,21 @@
   
       </div>
     </div>
+
+      <!-- ================= NAV ================= -->
+
+  <div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=2) }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Regresar
+    </a>
+
+    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=4) }}"
+       class="btn btn-success btn-sm">
+      Continuar →
+    </a>
+  </div>
+
 </div>
 
 <script>
