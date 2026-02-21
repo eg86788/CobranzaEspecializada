@@ -1,4 +1,4 @@
 {
-    "terminal.integrated.fontSize": 9,
+    "terminal.integrated.fontSize": 13,
     "CodeGPT.apiKey": "Ollama"
 }

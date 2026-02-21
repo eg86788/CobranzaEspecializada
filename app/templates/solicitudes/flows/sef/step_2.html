@@ -156,15 +156,17 @@
             <input type="email"
                    name="correo_apoderado_legal"
                    class="form-control"
+                   data-type="email"
                    value="{{ sef.correo_apoderado_legal or '' }}">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Teléfono</label>
-            <input type="text"
+            <input type="tel"
                    name="telefono_cliente"
-                   class="form-control"
+                   class="form-control telefono"
                    data-type="telefono"
+                   inputmode="tel"
                    value="{{ sef.telefono_cliente or '' }}">
           </div>
 

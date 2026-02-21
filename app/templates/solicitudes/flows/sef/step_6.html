@@ -16,6 +16,9 @@
       <strong>Agregar Usuario SEF</strong>
     </div>
     <div class="card-body">
+      <div id="form_error_step6" class="alert alert-danger d-none" role="alert">
+        Revisa los campos obligatorios.
+      </div>
 
       <form method="POST" class="needs-validation" novalidate>
 
@@ -24,7 +27,7 @@
           <!-- UNIDAD -->
           <div class="col-md-4">
             <label class="form-label">Unidad</label>
-            <select name="unidad_id" class="form-select">
+            <select name="unidad_id" class="form-select" required>
               <option value="">Selecciona</option>
               {% for u in unidades %}
                 <option value="{{ u.id }}"
@@ -33,12 +36,13 @@
                 </option>
               {% endfor %}
             </select>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- PERFIL PRODUCTO -->
           <div class="col-md-4">
             <label class="form-label">Perfil</label>
-            <select name="perfil_producto_id" class="form-select">
+            <select name="perfil_producto_id" class="form-select" required>
               <option value="">Selecciona</option>
               {% for p in perfiles_producto %}
                 <option value="{{ p.id }}"
@@ -47,6 +51,7 @@
                 </option>
               {% endfor %}
             </select>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- USUARIO LOGIN -->
@@ -55,7 +60,9 @@
             <input type="text"
                    name="username"
                    class="form-control"
+                   required
                    value="{{ usuario_editar.username if usuario_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- NOMBRE -->
@@ -64,7 +71,9 @@
             <input type="text"
                    name="nombre"
                    class="form-control"
+                   required
                    value="{{ usuario_editar.nombre if usuario_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- CORREO -->
@@ -73,7 +82,9 @@
             <input type="email"
                    name="correo"
                    class="form-control"
+                   required
                    value="{{ usuario_editar.correo if usuario_editar else '' }}">
+            <div class="invalid-feedback">Correo obligatorio y con formato válido.</div>
           </div>
 
           <!-- ACTIVO -->
@@ -179,10 +190,10 @@
       ← Regresar
     </a>
 
-    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=7) }}"
-       class="btn btn-primary px-4">
-      Finalizar →
-    </a>
+    <form method="POST" class="m-0">
+      <input type="hidden" name="continuar_step_6" value="1">
+      <button type="submit" class="btn btn-primary px-4">Finalizar →</button>
+    </form>
   </div>
 
 </div>
@@ -190,11 +201,32 @@
   (() => {
     'use strict'
     const forms = document.querySelectorAll('.needs-validation')
+    const formError = document.getElementById('form_error_step6')
+    const syncFieldState = (field) => {
+      if (!field) return true
+      const ok = field.checkValidity()
+      field.classList.toggle('is-invalid', !ok)
+      return ok
+    }
+
     Array.from(forms).forEach(form => {
+      const fields = Array.from(form.querySelectorAll('input, select, textarea')).filter(el => {
+        return !el.disabled && el.type !== 'hidden'
+      })
+
+      fields.forEach(field => {
+        const evt = field.tagName === 'SELECT' ? 'change' : 'input'
+        field.addEventListener(evt, () => syncFieldState(field))
+      })
+
       form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
+        const allOk = fields.map(syncFieldState).every(Boolean)
+        if (!allOk || !form.checkValidity()) {
+          if (formError) formError.classList.remove('d-none')
           event.preventDefault()
           event.stopPropagation()
+        } else if (formError) {
+          formError.classList.add('d-none')
         }
         form.classList.add('was-validated')
       }, false)

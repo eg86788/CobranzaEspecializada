@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+import re
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models import Solicitud, Role
 from app.extensions import db
 
@@ -21,12 +22,52 @@ def step(solicitud_id, step):
 
         # ---------- STEP 1 ----------
         if step == 1:
-            solicitud.numero_cliente = request.form.get("numero_cliente")
-            solicitud.numero_contrato = request.form.get("numero_contrato")
-            solicitud.razon_social = request.form.get("razon_social")
-            solicitud.observaciones = request.form.get("observaciones")
-            solicitud.rfc = request.form.get("rfc")
-            solicitud.tipo_tramite = request.form.get("tipo_tramite")
+            numero_cliente = (request.form.get("numero_cliente") or "").strip()
+            numero_contrato = (request.form.get("numero_contrato") or "").strip()
+            razon_social = (request.form.get("razon_social") or "").strip()
+            observaciones = request.form.get("observaciones")
+            rfc = (request.form.get("rfc") or "").strip().upper()
+            tipo_tramite = (request.form.get("tipo_tramite") or "").strip().upper()
+
+            errores = []
+
+            if not re.fullmatch(r"\d{10}", numero_cliente):
+                errores.append("Número Cliente debe contener exactamente 10 dígitos.")
+
+            if not re.fullmatch(r"^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$", rfc):
+                errores.append("RFC debe contener exactamente 13 caracteres con formato válido.")
+
+            if tipo_tramite not in {"ALTA", "MODIFICACION", "BAJA"}:
+                errores.append("Debe seleccionar un tipo de trámite válido.")
+
+            if tipo_tramite == "ALTA":
+                numero_contrato = ""
+            elif tipo_tramite in {"MODIFICACION", "BAJA"}:
+                if not re.fullmatch(r"\d{12}", numero_contrato):
+                    errores.append(
+                        "Número Contrato es obligatorio en MODIFICACIÓN y BAJA, y debe tener 12 dígitos."
+                    )
+
+            if not razon_social:
+                errores.append("Razón Social es obligatoria.")
+
+            if errores:
+                for err in errores:
+                    flash(err, "danger")
+                return redirect(
+                    url_for(
+                        "solicitudes_flow.step",
+                        solicitud_id=solicitud.id,
+                        step=1
+                    )
+                )
+
+            solicitud.numero_cliente = numero_cliente
+            solicitud.numero_contrato = numero_contrato
+            solicitud.razon_social = razon_social
+            solicitud.observaciones = observaciones
+            solicitud.rfc = rfc
+            solicitud.tipo_tramite = tipo_tramite
 
             db.session.commit()
 

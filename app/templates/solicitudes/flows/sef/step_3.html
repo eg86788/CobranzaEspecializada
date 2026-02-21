@@ -15,6 +15,9 @@
     </div>
 
     <div class="card-body">
+      <div id="form_error_step3" class="alert alert-danger d-none" role="alert">
+        Revisa los campos obligatorios.
+      </div>
 
       <form method="POST" class="needs-validation" novalidate>
 
@@ -109,6 +112,9 @@
         <!-- SERVICIOS -->
         <!-- ========================= -->
         <h6>Servicios</h6>
+        <div id="servicios_error" class="text-danger small mb-2 d-none">
+          Debes seleccionar al menos un servicio.
+        </div>
 
         <div class="row g-3">
 
@@ -294,10 +300,10 @@
         ← Regresar
         </a>
 
-       <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=4) }}"
-        class="btn btn-primary px-4">
-        Continuar →
-       </a>
+       <form method="POST" class="m-0">
+        <input type="hidden" name="continuar_step_3" value="1">
+        <button type="submit" class="btn btn-primary px-4">Continuar →</button>
+       </form>
      </div>
 
 </div>
@@ -306,14 +312,44 @@
 (() => {
   'use strict'
   const forms = document.querySelectorAll('.needs-validation')
+  const formError = document.getElementById('form_error_step3')
+  const serviceChecks = [
+    'servicio_verificacion_tradicional',
+    'servicio_verificacion_electronica',
+    'servicio_cliente_certificado_central',
+    'servicio_dotacion_centralizada',
+    'servicio_integradora',
+    'servicio_dotacion',
+    'servicio_traslado',
+    'servicio_cofre'
+  ].map(name => document.querySelector(`input[name="${name}"]`)).filter(Boolean)
+  const serviciosError = document.getElementById('servicios_error')
+
+  const isServiciosValido = () => serviceChecks.some(chk => chk.checked)
+
   Array.from(forms).forEach(form => {
     form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
+      const serviciosOk = isServiciosValido()
+      if (!serviciosOk && serviciosError) {
+        serviciosError.classList.remove('d-none')
+      }
+      if (!form.checkValidity() || !serviciosOk) {
+        if (formError) formError.classList.remove('d-none')
         event.preventDefault()
         event.stopPropagation()
+      } else if (formError) {
+        formError.classList.add('d-none')
       }
       form.classList.add('was-validated')
     }, false)
+  })
+
+  serviceChecks.forEach(chk => {
+    chk.addEventListener('change', () => {
+      if (isServiciosValido() && serviciosError) {
+        serviciosError.classList.add('d-none')
+      }
+    })
   })
 })();
 </script>

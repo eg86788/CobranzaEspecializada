@@ -42,15 +42,15 @@
             <label class="form-label">Número Contrato</label>
             <input type="text"
                    name="numero_contrato"
+                   id="numero_contrato"
                    class="form-control"
                    data-type="numero_contrato"
                    inputmode="numeric"
                    maxlength="12"
                    pattern="\d{12}"
-                   required
                    value="{{ solicitud.numero_contrato or '' }}">
             <div class="invalid-feedback">
-              Debe contener exactamente 12 dígitos numéricos.
+              En MODIFICACIÓN y BAJA debe contener exactamente 12 dígitos numéricos.
             </div>
           </div>
 
@@ -75,11 +75,12 @@
                    class="form-control"
                    data-type="text"
                    maxlength="13"
-                   pattern="^([A-ZÑ&]{3,4})\d{6}[A-Z0-9]{3}$"
+                   minlength="13"
+                   pattern="^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$"
                    required
                    value="{{ solicitud.rfc or '' }}">
             <div class="invalid-feedback">
-              Formato inválido. Ejemplo: ABCD123456XYZ
+              Debe contener exactamente 13 caracteres. Ejemplo: ABCD123456XYZ
             </div>
           </div>
 
@@ -103,6 +104,7 @@
           <div class="col-md-6">
             <label class="form-label">Tipo de Trámite</label>
             <select name="tipo_tramite"
+                    id="tipo_tramite"
                     class="form-select"
                     required>
               <option value="">Seleccione...</option>
@@ -149,6 +151,31 @@
 </div>
 
 <script>
+function applyContratoRules() {
+  const tipoTramite = document.getElementById('tipo_tramite');
+  const numeroContrato = document.getElementById('numero_contrato');
+  if (!tipoTramite || !numeroContrato) return;
+
+  const tramite = (tipoTramite.value || '').toUpperCase();
+  const esAlta = tramite === 'ALTA';
+  const esObligatorio = tramite === 'MODIFICACION' || tramite === 'BAJA';
+
+  numeroContrato.disabled = esAlta;
+  numeroContrato.required = esObligatorio;
+
+  if (esAlta) {
+    numeroContrato.value = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tipoTramite = document.getElementById('tipo_tramite');
+  applyContratoRules();
+  if (tipoTramite) {
+    tipoTramite.addEventListener('change', applyContratoRules);
+  }
+});
+
 // Bootstrap validation
 (() => {
   'use strict'

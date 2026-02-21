@@ -46,7 +46,7 @@ def create_app():
     app.config["SESSION_COOKIE_SECURE"] = False  # ponlo True si usas HTTPS
 
     # CONFIGURACIÓN DIRECTA
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://edgargarcia:Robert2025@localhost:5432/postgres"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:admin123@localhost:5432/postgresql"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = "dev"
 

@@ -16,6 +16,9 @@
       <strong>Agregar Contacto</strong>
     </div>
     <div class="card-body">
+      <div id="form_error_step5" class="alert alert-danger d-none" role="alert">
+        Revisa los campos obligatorios.
+      </div>
 
       <form method="POST" class="needs-validation" novalidate>
 
@@ -24,7 +27,7 @@
           <!-- UNIDAD -->
           <div class="col-md-4">
             <label class="form-label">Unidad</label>
-            <select name="unidad_id" class="form-select">
+            <select name="unidad_id" class="form-select" required>
               <option value="">Selecciona</option>
               {% for u in unidades %}
                 <option value="{{ u.id }}"
@@ -33,12 +36,13 @@
                 </option>
               {% endfor %}
             </select>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- PERFIL -->
           <div class="col-md-4">
             <label class="form-label">Perfil</label>
-            <select name="perfil_id" class="form-select">
+            <select name="perfil_id" class="form-select" required>
               <option value="">Selecciona</option>
               {% for p in perfiles %}
                 <option value="{{ p.id }}"
@@ -47,12 +51,13 @@
                 </option>
               {% endfor %}
             </select>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- ENTIDAD -->
           <div class="col-md-4">
             <label class="form-label">Entidad</label>
-            <select name="entidad_id" class="form-select">
+            <select name="entidad_id" class="form-select" required>
               <option value="">Selecciona</option>
               {% for e in entidades %}
                 <option value="{{ e.id }}"
@@ -61,6 +66,7 @@
                 </option>
               {% endfor %}
             </select>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- NOMBRE -->
@@ -69,7 +75,9 @@
             <input type="text"
                    name="nombre"
                    class="form-control"
+                   required
                    value="{{ contacto_editar.nombre if contacto_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- PATERNO -->
@@ -78,7 +86,9 @@
             <input type="text"
                    name="paterno"
                    class="form-control"
+                   required
                    value="{{ contacto_editar.paterno if contacto_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- MATERNO -->
@@ -87,7 +97,9 @@
             <input type="text"
                    name="materno"
                    class="form-control"
+                   required
                    value="{{ contacto_editar.materno if contacto_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <!-- CORREO -->
@@ -96,16 +108,23 @@
             <input type="email"
                    name="correo"
                    class="form-control"
+                   required
                    value="{{ contacto_editar.correo if contacto_editar else '' }}">
+            <div class="invalid-feedback">Correo obligatorio y con formato válido.</div>
           </div>
 
           <!-- TELEFONO -->
           <div class="col-md-3">
             <label class="form-label">Teléfono</label>
-            <input type="text"
+            <input type="tel"
                    name="telefono"
-                   class="form-control"
+                   class="form-control telefono"
+                   data-type="telefono"
+                   inputmode="numeric"
+                   pattern="^\D*(?:\d\D*){10}$"
+                   required
                    value="{{ contacto_editar.telefono if contacto_editar else '' }}">
+            <div class="invalid-feedback">Teléfono obligatorio (10 dígitos).</div>
           </div>
 
           <!-- EXTENSION -->
@@ -114,7 +133,9 @@
             <input type="text"
                    name="extension"
                    class="form-control"
+                   required
                    value="{{ contacto_editar.extension if contacto_editar else '' }}">
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
         </div>
@@ -198,10 +219,10 @@
       ← Regresar
     </a>
 
-    <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=6) }}"
-       class="btn btn-primary px-4">
-      Continuar →
-    </a>
+    <form method="POST" class="m-0">
+      <input type="hidden" name="continuar_step_5" value="1">
+      <button type="submit" class="btn btn-primary px-4">Continuar →</button>
+    </form>
   </div>
 
 </div>
@@ -209,11 +230,32 @@
   (() => {
     'use strict'
     const forms = document.querySelectorAll('.needs-validation')
+    const formError = document.getElementById('form_error_step5')
+    const syncFieldState = (field) => {
+      if (!field) return true
+      const ok = field.checkValidity()
+      field.classList.toggle('is-invalid', !ok)
+      return ok
+    }
+
     Array.from(forms).forEach(form => {
+      const fields = Array.from(form.querySelectorAll('input, select, textarea')).filter(el => {
+        return !el.disabled && el.type !== 'hidden'
+      })
+
+      fields.forEach(field => {
+        const evt = field.tagName === 'SELECT' ? 'change' : 'input'
+        field.addEventListener(evt, () => syncFieldState(field))
+      })
+
       form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
+        const allOk = fields.map(syncFieldState).every(Boolean)
+        if (!allOk || !form.checkValidity()) {
+          if (formError) formError.classList.remove('d-none')
           event.preventDefault()
           event.stopPropagation()
+        } else if (formError) {
+          formError.classList.add('d-none')
         }
         form.classList.add('was-validated')
       }, false)

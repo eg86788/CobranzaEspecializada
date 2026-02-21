@@ -1,4 +1,5 @@
-from flask import request
+import re
+from flask import request, flash
 from app.models import (
     CatalogoEntidad,
     CatalogoProcesadora,
@@ -18,6 +19,21 @@ def to_int(value):
     if not value or value == "None":
         return None
     return int(value)
+
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def _norm(value):
+    return (value or "").strip()
+
+
+def _telefono_10(value):
+    return re.sub(r"\D", "", value or "")
+
+
+def _email_valido(value):
+    return bool(EMAIL_RE.fullmatch(_norm(value)))
 
 
 def handle_step(solicitud, step, form):
@@ -77,6 +93,12 @@ def handle_step(solicitud, step, form):
     # =====================================================
     if step == 3:
 
+        if form and form.get("continuar_step_3"):
+            if not sef.sef_unidades:
+                flash("Verifica que todos los campos obligatorios estén llenados antes de continuar.", "danger")
+                return None
+            return 4
+
         if form and form.get("eliminar_unidad_id"):
 
             unidad = SolicitudSEFUnidad.query.get(
@@ -99,8 +121,8 @@ def handle_step(solicitud, step, form):
                 unidad = SolicitudSEFUnidad(sef=sef)
                 db.session.add(unidad)
 
-            unidad.accion_unidad = form.get("accion_unidad")
-            unidad.nombre_unidad = form.get("nombre_unidad")
+            unidad.accion_unidad = _norm(form.get("accion_unidad"))
+            unidad.nombre_unidad = _norm(form.get("nombre_unidad"))
 
             unidad.cpae_id = to_int(form.get("cpae_id"))
             unidad.etv_id = to_int(form.get("etv_id"))
@@ -126,6 +148,19 @@ def handle_step(solicitud, step, form):
             unidad.servicio_dotacion = bool(form.get("servicio_dotacion"))
             unidad.servicio_traslado = bool(form.get("servicio_traslado"))
             unidad.servicio_cofre = bool(form.get("servicio_cofre"))
+
+            if not any([
+                unidad.servicio_verificacion_tradicional,
+                unidad.servicio_verificacion_electronica,
+                unidad.servicio_cliente_certificado_central,
+                unidad.servicio_dotacion_centralizada,
+                unidad.servicio_integradora,
+                unidad.servicio_dotacion,
+                unidad.servicio_traslado,
+                unidad.servicio_cofre
+            ]):
+                flash("Verifica que todos los campos obligatorios estén llenados antes de continuar.", "danger")
+                return None
 
             unidad.calle_numero = form.get("calle_numero")
             unidad.codigo_postal = form.get("codigo_postal")
@@ -208,6 +243,12 @@ def handle_step(solicitud, step, form):
 
         from app.models import SolicitudSEFContacto, Role
 
+        if form and form.get("continuar_step_5"):
+            if not sef.sef_contactos:
+                flash("Verifica que todos los campos obligatorios estén llenados antes de continuar.", "danger")
+                return None
+            return 6
+
         if form and form.get("eliminar_contacto_id"):
 
             contacto = SolicitudSEFContacto.query.get(
@@ -236,12 +277,42 @@ def handle_step(solicitud, step, form):
             contacto.entidad_id = to_int(form.get("entidad_id"))
 
             # Datos generales
-            contacto.nombre = form.get("nombre")
-            contacto.paterno = form.get("paterno")
-            contacto.materno = form.get("materno")
-            contacto.correo = form.get("correo")
-            contacto.telefono = form.get("telefono")
-            contacto.extension = form.get("extension")
+            contacto.nombre = _norm(form.get("nombre"))
+            contacto.paterno = _norm(form.get("paterno"))
+            contacto.materno = _norm(form.get("materno"))
+            contacto.correo = _norm(form.get("correo"))
+            telefono_limpio = _telefono_10(form.get("telefono"))
+            contacto.telefono = telefono_limpio
+            contacto.extension = _norm(form.get("extension"))
+
+            errores = []
+            if not contacto.unidad_id:
+                errores.append("Unidad es obligatoria.")
+            if not contacto.perfil_id:
+                errores.append("Perfil es obligatorio.")
+            if not contacto.entidad_id:
+                errores.append("Entidad es obligatoria.")
+            if not contacto.nombre:
+                errores.append("Nombre es obligatorio.")
+            if not contacto.paterno:
+                errores.append("Apellido paterno es obligatorio.")
+            if not contacto.materno:
+                errores.append("Apellido materno es obligatorio.")
+            if not contacto.correo:
+                errores.append("Correo es obligatorio.")
+            elif not _email_valido(contacto.correo):
+                errores.append("Correo con formato inválido.")
+            if not telefono_limpio:
+                errores.append("Teléfono es obligatorio.")
+            elif len(telefono_limpio) != 10:
+                errores.append("Teléfono debe tener 10 dígitos.")
+            if not contacto.extension:
+                errores.append("Extensión es obligatoria.")
+
+            if errores:
+                for err in errores:
+                    flash(err, "danger")
+                return None
 
             db.session.commit()
             return None
@@ -274,6 +345,12 @@ def handle_step(solicitud, step, form):
         # Obtener producto SEF
         producto_sef = Producto.query.filter_by(code="sef").first()
 
+        if form and form.get("continuar_step_6"):
+            if not sef.sef_usuarios:
+                flash("Verifica que todos los campos obligatorios estén llenados antes de continuar.", "danger")
+                return None
+            return 7
+
         if form and form.get("eliminar_usuario_id"):
 
             usuario = SolicitudSEFUsuario.query.get(
@@ -299,10 +376,29 @@ def handle_step(solicitud, step, form):
             usuario.unidad_id = to_int(form.get("unidad_id"))
             usuario.perfil_producto_id = to_int(form.get("perfil_producto_id"))
 
-            usuario.username = form.get("username")
-            usuario.nombre = form.get("nombre")
-            usuario.correo = form.get("correo")
+            usuario.username = _norm(form.get("username"))
+            usuario.nombre = _norm(form.get("nombre"))
+            usuario.correo = _norm(form.get("correo"))
             usuario.activo = bool(form.get("activo"))
+
+            errores = []
+            if not usuario.unidad_id:
+                errores.append("Unidad es obligatoria.")
+            if not usuario.perfil_producto_id:
+                errores.append("Perfil es obligatorio.")
+            if not usuario.username:
+                errores.append("Usuario es obligatorio.")
+            if not usuario.nombre:
+                errores.append("Nombre es obligatorio.")
+            if not usuario.correo:
+                errores.append("Correo es obligatorio.")
+            elif not _email_valido(usuario.correo):
+                errores.append("Correo con formato inválido.")
+
+            if errores:
+                for err in errores:
+                    flash(err, "danger")
+                return None
 
             db.session.commit()
             return None
