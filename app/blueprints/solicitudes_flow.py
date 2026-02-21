@@ -1,5 +1,6 @@
 import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from jinja2 import TemplateNotFound
 from app.models import Solicitud, Role
 from app.extensions import db
 
@@ -14,6 +15,7 @@ flow_bp = Blueprint(
 def step(solicitud_id, step):
 
     solicitud = Solicitud.query.get_or_404(solicitud_id)
+    producto_code = (solicitud.producto or "").strip().lower()
 
     # ==========================================
     # POST
@@ -22,8 +24,8 @@ def step(solicitud_id, step):
 
         # ---------- STEP 1 ----------
         if step == 1:
-            numero_cliente = (request.form.get("numero_cliente") or "").strip()
-            numero_contrato = (request.form.get("numero_contrato") or "").strip()
+            numero_cliente = re.sub(r"\D", "", (request.form.get("numero_cliente") or "").strip())
+            numero_contrato = re.sub(r"\D", "", (request.form.get("numero_contrato") or "").strip())
             razon_social = (request.form.get("razon_social") or "").strip()
             observaciones = request.form.get("observaciones")
             rfc = (request.form.get("rfc") or "").strip().upper()
@@ -31,8 +33,12 @@ def step(solicitud_id, step):
 
             errores = []
 
-            if not re.fullmatch(r"\d{10}", numero_cliente):
-                errores.append("Número Cliente debe contener exactamente 10 dígitos.")
+            if not numero_cliente:
+                errores.append("Número Cliente es obligatorio.")
+            elif len(numero_cliente) > 10:
+                errores.append("Número Cliente debe contener máximo 10 dígitos.")
+            else:
+                numero_cliente = numero_cliente.zfill(10)
 
             if not re.fullmatch(r"^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$", rfc):
                 errores.append("RFC debe contener exactamente 13 caracteres con formato válido.")
@@ -43,13 +49,19 @@ def step(solicitud_id, step):
             if tipo_tramite == "ALTA":
                 numero_contrato = ""
             elif tipo_tramite in {"MODIFICACION", "BAJA"}:
-                if not re.fullmatch(r"\d{12}", numero_contrato):
-                    errores.append(
-                        "Número Contrato es obligatorio en MODIFICACIÓN y BAJA, y debe tener 12 dígitos."
-                    )
+                if not numero_contrato:
+                    errores.append("Número Contrato es obligatorio en MODIFICACIÓN y BAJA.")
+                elif len(numero_contrato) > 12:
+                    errores.append("Número Contrato debe contener máximo 12 dígitos.")
+                elif len(numero_contrato) < 10:
+                    numero_contrato = numero_contrato.zfill(10)
 
             if not razon_social:
                 errores.append("Razón Social es obligatoria.")
+            elif len(razon_social) > 250:
+                errores.append("Razón Social debe contener máximo 250 caracteres.")
+            elif not re.fullmatch(r"[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ\s.,\-_/&()]+", razon_social):
+                errores.append("Razón Social solo acepta caracteres alfanuméricos.")
 
             if errores:
                 for err in errores:
@@ -80,7 +92,7 @@ def step(solicitud_id, step):
             )
 
         # ---------- PRODUCTOS ----------
-        if solicitud.producto == "sef":
+        if producto_code == "sef":
             from app.flows.sef_flow import handle_step
 
             next_step = handle_step(solicitud, step, request.form)
@@ -103,7 +115,7 @@ def step(solicitud_id, step):
         template_base = f"solicitudes/flows/base/step_{step}.html"
 
         total_steps = None
-        if solicitud.producto == "sef":
+        if producto_code == "sef":
             total_steps = 6  # Total de pasos del flujo SEF
 
         return render_template(
@@ -114,7 +126,7 @@ def step(solicitud_id, step):
         )
 
     # Para productos específicos desde step 2
-    if solicitud.producto == "sef":
+    if producto_code == "sef":
         from app.flows.sef_flow import handle_step
 
         context = handle_step(solicitud, step, None) or {}
@@ -135,13 +147,17 @@ def step(solicitud_id, step):
     # BASE (productos sin flow específico)
     # ==========================================
 
-    template_producto = f"solicitudes/flows/{solicitud.producto}/step_{step}.html"
+    template_producto = f"solicitudes/flows/{producto_code}/step_{step}.html"
     template_base = f"solicitudes/flows/base/step_{step}.html"
 
     try:
         return render_template(template_producto, solicitud=solicitud, step=step)
-    except:
-        return render_template(template_base, solicitud=solicitud, step=step)
+    except TemplateNotFound:
+        try:
+            return render_template(template_base, solicitud=solicitud, step=step)
+        except TemplateNotFound:
+            flash("No existe plantilla para este paso del flujo.", "danger")
+            return redirect(url_for("solicitudes_flow.step", solicitud_id=solicitud.id, step=1))
 
 # ==========================================
 # CANCELAR SOLICITUD

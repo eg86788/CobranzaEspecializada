@@ -1,262 +1,478 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="container mt-4">
+{% set tipo_contrato_sel = sef.tipo_contrato.split(' | ') if sef and sef.tipo_contrato else [] %}
+{% set tipo_servicio_sel = sef.tipo_servicio.split(' | ') if sef and sef.tipo_servicio else [] %}
+{% set servicio_adicional_sel = sef.servicio_adicional.split(' | ') if sef and sef.servicio_adicional else [] %}
+{% set cortes_envio_sel = sef.cortes_envio.split(' | ') if sef and sef.cortes_envio else [] %}
+{% set es_alta = (solicitud.tipo_tramite or '')|upper == 'ALTA' %}
+{% set es_modificacion = (solicitud.tipo_tramite or '')|upper == 'MODIFICACION' %}
+{% set es_baja = (solicitud.tipo_tramite or '')|upper == 'BAJA' %}
 
+<style>
+  .step2-dd-wrap,
+  .step2-dd-wrap .card,
+  .step2-dd-wrap .card-body,
+  .step2-dd-wrap .row,
+  .step2-dd-wrap .col-md-6 {
+    overflow: visible !important;
+  }
+  .multi-dd {
+    position: relative;
+    z-index: 1;
+  }
+  .multi-dd.show {
+    z-index: 5000;
+  }
+  .multi-dd.behind {
+    z-index: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .multi-dd .dropdown-menu {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 5001;
+    width: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    position: absolute !important;
+    top: calc(100% + 2px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    inset: unset !important;
+    margin-top: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .multi-dd .dropdown-toggle {
+    background-color: #fff;
+    color: #212529;
+    border-color: #ced4da;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    overflow: hidden;
+  }
+  .multi-dd .dropdown-toggle [data-label] {
+    display: block;
+    min-width: 0;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+  .multi-dd .dropdown-toggle:focus,
+  .multi-dd .dropdown-toggle:hover {
+    background-color: #fff;
+    color: #212529;
+  }
+  .step2-dd-wrap .form-control,
+  .step2-dd-wrap .form-select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+
+<div class="container mt-4 step2-dd-wrap">
   <h4 class="mb-3">
     {% include "components/_progress_steps.html" %}
     Servicios de Efectivo
-    <small class="text-muted">– Datos Generales</small>
+    <small class="text-muted">- Datos Generales</small>
   </h4>
 
   <form method="POST" class="needs-validation" novalidate>
-
     <div class="card mb-4 shadow-sm">
       <div class="card-header bg-light">
-        <strong>Información del Servicio</strong>
+        <strong>Informacion del Servicio</strong>
       </div>
       <div class="card-body">
-
         <div class="row g-3">
-
-          <!-- TIPO CONTRATO -->
           <div class="col-md-6">
             <label class="form-label">Tipo de Contrato</label>
-            <select name="tipo_contrato" class="form-select" required>
-              <option value="">Seleccione...</option>
-              <option value="NUEVO"
-                {% if sef.tipo_contrato == "NUEVO" %}selected{% endif %}>
-                Nuevo
-              </option>
-              <option value="EXISTENTE"
-                {% if sef.tipo_contrato == "EXISTENTE" %}selected{% endif %}>
-                Existente
-              </option>
-            </select>
-            <div class="invalid-feedback">
-              Debe seleccionar tipo de contrato.
+            <div class="dropdown w-100 multi-dd" data-bs-auto-close="outside" data-bs-display="static">
+              <button id="tipo_contrato_btn" class="btn btn-outline-secondary dropdown-toggle text-start w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span data-label>Selecciona opciones...</span>
+              </button>
+              <div class="dropdown-menu w-100 p-3">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="tipo_contrato" value="CPAE TRADICIONAL" id="tipo_contrato_1" {% if "CPAE TRADICIONAL" in tipo_contrato_sel %}checked{% endif %}>
+                  <label class="form-check-label" for="tipo_contrato_1">SEF TRADICIONAL (CPAE)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="tipo_contrato" value="SEF ELECTRÓNICO" id="tipo_contrato_2" {% if "SEF ELECTRÓNICO" in tipo_contrato_sel %}checked{% endif %}>
+                  <label class="form-check-label" for="tipo_contrato_2">SEF ELECTRÓNICO</label>
+                </div>
+              </div>
             </div>
+            <div class="invalid-feedback">Selecciona al menos 1 y maximo 2 opciones.</div>
           </div>
 
-          <!-- TIPO SERVICIO -->
           <div class="col-md-6">
             <label class="form-label">Tipo de Servicio</label>
-            <input type="text"
-                   name="tipo_servicio"
-                   class="form-control"
-                   required
-                   value="{{ sef.tipo_servicio or '' }}">
-            <div class="invalid-feedback">
-              Campo obligatorio.
+            <div class="dropdown w-100 multi-dd" data-bs-auto-close="outside" data-bs-display="static">
+              <button id="tipo_servicio_btn" class="btn btn-outline-secondary dropdown-toggle text-start w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span data-label>Selecciona opciones...</span>
+              </button>
+              <div class="dropdown-menu w-100 p-3">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="tipo_servicio" value="DEPÓSITO TRADICIONAL" id="tipo_servicio_1" {% if "DEPÓSITO TRADICIONAL" in tipo_servicio_sel %}checked{% endif %}>
+                  <label class="form-check-label" for="tipo_servicio_1">DEPÓSITO TRADICIONAL</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="tipo_servicio" value="DEPÓSITO ELECTRÓNICO" id="tipo_servicio_2" {% if "DEPÓSITO ELECTRÓNICO" in tipo_servicio_sel %}checked{% endif %}>
+                  <label class="form-check-label" for="tipo_servicio_2">DEPÓSITO ELECTRÓNICO</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="tipo_servicio" value="DOTACIÓN ELECTRÓNICA" id="tipo_servicio_3" {% if "DOTACIÓN ELECTRÓNICA" in tipo_servicio_sel %}checked{% endif %}>
+                  <label class="form-check-label" for="tipo_servicio_3">DOTACIÓN ELECTRÓNICA</label>
+                </div>
+              </div>
             </div>
+            <div class="invalid-feedback">Selecciona al menos 1 y maximo 3 opciones.</div>
           </div>
 
-          <!-- SERVICIO ADICIONAL -->
           <div class="col-md-6">
             <label class="form-label">Servicio Adicional</label>
-            <input type="text"
-                   name="servicio_adicional"
-                   class="form-control"
-                   value="{{ sef.servicio_adicional or '' }}">
+            <div class="dropdown w-100 multi-dd" data-bs-auto-close="outside" data-bs-display="static">
+              <button id="servicio_adicional_btn" class="btn btn-outline-secondary dropdown-toggle text-start w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false" {% if es_baja %}disabled{% endif %}>
+                <span data-label>Selecciona opciones...</span>
+              </button>
+              <div class="dropdown-menu w-100 p-3">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="servicio_adicional" value="TRASLADO DE VALORES" id="servicio_adicional_1" {% if "TRASLADO DE VALORES" in servicio_adicional_sel %}checked{% endif %} {% if es_baja %}disabled{% endif %}>
+                  <label class="form-check-label" for="servicio_adicional_1">TRASLADO DE VALORES</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="servicio_adicional" value="RENTA DE COFRE ELECTRÓNICO" id="servicio_adicional_2" {% if "RENTA DE COFRE ELECTRÓNICO" in servicio_adicional_sel %}checked{% endif %} {% if es_baja %}disabled{% endif %}>
+                  <label class="form-check-label" for="servicio_adicional_2">RENTA DE COFRE ELECTRÓNICO</label>
+                </div>
+              </div>
+            </div>
+            <div class="invalid-feedback">Selecciona al menos 1 y maximo 2 opciones.</div>
           </div>
 
-          <!-- CORTES ENVIO -->
           <div class="col-md-6">
-            <label class="form-label">Cortes de Envío</label>
-            <input type="text"
-                   name="cortes_envio"
-                   class="form-control"
-                   value="{{ sef.cortes_envio or '' }}">
+            <label class="form-label">Cortes de envio</label>
+            <div class="dropdown w-100 multi-dd" data-bs-auto-close="outside" data-bs-display="static">
+              <button id="cortes_envio_btn" class="btn btn-outline-secondary dropdown-toggle text-start w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false" {% if es_baja %}disabled{% endif %}>
+                <span data-label>Selecciona opciones...</span>
+              </button>
+              <div class="dropdown-menu w-100 p-3">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="cortes_envio" value="08:00 H" id="cortes_envio_1" {% if "08:00 H" in cortes_envio_sel %}checked{% endif %} {% if es_baja %}disabled{% endif %}>
+                  <label class="form-check-label" for="cortes_envio_1">Abono mismo dia 08:00 H</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="cortes_envio" value="14:00 H" id="cortes_envio_2" {% if "14:00 H" in cortes_envio_sel %}checked{% endif %} {% if es_baja %}disabled{% endif %}>
+                  <label class="form-check-label" for="cortes_envio_2">Abono mismo dia 14:00 H</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="cortes_envio" value="18:00 H" id="cortes_envio_3" {% if "18:00 H" in cortes_envio_sel %}checked{% endif %} {% if es_baja %}disabled{% endif %}>
+                  <label class="form-check-label" for="cortes_envio_3">Abono mismo dia 18:00 H</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="cortes_envio" value="T+1" id="cortes_envio_4" {% if "T+1" in cortes_envio_sel %}checked{% endif %} {% if es_baja %}disabled{% endif %}>
+                  <label class="form-check-label" for="cortes_envio_4">Abono T+1</label>
+                </div>
+              </div>
+            </div>
+            <div class="invalid-feedback">Selecciona al menos 1 y maximo 4 opciones.</div>
           </div>
 
-          <!-- TIPO COBRO -->
           <div class="col-md-4">
             <label class="form-label">Tipo de Cobro</label>
-            <select name="tipo_cobro" class="form-select" required>
+            <select name="tipo_cobro" id="tipo_cobro" class="form-select" {% if es_alta %}required{% endif %} {% if es_baja %}disabled{% endif %}>
               <option value="">Seleccione...</option>
-              <option value="FIJO"
-                {% if sef.tipo_cobro == "FIJO" %}selected{% endif %}>
-                Fijo
-              </option>
-              <option value="VARIABLE"
-                {% if sef.tipo_cobro == "VARIABLE" %}selected{% endif %}>
-                Variable
-              </option>
+              <option value="LOCAL" {% if sef.tipo_cobro == "LOCAL" %}selected{% endif %}>Local</option>
+              <option value="CENTRAL" {% if sef.tipo_cobro == "CENTRAL" %}selected{% endif %}>Central</option>
             </select>
-            <div class="invalid-feedback">
-              Debe seleccionar tipo de cobro.
-            </div>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
-          <!-- IMPORTE MAX DIF -->
           <div class="col-md-4">
-            <label class="form-label">Importe Máximo Diferencia</label>
-            <input type="number"
-                   step="0.01"
-                   name="importe_maximo_dif"
-                   class="form-control"
-                   value="{{ sef.importe_maximo_dif or '' }}">
+            <label class="form-label">Importe Maximo Diferencia</label>
+            <input type="text" name="importe_maximo_dif" id="importe_maximo_dif" class="form-control" inputmode="decimal" placeholder="$ 999,999.00" value="{{ sef.importe_maximo_dif or '200.00' }}" {% if es_alta %}required{% endif %} {% if es_baja %}disabled{% endif %}>
+            <div class="form-text">Formato: $ 999,999.00</div>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
-          <!-- SEGMENTO -->
           <div class="col-md-4">
             <label class="form-label">Segmento</label>
-            <input type="text"
-                   name="segmento"
-                   class="form-control"
-                   value="{{ sef.segmento or '' }}">
+            <select name="segmento" id="segmento" class="form-select" {% if es_alta or es_modificacion %}required{% endif %} {% if es_baja %}disabled{% endif %}>
+              <option value="">Seleccione...</option>
+              <option value="PYME" {% if sef.segmento == "PYME" %}selected{% endif %}>PYME</option>
+              <option value="INSTITUCIONES Y GOBIERNO" {% if sef.segmento == "INSTITUCIONES Y GOBIERNO" %}selected{% endif %}>INSTITUCIONES Y GOBIERNO</option>
+              <option value="CORPORATIVO" {% if sef.segmento == "CORPORATIVO" %}selected{% endif %}>CORPORATIVO</option>
+            </select>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
-          <!-- TIPO PERSONA -->
           <div class="col-md-6">
             <label class="form-label">Tipo Persona</label>
-            <select name="tipo_persona" class="form-select" required>
+            <select name="tipo_persona" id="tipo_persona" class="form-select" {% if es_alta %}required{% endif %} {% if es_baja %}disabled{% endif %}>
               <option value="">Seleccione...</option>
-              <option value="FISICA"
-                {% if sef.tipo_persona == "FISICA" %}selected{% endif %}>
-                Física
-              </option>
-              <option value="MORAL"
-                {% if sef.tipo_persona == "MORAL" %}selected{% endif %}>
-                Moral
-              </option>
+              <option value="PERSONA FÍSICA CON ACTIVIDAD EMPRESARIAL" {% if sef.tipo_persona == "PERSONA FÍSICA CON ACTIVIDAD EMPRESARIAL" %}selected{% endif %}>Persona Física con Actividad Empresarial</option>
+              <option value="PERSONA MORAL" {% if sef.tipo_persona == "PERSONA MORAL" %}selected{% endif %}>Persona Moral</option>
             </select>
-            <div class="invalid-feedback">
-              Campo obligatorio.
-            </div>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
-
         </div>
-
       </div>
     </div>
-
-    <!-- ========================= -->
-    <!-- DATOS DE CONTACTO -->
-    <!-- ========================= -->
 
     <div class="card mb-4 shadow-sm">
       <div class="card-header bg-light">
         <strong>Datos de Contacto</strong>
       </div>
       <div class="card-body">
-
         <div class="row g-3">
-
           <div class="col-md-6">
             <label class="form-label">Apoderado Legal</label>
-            <input type="text"
-                   name="apoderado_legal"
-                   class="form-control"
-                   value="{{ sef.apoderado_legal or '' }}">
+            <input type="text" name="apoderado_legal" class="form-control" value="{{ sef.apoderado_legal or '' }}" required>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Correo Apoderado</label>
-            <input type="email"
-                   name="correo_apoderado_legal"
-                   class="form-control"
-                   data-type="email"
-                   value="{{ sef.correo_apoderado_legal or '' }}">
+            <label class="form-label">Correo Apoderado Legal</label>
+            <input type="email" name="correo_apoderado_legal" class="form-control" value="{{ sef.correo_apoderado_legal or '' }}" required>
+            <div class="invalid-feedback">Correo obligatorio y valido.</div>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Teléfono</label>
-            <input type="tel"
-                   name="telefono_cliente"
-                   class="form-control telefono"
-                   data-type="telefono"
-                   inputmode="tel"
-                   value="{{ sef.telefono_cliente or '' }}">
+            <label class="form-label">Telefono</label>
+            <input type="tel" name="telefono_cliente" class="form-control telefono" inputmode="numeric" pattern="^\D*(?:\d\D*){10}$" value="{{ sef.telefono_cliente or '' }}" {% if es_alta %}required{% endif %} {% if es_baja %}disabled{% endif %}>
+            <div class="invalid-feedback">Telefono obligatorio (10 digitos).</div>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Domicilio Cliente</label>
-            <input type="text"
-                   name="domicilio_cliente"
-                   class="form-control"
-                   value="{{ sef.domicilio_cliente or '' }}">
+            <label class="form-label">Domicilio del cliente</label>
+            <input type="text" name="domicilio_cliente" class="form-control" value="{{ sef.domicilio_cliente or '' }}" {% if es_alta %}required{% endif %} {% if es_baja %}disabled{% endif %}>
+            <div class="invalid-feedback">Campo obligatorio.</div>
           </div>
-
         </div>
-
       </div>
     </div>
-
-    <!-- ========================= -->
-    <!-- SUSTITUCIONES -->
-    <!-- ========================= -->
 
     <div class="card mb-4 shadow-sm">
       <div class="card-header bg-light">
         <strong>Sustituciones</strong>
       </div>
       <div class="card-body">
-
         <div class="row g-3">
-
-          <div class="col-md-4 form-check">
-            <input class="form-check-input"
-                   type="checkbox"
-                   name="smod_unidades"
-                   {% if sef.sust_mod_unidades %}checked{% endif %}>
+          <div class="col-md-3 form-check">
+            <input class="form-check-input" type="checkbox" name="smod_unidades" {% if sef.sust_mod_unidades %}checked{% endif %} {% if not es_modificacion %}disabled{% endif %}>
             <label class="form-check-label">Modificar Unidades</label>
           </div>
-
-          <div class="col-md-4 form-check">
-            <input class="form-check-input"
-                   type="checkbox"
-                   name="smod_cuentas"
-                   {% if sef.sust_mod_cuentas %}checked{% endif %}>
+          <div class="col-md-3 form-check">
+            <input class="form-check-input" type="checkbox" name="smod_cuentas" {% if sef.sust_mod_cuentas %}checked{% endif %} {% if not es_modificacion %}disabled{% endif %}>
             <label class="form-check-label">Modificar Cuentas</label>
           </div>
-
-          <div class="col-md-4 form-check">
-            <input class="form-check-input"
-                   type="checkbox"
-                   name="smod_usuarios"
-                   {% if sef.sust_mod_usuarios %}checked{% endif %}>
-            <label class="form-check-label">Modificar Usuarios</label>
+          <div class="col-md-3 form-check">
+            <input class="form-check-input" type="checkbox" name="smod_contactos" {% if sef.sust_mod_contactos %}checked{% endif %} {% if not es_modificacion %}disabled{% endif %}>
+            <label class="form-check-label">Modificar Contactos</label>
           </div>
-
+          <div class="col-md-3 form-check">
+            <input class="form-check-input" type="checkbox" name="smod_usuarios" {% if sef.sust_mod_usuarios %}checked{% endif %} {% if not es_modificacion %}disabled{% endif %}>
+            <label class="form-check-label">Modificar Usuarios SEF</label>
+          </div>
         </div>
-
       </div>
     </div>
 
-    <!-- BOTON -->
     <div class="mt-4 d-flex justify-content-between">
-
-      <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=1) }}"
-      class="btn btn-outline-secondary btn-sm">
-      ← Regresar
-      </a>
-
-      <button type="submit" class="btn btn-primary px-4">
-        Guardar y continuar →
-      </button>
+      <a href="{{ url_for('solicitudes_flow.step', solicitud_id=sef.solicitud_id, step=1) }}" class="btn btn-outline-secondary btn-sm">← Regresar</a>
+      <button type="submit" class="btn btn-primary px-4">Guardar y continuar →</button>
     </div>
-
   </form>
-
 </div>
 
 <script>
-// Bootstrap validation
 (() => {
-  'use strict'
-  const forms = document.querySelectorAll('.needs-validation')
+  'use strict';
+  const form = document.querySelector('.needs-validation');
+  if (!form) return;
 
-  Array.from(forms).forEach(form => {
-    form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
-        event.preventDefault()
-        event.stopPropagation()
+  const rules = [
+    { name: 'tipo_contrato', min: 1, max: 2, required: true },
+    { name: 'tipo_servicio', min: 1, max: 3, required: true },
+    { name: 'servicio_adicional', min: 1, max: 2, required: true },
+    { name: 'cortes_envio', min: 0, max: 4, required: false }
+  ];
+  const esAlta = {{ 'true' if es_alta else 'false' }};
+  const esModificacion = {{ 'true' if es_modificacion else 'false' }};
+  const esBaja = {{ 'true' if es_baja else 'false' }};
+
+  const checked = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`));
+  const count = (name) => checked(name).length;
+  const values = (name) => checked(name).map((x) => x.value);
+  const ddList = Array.from(document.querySelectorAll('.multi-dd'));
+  const importeInput = document.getElementById('importe_maximo_dif');
+
+  function parseMoney(value) {
+    if (value === null || value === undefined) return null;
+    const raw = String(value).replace(/\$/g, '').replace(/,/g, '').trim();
+    if (!raw) return null;
+    const num = Number(raw);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function formatMoney(value) {
+    const num = parseMoney(value);
+    if (num === null) return '';
+    return '$ ' + num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function setMultiError(name, ok) {
+    const btn = document.getElementById(`${name}_btn`);
+    if (!btn) return;
+    btn.classList.toggle('is-invalid', !ok);
+  }
+
+  function updateLabel(name) {
+    const btn = document.getElementById(`${name}_btn`);
+    const span = btn?.querySelector('[data-label]');
+    if (!btn || !span) return;
+    const labels = checked(name).map((x) => {
+      const id = x.getAttribute('id');
+      const lbl = id ? form.querySelector(`label[for="${id}"]`) : null;
+      return (lbl?.textContent || x.value || '').trim();
+    }).filter(Boolean);
+    span.textContent = labels.length ? labels.join(', ') : 'Selecciona opciones...';
+    btn.title = labels.length ? labels.join(', ') : 'Selecciona opciones...';
+  }
+
+  function validateRule(rule) {
+    const c = count(rule.name);
+    if (c > rule.max) {
+      setMultiError(rule.name, false);
+      return false;
+    }
+    if (rule.required && c < rule.min) {
+      setMultiError(rule.name, false);
+      return false;
+    }
+    setMultiError(rule.name, true);
+    return true;
+  }
+
+  function enforceMax(rule, changed) {
+    if (count(rule.name) <= rule.max) return;
+    changed.checked = false;
+    setMultiError(rule.name, false);
+  }
+
+  function updateTipoServicioRequired() {
+    const servicioRule = rules.find((r) => r.name === 'tipo_servicio');
+    if (!servicioRule) return true;
+    const requiere = esAlta || esModificacion || esBaja;
+    servicioRule.required = requiere;
+    servicioRule.min = requiere ? 1 : 0;
+    if (!requiere) setMultiError('tipo_servicio', true);
+    return validateRule(servicioRule);
+  }
+
+  function updateServicioAdicionalRequired() {
+    const adicionalRule = rules.find((r) => r.name === 'servicio_adicional');
+    if (!adicionalRule) return true;
+    const requiere = !esBaja;
+    adicionalRule.required = requiere;
+    adicionalRule.min = requiere ? 1 : 0;
+    if (!requiere) setMultiError('servicio_adicional', true);
+    return validateRule(adicionalRule);
+  }
+
+  function updateCortesRequired() {
+    const cortesRule = rules.find((r) => r.name === 'cortes_envio');
+    if (!cortesRule) return true;
+    const requiere = esAlta || esModificacion;
+    cortesRule.required = requiere;
+    cortesRule.min = requiere ? 1 : 0;
+    if (!requiere) setMultiError('cortes_envio', true);
+    return validateRule(cortesRule);
+  }
+
+  rules.forEach((rule) => {
+    checked(rule.name);
+    form.querySelectorAll(`input[name="${rule.name}"]`).forEach((chk) => {
+      chk.addEventListener('change', () => {
+        enforceMax(rule, chk);
+        updateLabel(rule.name);
+        validateRule(rule);
+        updateTipoServicioRequired();
+        updateServicioAdicionalRequired();
+        updateCortesRequired();
+      });
+    });
+    updateLabel(rule.name);
+  });
+
+  updateTipoServicioRequired();
+  updateServicioAdicionalRequired();
+  updateCortesRequired();
+
+  ddList.forEach((dd) => {
+    dd.addEventListener('show.bs.dropdown', () => {
+      ddList.forEach((other) => {
+        if (other !== dd) {
+          other.classList.add('behind');
+          const btn = other.querySelector('[data-bs-toggle="dropdown"]');
+          if (btn && window.bootstrap) {
+            const inst = window.bootstrap.Dropdown.getOrCreateInstance(btn);
+            inst.hide();
+          }
+        }
+      });
+    });
+    dd.addEventListener('hide.bs.dropdown', () => {
+      ddList.forEach((other) => other.classList.remove('behind'));
+    });
+  });
+
+  if (importeInput) {
+    const initial = formatMoney(importeInput.value);
+    if (initial) importeInput.value = initial;
+
+    importeInput.addEventListener('focus', () => {
+      const num = parseMoney(importeInput.value);
+      if (num !== null) {
+        importeInput.value = num.toFixed(2);
       }
-      form.classList.add('was-validated')
-    }, false)
-  })
+    });
+
+    importeInput.addEventListener('blur', () => {
+      const formatted = formatMoney(importeInput.value);
+      if (formatted) importeInput.value = formatted;
+    });
+  }
+
+  form.addEventListener('submit', (event) => {
+    const tipoServicioOk = updateTipoServicioRequired();
+    const servicioAdicionalOk = updateServicioAdicionalRequired();
+    const multiOk = rules.map(validateRule).every(Boolean);
+    const cortesOk = updateCortesRequired();
+    if (!form.checkValidity() || !tipoServicioOk || !servicioAdicionalOk || !multiOk || !cortesOk) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (importeInput) {
+      const formatted = formatMoney(importeInput.value);
+      if (formatted) importeInput.value = formatted;
+    }
+    form.classList.add('was-validated');
+  }, false);
 })();
 </script>
 
 {% endblock %}
+

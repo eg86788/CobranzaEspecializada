@@ -1,4 +1,5 @@
 import re
+from decimal import Decimal, InvalidOperation
 from flask import request, flash
 from app.models import (
     CatalogoEntidad,
@@ -36,6 +37,17 @@ def _email_valido(value):
     return bool(EMAIL_RE.fullmatch(_norm(value)))
 
 
+def _list_from_form(form, name):
+    return [_norm(v) for v in form.getlist(name) if _norm(v)]
+
+
+def _normalize_money(value):
+    raw = _norm(value).replace("$", "").replace(",", "")
+    if not raw:
+        return None
+    return raw
+
+
 def handle_step(solicitud, step, form):
 
     # =====================================================
@@ -54,34 +66,194 @@ def handle_step(solicitud, step, form):
     if step == 2:
 
         if form:
-            sef.tipo_contrato = form.get("tipo_contrato")
-            sef.tipo_servicio = form.get("tipo_servicio")
-            sef.servicio_adicional = form.get("servicio_adicional")
-            sef.tipo_cobro = form.get("tipo_cobro")
-            sef.cortes_envio = form.get("cortes_envio")
+            tipo_tramite = (solicitud.tipo_tramite or "").upper()
 
-            sef.importe_maximo_dif = form.get("importe_maximo_dif") or None
-            sef.segmento = form.get("segmento")
-            sef.tipo_persona = form.get("tipo_persona")
+            valid_tipo_contrato = {"CPAE TRADICIONAL", "SEF ELECTRÓNICO"}
+            valid_tipo_servicio = {
+                "DEPÓSITO TRADICIONAL",
+                "DEPÓSITO ELECTRÓNICO",
+                "DOTACIÓN ELECTRÓNICA"
+            }
+            valid_servicio_adicional = {
+                "TRASLADO DE VALORES",
+                "RENTA DE COFRE ELECTRÓNICO"
+            }
+            valid_cortes = {"08:00 H", "14:00 H", "18:00 H", "T+1"}
+            valid_tipo_cobro = {"LOCAL", "CENTRAL"}
+            valid_segmento = {"PYME", "INSTITUCIONES Y GOBIERNO", "CORPORATIVO"}
+            valid_tipo_persona = {
+                "PERSONA FÍSICA CON ACTIVIDAD EMPRESARIAL",
+                "PERSONA MORAL"
+            }
 
-            sef.apoderado_legal = form.get("apoderado_legal")
-            sef.correo_apoderado_legal = form.get("correo_apoderado_legal")
-            sef.telefono_cliente = form.get("telefono_cliente")
-            sef.domicilio_cliente = form.get("domicilio_cliente")
+            tipo_contrato_vals = _list_from_form(form, "tipo_contrato")
+            tipo_servicio_vals = _list_from_form(form, "tipo_servicio")
+            servicio_adicional_vals = _list_from_form(form, "servicio_adicional")
+            cortes_envio_vals = _list_from_form(form, "cortes_envio")
+
+            tipo_cobro = _norm(form.get("tipo_cobro")).upper()
+            segmento = _norm(form.get("segmento")).upper()
+            tipo_persona = _norm(form.get("tipo_persona")).upper()
+            apoderado_legal = _norm(form.get("apoderado_legal"))
+            correo_apoderado_legal = _norm(form.get("correo_apoderado_legal"))
+            telefono_cliente = _telefono_10(form.get("telefono_cliente"))
+            domicilio_cliente = _norm(form.get("domicilio_cliente"))
+
+            errores = []
+
+            if tipo_tramite == "BAJA":
+                # En BAJA estos campos se consideran deshabilitados y no aplican.
+                servicio_adicional_vals = []
+                cortes_envio_vals = []
+                tipo_cobro = ""
+                segmento = ""
+                tipo_persona = ""
+                telefono_cliente = ""
+                domicilio_cliente = ""
+
+            # Tipo Contrato: obligatorio, 1 a 2
+            if len(tipo_contrato_vals) < 1 or len(tipo_contrato_vals) > 2:
+                errores.append("Tipo Contrato: selecciona al menos 1 y máximo 2 opciones.")
+            if any(v not in valid_tipo_contrato for v in tipo_contrato_vals):
+                errores.append("Tipo Contrato contiene valores inválidos.")
+
+            # Tipo Servicio: 1 a 3 cuando aplique
+            if len(tipo_servicio_vals) > 3:
+                errores.append("Tipo Servicio: selecciona máximo 3 opciones.")
+            if any(v not in valid_tipo_servicio for v in tipo_servicio_vals):
+                errores.append("Tipo Servicio contiene valores inválidos.")
+
+            # Servicio adicional: 1 a 2 cuando aplique (en BAJA se deshabilita)
+            if tipo_tramite != "BAJA" and len(servicio_adicional_vals) < 1:
+                errores.append("Servicio Adicional: selecciona al menos 1 opción.")
+            if len(servicio_adicional_vals) > 2:
+                errores.append("Servicio Adicional: máximo 2 opciones.")
+            if any(v not in valid_servicio_adicional for v in servicio_adicional_vals):
+                errores.append("Servicio Adicional contiene valores inválidos.")
+
+            # Cortes: máximo 4 (obligatorio se valida por tipo de trámite)
+            if len(cortes_envio_vals) > 4:
+                errores.append("Cortes de envío: selecciona máximo 4 opciones.")
+            if any(v not in valid_cortes for v in cortes_envio_vals):
+                errores.append("Cortes de envío contiene valores inválidos.")
+
+            # Alta: reglas condicionales
+            if tipo_tramite == "ALTA":
+                # Tipo Servicio obligatorio cuando hay Tipo Contrato seleccionado
+                if tipo_contrato_vals and len(tipo_servicio_vals) < 1:
+                    errores.append("Tipo Servicio es obligatorio para ALTA.")
+
+                if len(cortes_envio_vals) < 1:
+                    errores.append("Cortes de envío es obligatorio para ALTA.")
+
+                if tipo_cobro not in valid_tipo_cobro:
+                    errores.append("Tipo de Cobro es obligatorio y debe ser Local o Central.")
+                if segmento not in valid_segmento:
+                    errores.append("Segmento es obligatorio.")
+                if tipo_persona not in valid_tipo_persona:
+                    errores.append("Tipo de Persona es obligatorio.")
+                if not apoderado_legal:
+                    errores.append("Apoderado Legal es obligatorio.")
+                if not correo_apoderado_legal:
+                    errores.append("Correo Apoderado Legal es obligatorio.")
+                elif not _email_valido(correo_apoderado_legal):
+                    errores.append("Correo Apoderado Legal con formato inválido.")
+                if len(telefono_cliente) != 10:
+                    errores.append("Teléfono debe tener 10 dígitos.")
+                if not domicilio_cliente:
+                    errores.append("Domicilio del cliente es obligatorio.")
+
+                raw_importe = _normalize_money(form.get("importe_maximo_dif"))
+                if raw_importe is None:
+                    importe_maximo_dif = None
+                    errores.append("Importe Máximo Diferencia es obligatorio.")
+                else:
+                    try:
+                        importe_maximo_dif = Decimal(raw_importe)
+                    except InvalidOperation:
+                        importe_maximo_dif = None
+                        errores.append("Importe Máximo Diferencia debe tener formato válido (ej. 200.00).")
+                    else:
+                        if importe_maximo_dif < 0:
+                            errores.append("Importe Máximo Diferencia no puede ser negativo.")
+            elif tipo_tramite == "MODIFICACION":
+                if len(tipo_servicio_vals) < 1:
+                    errores.append("Tipo Servicio es obligatorio para MODIFICACIÓN.")
+                if segmento not in valid_segmento:
+                    errores.append("Segmento es obligatorio.")
+                if not apoderado_legal:
+                    errores.append("Apoderado Legal es obligatorio.")
+                if not correo_apoderado_legal:
+                    errores.append("Correo Apoderado Legal es obligatorio.")
+                elif not _email_valido(correo_apoderado_legal):
+                    errores.append("Correo Apoderado Legal con formato inválido.")
+
+                if tipo_cobro and tipo_cobro not in valid_tipo_cobro:
+                    errores.append("Tipo de Cobro inválido.")
+                if tipo_persona and tipo_persona not in valid_tipo_persona:
+                    errores.append("Tipo de Persona inválido.")
+                if telefono_cliente and len(telefono_cliente) != 10:
+                    errores.append("Teléfono debe tener 10 dígitos.")
+
+                raw_importe = _normalize_money(form.get("importe_maximo_dif"))
+                if raw_importe is None:
+                    importe_maximo_dif = None
+                else:
+                    try:
+                        importe_maximo_dif = Decimal(raw_importe)
+                    except InvalidOperation:
+                        importe_maximo_dif = None
+                        errores.append("Importe Máximo Diferencia debe tener formato válido (ej. 200.00).")
+                    else:
+                        if importe_maximo_dif < 0:
+                            errores.append("Importe Máximo Diferencia no puede ser negativo.")
+            elif tipo_tramite == "BAJA":
+                if len(tipo_servicio_vals) < 1:
+                    errores.append("Tipo Servicio es obligatorio para BAJA.")
+                if not apoderado_legal:
+                    errores.append("Apoderado Legal es obligatorio.")
+                if not correo_apoderado_legal:
+                    errores.append("Correo Apoderado Legal es obligatorio.")
+                elif not _email_valido(correo_apoderado_legal):
+                    errores.append("Correo Apoderado Legal con formato inválido.")
+                importe_maximo_dif = None
+            else:
+                importe_maximo_dif = None
+
+            if errores:
+                for err in errores:
+                    flash(err, "danger")
+                return {"sef": sef}
+
+            # Guardado normalizado (multiselect como texto separado por '|')
+            sef.tipo_contrato = " | ".join(tipo_contrato_vals)
+            sef.tipo_servicio = " | ".join(tipo_servicio_vals)
+            sef.servicio_adicional = " | ".join(servicio_adicional_vals)
+            sef.cortes_envio = " | ".join(cortes_envio_vals)
+            sef.tipo_cobro = tipo_cobro
+            sef.importe_maximo_dif = importe_maximo_dif
+            sef.segmento = segmento
+            sef.tipo_persona = tipo_persona
+            sef.apoderado_legal = apoderado_legal
+            sef.correo_apoderado_legal = correo_apoderado_legal
+            sef.telefono_cliente = telefono_cliente
+            sef.domicilio_cliente = domicilio_cliente
 
             # Sustitución - modificar
-            sef.sust_mod_unidades = bool(form.get("smod_unidades"))
-            sef.sust_mod_cuentas = bool(form.get("smod_cuentas"))
-            sef.sust_mod_usuarios = bool(form.get("smod_usuarios"))
-            sef.sust_mod_contactos = bool(form.get("smod_contactos"))
-            sef.sust_mod_tipocobro = bool(form.get("smod_tipocobro"))
-            sef.sust_mod_impdif = bool(form.get("smod_impdif"))
+            # Solo habilitadas para MODIFICACION
+            can_use_sust = tipo_tramite == "MODIFICACION"
+            sef.sust_mod_unidades = can_use_sust and bool(form.get("smod_unidades"))
+            sef.sust_mod_cuentas = can_use_sust and bool(form.get("smod_cuentas"))
+            sef.sust_mod_usuarios = can_use_sust and bool(form.get("smod_usuarios"))
+            sef.sust_mod_contactos = can_use_sust and bool(form.get("smod_contactos"))
+            sef.sust_mod_tipocobro = can_use_sust and bool(form.get("smod_tipocobro"))
+            sef.sust_mod_impdif = can_use_sust and bool(form.get("smod_impdif"))
 
             # Sustitución - crear
-            sef.sust_crea_unidades = bool(form.get("screa_unidades"))
-            sef.sust_crea_cuentas = bool(form.get("screa_cuentas"))
-            sef.sust_crea_usuarios = bool(form.get("screa_usuarios"))
-            sef.sust_crea_contactos = bool(form.get("screa_contactos"))
+            sef.sust_crea_unidades = can_use_sust and bool(form.get("screa_unidades"))
+            sef.sust_crea_cuentas = can_use_sust and bool(form.get("screa_cuentas"))
+            sef.sust_crea_usuarios = can_use_sust and bool(form.get("screa_usuarios"))
+            sef.sust_crea_contactos = can_use_sust and bool(form.get("screa_contactos"))
 
             db.session.commit()
             return 3

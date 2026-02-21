@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h4 class="mb-3">
+    SPEI
+    <small class="text-muted">- Paso 2</small>
+  </h4>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <p class="mb-3">
+        El flujo de captura para SPEI en este paso aun no esta configurado.
+      </p>
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('solicitudes_flow.step', solicitud_id=solicitud.id, step=1) }}" class="btn btn-outline-secondary btn-sm">
+          ← Regresar
+        </a>
+        <a href="{{ url_for('sol_portal.lista') }}" class="btn btn-primary btn-sm">
+          Ir a solicitudes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -25,15 +25,16 @@
             <label class="form-label">Número Cliente</label>
             <input type="text"
                    name="numero_cliente"
+                   id="numero_cliente"
                    class="form-control"
                    data-type="numero_cliente"
                    inputmode="numeric"
                    maxlength="10"
-                   pattern="\d{10}"
+                   pattern="\d{1,10}"
                    required
                    value="{{ solicitud.numero_cliente or '' }}">
             <div class="invalid-feedback">
-              Debe contener exactamente 10 dígitos numéricos.
+              Debe contener máximo 10 dígitos numéricos.
             </div>
           </div>
 
@@ -46,11 +47,11 @@
                    class="form-control"
                    data-type="numero_contrato"
                    inputmode="numeric"
-                   maxlength="12"
-                   pattern="\d{12}"
+                    maxlength="12"
+                   pattern="\d{1,12}"
                    value="{{ solicitud.numero_contrato or '' }}">
             <div class="invalid-feedback">
-              En MODIFICACIÓN y BAJA debe contener exactamente 12 dígitos numéricos.
+              En MODIFICACIÓN y BAJA debe contener máximo 12 dígitos numéricos.
             </div>
           </div>
 
@@ -60,10 +61,12 @@
             <input type="text"
                    name="razon_social"
                    class="form-control"
+                   maxlength="250"
+                   pattern="[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ\s.,\-_/&()]+"
                    required
                    value="{{ solicitud.razon_social or '' }}">
             <div class="invalid-feedback">
-              Campo obligatorio.
+               Campo obligatorio, máximo 250 caracteres alfanuméricos.
             </div>
           </div>
 
@@ -168,11 +171,53 @@ function applyContratoRules() {
   }
 }
 
+function keepOnlyDigits(value, maxLen) {
+  return (value || '').replace(/\D/g, '').slice(0, maxLen);
+}
+
+function padLeftZeroIfNeeded(value, threshold) {
+  if (!value) return value;
+  return value.length < threshold ? value.padStart(threshold, '0') : value;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const tipoTramite = document.getElementById('tipo_tramite');
+  const numeroCliente = document.getElementById('numero_cliente');
+  const numeroContrato = document.getElementById('numero_contrato');
+  const form = document.querySelector('form.needs-validation');
+
+  if (numeroCliente) {
+    numeroCliente.addEventListener('input', () => {
+      numeroCliente.value = keepOnlyDigits(numeroCliente.value, 10);
+    });
+  }
+
+  if (numeroContrato) {
+    numeroContrato.addEventListener('input', () => {
+      numeroContrato.value = keepOnlyDigits(numeroContrato.value, 12);
+    });
+  }
+
   applyContratoRules();
   if (tipoTramite) {
     tipoTramite.addEventListener('change', applyContratoRules);
+  }
+
+  if (form) {
+    form.addEventListener('submit', () => {
+      if (numeroCliente) {
+        numeroCliente.value = padLeftZeroIfNeeded(
+          keepOnlyDigits(numeroCliente.value, 10),
+          10
+        );
+      }
+      if (numeroContrato && !numeroContrato.disabled) {
+        numeroContrato.value = padLeftZeroIfNeeded(
+          keepOnlyDigits(numeroContrato.value, 12),
+          10
+        );
+      }
+    });
   }
 });
 
