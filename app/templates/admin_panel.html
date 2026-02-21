@@ -4,6 +4,13 @@
 {% block content %}
 <div class="container py-4">
 
+  {% set hora = now().hour %}
+  {% if hora >= 6 and hora < 19 %}
+    <h4 class="mb-4">Buenos días, {{ current_user_name }}!</h4>
+  {% else %}
+    <h4 class="mb-4">Buenas noches, {{ current_user_name }}!</h4>
+  {% endif %}
+
   <!-- ============================== -->
   <!-- OPERACIÓN -->
   <!-- ============================== -->
@@ -11,39 +18,22 @@
     <h5 class="admin-section-title mb-4">Operación</h5>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
-      <!-- Plantillas -->
+      <!-- Llenado de Formatos -->
       <div class="col">
         <div class="admin-card h-100">
           <div class="admin-body">
-            <h5 class="admin-title">Plantillas</h5>
-            <p class="admin-desc">Gestión de plantillas del sistema.</p>
+            <h5 class="admin-title">Llenado de Formatos por Producto</h5>
+            <p class="admin-desc">Gestión de llenado automatico de formatos.</p>
           </div>
           <div class="admin-footer">
             <a class="btn btn-redondo"
-               href="{{ url_for('templates_admin.list_templates') }}">
+               href="{{ url_for('core.inicio_productos') }}">
               Abrir
             </a>
           </div>
         </div>
       </div>
-
-      <!-- Adhesiones -->
-      <div class="col">
-        <div class="admin-card h-100">
-          <div class="admin-body">
-            <h5 class="admin-title">Adhesiones</h5>
-            <p class="admin-desc">Administración de contratos y convenios.</p>
-          </div>
-          <div class="admin-footer">
-            <a class="btn btn-redondo"
-               href="{{ url_for('adh_admin.list_adh') }}">
-              Abrir
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Minutas -->
+            <!-- Minutas -->
       <div class="col">
         <div class="admin-card h-100">
           <div class="admin-body">
@@ -59,9 +49,26 @@
         </div>
       </div>
 
+      <!-- Generador de Referencias -->
+      <div class="col">
+        <div class="admin-card h-100">
+          <div class="admin-body">
+            <h5 class="admin-title">Referencias</h5>
+            <p class="admin-desc">Gestión de Referncias bancarias</p>
+          </div>
+          <div class="admin-footer">
+            <a class="btn btn-redondo"
+               href="">
+              Abrir
+            </a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
+  {% if session.get('role') == 'admin' %}
   <!-- ============================== -->
   <!-- DATOS MAESTROS -->
   <!-- ============================== -->
@@ -85,38 +92,6 @@
         </div>
       </div>
 
-      <!-- Productos -->
-      <div class="col">
-        <div class="admin-card h-100">
-          <div class="admin-body">
-            <h5 class="admin-title">Productos</h5>
-            <p class="admin-desc">Administración de productos.</p>
-          </div>
-          <div class="admin-footer">
-            <a class="btn btn-redondo"
-               href="{{ url_for('productos_admin.lista') }}">
-              Abrir
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Usuarios -->
-      <div class="col">
-        <div class="admin-card h-100">
-          <div class="admin-body">
-            <h5 class="admin-title">Usuarios</h5>
-            <p class="admin-desc">Gestión de usuarios del sistema.</p>
-          </div>
-          <div class="admin-footer">
-            <a class="btn btn-redondo"
-               href="{{ url_for('users_admin.listar_usuarios') }}">
-              Abrir
-            </a>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -126,6 +101,22 @@
   <div class="admin-section">
     <h5 class="admin-section-title mb-4">Configuración y Seguridad</h5>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+            <!-- Usuarios -->
+            <div class="col">
+              <div class="admin-card h-100">
+                <div class="admin-body">
+                  <h5 class="admin-title">Usuarios</h5>
+                  <p class="admin-desc">Gestión de usuarios del sistema.</p>
+                </div>
+                <div class="admin-footer">
+                  <a class="btn btn-redondo"
+                     href="{{ url_for('users_admin.listar_usuarios') }}">
+                    Abrir
+                  </a>
+                </div>
+              </div>
+            </div>
 
       <!-- Parámetros del sistema -->
       <div class="col">
@@ -174,23 +165,11 @@
         </div>
       </div>
 
-      <div class="col">
-        <div class="admin-card h-100">
-          <div class="admin-body">
-            <h5 class="admin-title">Roles</h5>
-            <p class="admin-desc">Administrar roles del sistema.</p>
-          </div>
-          <div class="admin-footer">
-            <a class="btn btn-redondo"
-               href="{{ url_for('roles_admin.index') }}">
-               Abrir
-            </a>
-          </div>
-        </div>
-      </div>
+
       
     </div>
   </div>
+  {% endif %}
 
 </div>
 

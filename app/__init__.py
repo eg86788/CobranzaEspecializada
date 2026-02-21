@@ -65,6 +65,14 @@ def create_app():
             "current_role": session.get("role"),
             "current_user_name": session.get("fullname") or session.get("username")
         }
+
+    from datetime import datetime
+
+    @app.context_processor
+    def inject_now():
+        return {
+            "now": datetime.now
+        }
     
     # Importar modelos para que Alembic los detecte
     from app import models  # noqa
@@ -98,6 +106,7 @@ def create_app():
     from .blueprints.roles_product_admin import roles_product_admin_bp
 
     from .blueprints.roles_admin import roles_admin_bp
+    from .blueprints.admin import admin_bp
 
     # Registro
     app.register_blueprint(core_bp)
@@ -119,6 +128,7 @@ def create_app():
     app.register_blueprint(catalog_admin_bp)
     app.register_blueprint(roles_product_admin_bp)
     app.register_blueprint(roles_admin_bp)
+    app.register_blueprint(admin_bp)
 
 
     @app.route("/sol")

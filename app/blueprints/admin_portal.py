@@ -13,9 +13,12 @@ admin_portal = Blueprint("admin_portal", __name__, url_prefix="/admin")
 
     # --- Guard de administrador muy simple (usa tu lógica real si ya la tienes) ---
 @admin_portal.before_request
-def _admin_only():
-    if session.get("role") != "admin":
-        flash("Acceso restringido a administradores.", "warning")
+def _admin_or_user():
+    role = session.get("role")
+
+    # Permitir acceso a admin y user
+    if role not in ["admin", "user"]:
+        flash("Debes iniciar sesión.", "warning")
         return redirect(url_for("auth_admin.login"))    
 
     

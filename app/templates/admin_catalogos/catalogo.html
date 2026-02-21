@@ -26,17 +26,75 @@
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
       <form method="POST">
+        {% if item %}
+        <input type="hidden" name="edit_id" value="{{ item.id }}">
+        {% endif %}
         <div class="row g-3">
           {% for campo in campos %}
           <div class="col-md-4">
             <label class="form-label text-capitalize">
               {{ campo.replace('_',' ') }}
             </label>
-            <input type="text" name="{{ campo }}" class="form-control">
+
+            {% if opciones and campo in opciones %}
+
+              {% if campo == 'producto_id' %}
+                <select name="{{ campo }}" class="form-select" required>
+                  <option value="">Seleccione...</option>
+                  {% for p in opciones[campo] %}
+                  <option value="{{ p.id }}"
+                    {% if item and item.producto_id == p.id %}selected{% endif %}>
+                    {{ p.nombre }}
+                  </option>
+                  {% endfor %}
+                </select>
+              {% elif campo == 'moneda' %}
+                <select name="{{ campo }}" class="form-select" required>
+                  {% for m in opciones[campo] %}
+                  <option value="{{ m }}"
+                    {% if item and item.moneda == m %}selected{% endif %}>
+                    {{ m }}
+                  </option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+
+            {% else %}
+
+              {% if campo == 'activo' %}
+                <div class="form-check mt-2">
+                  <input type="checkbox" name="{{ campo }}" value="1" class="form-check-input"
+                    {% if item %}
+                      {% if item.activo %}checked{% endif %}
+                    {% else %}
+                      checked
+                    {% endif %}>
+                  <label class="form-check-label">Activo</label>
+                </div>
+              {% else %}
+
+                {% if campo == 'valor' %}
+                  <input type="text"
+                         name="{{ campo }}"
+                         class="form-control money-mask"
+                         placeholder="$ 0.00"
+                         value="{{ ('$ ' + '{:,.2f}'.format(item.valor)) if item and item.valor else '' }}"
+                         oninput="formatCurrency(this)">
+                {% else %}
+                  <input type="text" name="{{ campo }}" class="form-control"
+                         value="{{ item|attr(campo) if item else '' }}">
+                {% endif %}
+
+              {% endif %}
+
+            {% endif %}
+
           </div>
           {% endfor %}
           <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-primary w-100">Crear</button>
+            <button class="btn btn-primary w-100">
+              {{ 'Actualizar' if item else 'Crear' }}
+            </button>
           </div>
         </div>
       </form>
@@ -61,17 +119,63 @@
           <tr>
             <td>{{ r.id }}</td>
             {% for campo in campos %}
-            <td>{{ r|attr(campo) }}</td>
+              {% if campo == 'producto_id' and r.producto %}
+                <td>{{ r.producto.nombre }}</td>
+              {% else %}
+                {% if campo == 'activo' %}
+                  <td>
+                    {% if r.activo %}
+                      <span class="badge bg-success">Sí</span>
+                    {% else %}
+                      <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                  </td>
+                {% else %}
+                  <td>{{ r|attr(campo) }}</td>
+                {% endif %}
+              {% endif %}
             {% endfor %}
             <td>
-              <form method="POST"
-                    action="{{ url_for('catalog_admin.eliminar', catalogo=catalogo, item_id=r.id) }}"
-                    style="display:inline;"
-                    onsubmit="return confirm('¿Eliminar registro?');">
-                <button class="btn btn-sm btn-outline-danger">
-                  Eliminar
-                </button>
-              </form>
+
+              {% if catalogo == 'tarifas_comision' %}
+
+                <a href="{{ url_for('catalog_admin.administrar', catalogo=catalogo, edit=r.id) }}"
+                   class="btn btn-sm btn-outline-primary me-1">
+                   Editar
+                </a>
+
+                {% if r.activo %}
+                  <form method="POST"
+                        action="{{ url_for('catalog_admin.eliminar', catalogo=catalogo, item_id=r.id) }}"
+                        style="display:inline;"
+                        onsubmit="return confirm('¿Desactivar registro?');">
+                    <button class="btn btn-sm btn-outline-danger">
+                      Desactivar
+                    </button>
+                  </form>
+                {% else %}
+                  <form method="POST"
+                        action="{{ url_for('catalog_admin.reactivar', catalogo=catalogo, item_id=r.id) }}"
+                        style="display:inline;">
+                    <button class="btn btn-sm btn-outline-success">
+                      Reactivar
+                    </button>
+                  </form>
+                {% endif %}
+
+              {% else %}
+
+                <form method="POST"
+                      action="{{ url_for('catalog_admin.eliminar', catalogo=catalogo, item_id=r.id) }}"
+                      style="display:inline;"
+                      onsubmit="return confirm('¿Eliminar registro?');">
+                  <button class="btn btn-sm btn-outline-danger">
+                    Eliminar
+                  </button>
+                </form>
+
+              {% endif %}
+
             </td>
           </tr>
           {% endfor %}
@@ -89,4 +193,25 @@
   </div>
 
 </div>
+<script>
+function formatCurrency(input) {
+  let value = input.value.replace(/[^0-9.]/g, '');
+
+  if (value === '') {
+    input.value = '';
+    return;
+  }
+
+  let parts = value.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  if (parts.length > 1) {
+    value = parts[0] + '.' + parts[1].substring(0,2);
+  } else {
+    value = parts[0];
+  }
+
+  input.value = '$ ' + value;
+}
+</script>
 {% endblock %}

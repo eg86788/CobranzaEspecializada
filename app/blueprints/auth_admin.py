@@ -47,8 +47,10 @@ def login():
             # Redirección por rol
             if session["role"] == "admin":
                 return redirect(url_for("admin_portal.dashboard"))
+            elif session["role"] == "user":
+                return redirect(url_for("admin_portal.dashboard"))
             else:
-                return redirect(url_for("core.inicio_productos"))
+                return redirect(url_for("auth_admin.login"))
 
         flash("Credenciales inválidas.", "danger")
 

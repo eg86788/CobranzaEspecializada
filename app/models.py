@@ -54,6 +54,7 @@ class RolePermiso(db.Model):
     )
 
 
+
 class RoleProductAccess(db.Model):
     __tablename__ = "role_product_access"
 
@@ -63,9 +64,32 @@ class RoleProductAccess(db.Model):
     habilitado = db.Column(db.Boolean, nullable=False, default=True)
 
 
+# ==========================================
+# SYSTEM PARAMS
+# ==========================================
+class SystemParam(db.Model):
+    __tablename__ = "system_params"
+
+    key = db.Column(db.Text, primary_key=True)
+    value = db.Column(db.Text, nullable=False)
+
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    updated_by = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f"{self.key} = {self.value}"
+
+
 # =====================================================
 # PRODUCTOS
 # =====================================================
+
 
 class Producto(db.Model):
     __tablename__ = "catalogo_productos"
@@ -77,6 +101,62 @@ class Producto(db.Model):
     activo = db.Column(db.Boolean, nullable=False, default=True)
 
     fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+# =====================================================
+# TARIFAS DE COMISIÓN POR PRODUCTO
+# =====================================================
+
+class TarifaComisionProducto(db.Model):
+    __tablename__ = "tarifas_comision_producto"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    producto_id = db.Column(
+        db.Integer,
+        db.ForeignKey("catalogo_productos.id"),
+        nullable=False,
+        index=True
+    )
+
+    nombre_comision = db.Column(db.String(150), nullable=False)
+
+    # Puede representar porcentaje o monto fijo según el tipo
+    valor = db.Column(db.Numeric(15, 4), nullable=False)
+
+    moneda = db.Column(db.String(10), nullable=True, default="MXN")
+
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    fecha_creacion = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    fecha_actualizacion = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    # Relación con producto
+    producto = db.relationship(
+        "Producto",
+        backref="tarifas_comision"
+    )
+
+    __table_args__ = (
+        db.Index(
+            "idx_tarifa_comision_producto_activo",
+            "producto_id",
+            postgresql_where=db.text("activo = TRUE")
+        ),
+    )
+
+    def __repr__(self):
+        return f"{self.nombre_comision} - {self.producto.code if self.producto else ''}"
 
 
 # ==========================================
@@ -599,7 +679,7 @@ class SolicitudSEFContacto(db.Model):
         nullable=True
     )
     tipos_contacto = db.Column(db.Text, nullable=True)
-
+ 
     sef = db.relationship(
         "SolicitudSEF",
         back_populates="sef_contactos"

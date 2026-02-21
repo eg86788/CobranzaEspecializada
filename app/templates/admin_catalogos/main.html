@@ -56,7 +56,37 @@
       </a>
     </div>
 
-  </div>
+    <div class="col-md-4">
+      <a href="{{ url_for('catalog_admin.administrar', catalogo='tarifas_comision') }}" 
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Tarifas de Comisión</h5>
+        <p class="text-muted">Administrar comisiones por producto.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('roles_admin.index') }}"
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Roles del sistema</h5>
+        <p class="text-muted">Administrar roles del sistema.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('admin.admin_adhesiones') }}"
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Números de RECA por Producto</h5>
+        <p class="text-muted">Administrar RECA por Producto.</p>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ url_for('templates_admin.list_templates') }}"
+         class="card p-4 text-decoration-none catalog-card">
+        <h5>Plantillas de Formatos</h5>
+        <p class="text-muted">Administrar platillas de Productos.</p>
+      </a>
+    </div>
 
   <div class="mt-4">
     <a class="btn btn-outline-secondary"

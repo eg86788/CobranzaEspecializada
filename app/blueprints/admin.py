@@ -1,5 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
 from ..auth.decorators import role_required, permiso_required
+from app.models import Producto, RoleProductAccess, TarifaComisionProducto
+from app.extensions import db
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -24,9 +26,6 @@ def admin_templates():
 @permiso_required("manage_adhesiones")
 def admin_adhesiones():
     return render_template("admin_adhesiones.html")
-from flask import request, redirect, url_for
-from app.models import Producto, RoleProductAccess
-from app.extensions import db
 
 
 @admin_bp.route("/catalogos/asignacion-productos", methods=["GET", "POST"])
@@ -74,3 +73,77 @@ def admin_asignacion_productos():
         productos=productos,
         accesos=accesos
     )
+
+
+# ==============================
+# TARIFAS DE COMISIÓN POR PRODUCTO
+# ==============================
+
+@admin_bp.route("/tarifas-comision")
+@permiso_required("manage_catalogs")
+def admin_tarifas_comision():
+    tarifas = TarifaComisionProducto.query.order_by(
+        TarifaComisionProducto.id.desc()
+    ).all()
+
+    return render_template(
+        "admin_tarifas_comision.html",
+        tarifas=tarifas
+    )
+
+
+@admin_bp.route("/tarifas-comision/nueva", methods=["GET"])
+@permiso_required("manage_catalogs")
+def nueva_tarifa_comision():
+    productos = Producto.query.filter_by(activo=True).all()
+    return render_template(
+        "admin_tarifa_comision_form.html",
+        productos=productos,
+        tarifa=None
+    )
+
+
+@admin_bp.route("/tarifas-comision/guardar", methods=["POST"])
+@permiso_required("manage_catalogs")
+def guardar_tarifa_comision():
+
+    id = request.form.get("id")
+
+    if id:
+        tarifa = TarifaComisionProducto.query.get(id)
+    else:
+        tarifa = TarifaComisionProducto()
+
+    tarifa.producto_id = request.form.get("producto_id")
+    tarifa.tipo_comision = request.form.get("tipo_comision")
+    tarifa.valor = request.form.get("valor")
+    tarifa.moneda = request.form.get("moneda")
+    tarifa.activo = True if request.form.get("activo") else False
+
+    db.session.add(tarifa)
+    db.session.commit()
+
+    return redirect(url_for("admin.admin_tarifas_comision"))
+
+
+@admin_bp.route("/tarifas-comision/editar/<int:id>")
+@permiso_required("manage_catalogs")
+def editar_tarifa_comision(id):
+    tarifa = TarifaComisionProducto.query.get_or_404(id)
+    productos = Producto.query.filter_by(activo=True).all()
+
+    return render_template(
+        "admin_tarifa_comision_form.html",
+        tarifa=tarifa,
+        productos=productos
+    )
+
+
+@admin_bp.route("/tarifas-comision/baja/<int:id>")
+@permiso_required("manage_catalogs")
+def baja_tarifa_comision(id):
+    tarifa = TarifaComisionProducto.query.get_or_404(id)
+    tarifa.activo = False
+    db.session.commit()
+
+    return redirect(url_for("admin.admin_tarifas_comision"))
